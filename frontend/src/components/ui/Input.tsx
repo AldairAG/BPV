@@ -22,9 +22,9 @@ export const Input: React.FC<InputProps> = ({
         <div className={twMerge("space-y-2", className)}>
             {label && (
                 <label
-                    className="text-sm font-medium leading-none 
-            peer-disabled:cursor-not-allowed 
-            peer-disabled:opacity-70 text-white"
+                    className={twMerge("text-sm font-medium leading-none" +
+                        "peer-disabled:cursor-not-allowed " +
+                        "peer-disabled:opacity-70 text-white",className)}
                     htmlFor={id}
                 >
                     {label}
@@ -42,7 +42,7 @@ export const Input: React.FC<InputProps> = ({
                     type={isSearch ? 'search' : props.type}
                     {...props}
                     className={twMerge(
-                        "flex h-10 w-full rounded-md border border-input px-3 py-2 text-base bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:text-sm",
+                        "flex h-10 w-full rounded-md border border-input px-3 py-2 text-base bg-transparent focus-visible:outline-none focus-visible:ring focus-visible:ring-ring focus-visible:ring-offset md:text-sm",
                         isSearch && "pl-10" // ← espacio para el ícono
                     )}
                 />

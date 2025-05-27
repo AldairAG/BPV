@@ -1,7 +1,7 @@
 import { CreditCardIcon, ListBulletIcon } from "@heroicons/react/24/outline";
 import { Input } from "../components/ui/Input";
 import { Badge, Card, CardContent, CardHead } from "../components/ui/Card";
-import ItemProductoCajero from "../components/items/ItemProductoCajero";
+import ItemProductoCajero from "../components/items/ItemProducto";
 import Carrito from "../components/carrito/Carrito";
 
 const UserLayout = () => {

@@ -7,10 +7,11 @@ export const USER_ROUTES={
 }
 
 export const ADMIN_ROUTES={
-    ADMIN: "/admin",
-    HOME: "/admin/inicio",
-    PRODUCTOS: "/admin/productos",
-    CATEGORIAS: "/admin/categorias",
-    USUARIOS: "/admin/usuarios",
-    REPORTES: "/admin/reportes",
+    ADMIN: "/admin/*",
+    HOME: "inicio",
+    PRODUCTOS: "productos",
+    CREAR_PRODUCTO: "crear-producto",
+    CATEGORIAS: "categorias",
+    USUARIOS: "usuarios",
+    REPORTES: "reportes",
 }

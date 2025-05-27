@@ -1,4 +1,4 @@
-type IconProps = React.SVGProps<SVGSVGElement>
+//type IconProps = React.SVGProps<SVGSVGElement>
 
-const LiquidoIcon: React.FC<IconProps> = (props) => {}
+//const LiquidoIcon: React.FC<IconProps> = (props) => {}
 

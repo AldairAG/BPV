@@ -5,6 +5,7 @@ import storage from 'redux-persist/lib/storage/session'; // Usar sessionStorage 
 import { combineReducers } from 'redux';
 
 import userReducer from './slices/userSlice'; // Importa el slice de auth con datos de ususario
+import categoriaReducer from './slices/categoriaSlice'; // Importa el slice de las categorias
 
 // Configuración de Redux-Persist
 const persistConfig = {
@@ -16,6 +17,7 @@ const persistConfig = {
 // Combina todos los reducers
 const rootReducer = combineReducers({
   user: userReducer,
+  categoria: categoriaReducer,
 });
 
 // Aplica persistencia al reducer combinado

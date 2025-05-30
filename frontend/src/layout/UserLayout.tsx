@@ -3,8 +3,11 @@ import { Input } from "../components/ui/Input";
 import { Badge, Card, CardContent, CardHead } from "../components/ui/Card";
 import ItemProductoCajero from "../components/items/ItemProducto";
 import Carrito from "../components/carrito/Carrito";
+import useUser from "../hooks/useUser";
 
 const UserLayout = () => {
+  const {logout } = useUser();
+
   return (
     <section>
       <header className="flex items-center justify-between h-16 bg-gray-900 
@@ -12,6 +15,7 @@ const UserLayout = () => {
         <h1 className="text-2xl font-bold text-sky-500">
           La Borbuja Feliz Manager
         </h1>
+        <button onClick={logout}>cerras sesion</button>
       </header>
 
       <main className="grid max-w-[1600px] w-full p-6">

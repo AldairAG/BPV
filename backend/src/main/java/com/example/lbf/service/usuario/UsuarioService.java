@@ -1,5 +1,6 @@
 package com.example.lbf.service.usuario;
 
+import com.example.lbf.dto.response.LoginResponse;
 import com.example.lbf.entities.Usuario;
 import com.example.lbf.entities.Venta;
 
@@ -13,7 +14,7 @@ public interface UsuarioService {
     Usuario getUsuarioById(Long usuarioId);
     Usuario getUsuarioByUsername(String username);
     List<Usuario> getAllUsuarios();
-    boolean validarCredenciales(String username, String contrasena);
+    LoginResponse validarCredenciales(String username, String contrasena);
     void actualizarUltimoAcceso(Long usuarioId, LocalDateTime fechaAcceso);
     List<Venta> getHistorialVentas(Long usuarioId);
     List<Usuario> getUsuariosByRol(String rol);

@@ -1,11 +1,8 @@
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../constants/routes";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { UserGroupIcon } from "@heroicons/react/24/outline";
 import { Boxes, ChartNoAxesCombined, Package } from "lucide-react";
-import Productos from "../page/admin/producto/Productos";
-import AddProducto from "../page/admin/producto/AddProducto";
-import Usuarios from "../page/admin/ususario/Usuarios";
 
 const AdminLayout = () => {
     const navigate = useNavigate();
@@ -28,7 +25,7 @@ const AdminLayout = () => {
                         Ventas
                     </button>
                     <button 
-                        onClick={() => handleNavigation(ADMIN_ROUTES.PRODUCTOS)} 
+                        onClick={() => handleNavigation(ADMIN_ROUTES.ADMIN)} 
                         className="flex gap-2 hover:bg-gray-700 px-3 py-1 rounded-md "
                     >
                         <Package className="h-5 w-5 text-sky-500" />
@@ -59,11 +56,7 @@ const AdminLayout = () => {
             </header>
 
             <div className="flex flex-1 overflow-hidden">
-                <Routes>
-                    <Route path={ADMIN_ROUTES.PRODUCTOS} Component={Productos} />
-                    <Route path={ADMIN_ROUTES.CREAR_PRODUCTO} Component={AddProducto} />
-                    <Route path={ADMIN_ROUTES.USUARIOS} Component={Usuarios} />
-                </Routes>
+                <Outlet/>
             </div>
 
         </section>

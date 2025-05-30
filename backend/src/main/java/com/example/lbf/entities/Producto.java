@@ -1,6 +1,9 @@
 package com.example.lbf.entities;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,9 +29,10 @@ public class Producto {
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
-    @JsonBackReference
+    @JsonBackReference("categoria-producto")
     private Categoria categoria;
 
     @OneToMany(mappedBy = "producto")
-    private java.util.List<ProductoVendido> productoVentas;
+    @JsonManagedReference("vendido-producto")
+    private List<ProductoVendido> productoVentas;
 }

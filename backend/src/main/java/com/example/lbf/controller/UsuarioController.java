@@ -1,5 +1,6 @@
 package com.example.lbf.controller;
 
+import com.example.lbf.dto.response.LoginResponse;
 import com.example.lbf.entities.Usuario;
 import com.example.lbf.entities.Venta;
 import com.example.lbf.service.usuario.UsuarioService;
@@ -124,22 +125,23 @@ public class UsuarioController {
     }
 
     @Operation(summary = "Iniciar sesión de usuario", 
-               description = "Valida las credenciales de un usuario y retorna sus datos si son correctas")
+               description = "Valida las credenciales de un usuario y retorna sus datos y el token si son correctas")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Credenciales válidas, sesión iniciada"),
         @ApiResponse(responseCode = "401", description = "Credenciales inválidas")
     })
     @PostMapping("/login")
-    public ResponseEntity<Usuario> login(
+    public ResponseEntity<LoginResponse> login(
             @Parameter(description = "Credenciales de inicio de sesión", required = true)
             @RequestBody LoginRequest loginRequest) {
-        boolean credencialesValidas = usuarioService.validarCredenciales(
+
+        LoginResponse loginResponse = usuarioService.validarCredenciales(
             loginRequest.getUsername(), loginRequest.getContrasena());
         
-        if (credencialesValidas) {
+        if (loginResponse.getSucces()) {
             Usuario usuario = usuarioService.getUsuarioByUsername(loginRequest.getUsername());
             usuarioService.actualizarUltimoAcceso(usuario.getId(), LocalDateTime.now());
-            return ResponseEntity.ok(usuario);
+            return ResponseEntity.ok(loginResponse);
         }
         
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

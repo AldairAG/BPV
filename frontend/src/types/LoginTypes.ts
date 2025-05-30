@@ -6,6 +6,6 @@ export type LoginRequest= {
 }
 
 export type LoginResponse ={
-  token?: string;
+  token?: string|null;
   usuario: UsuarioType;
 }

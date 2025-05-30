@@ -6,12 +6,16 @@ type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
     id: string;
     label?: string;
     className?: string;
+    classNameLabel?: string;
+    classNameInput?: string;
     variant?: 'default' | 'search'; // ← nueva variante
 };
 
 export const Input: React.FC<InputProps> = ({
     id,
     className,
+    classNameInput,
+    classNameLabel,
     label,
     variant = 'default',
     ...props
@@ -24,7 +28,7 @@ export const Input: React.FC<InputProps> = ({
                 <label
                     className={twMerge("text-sm font-medium leading-none" +
                         "peer-disabled:cursor-not-allowed " +
-                        "peer-disabled:opacity-70 text-white",className)}
+                        "peer-disabled:opacity-70 text-white",classNameLabel)}
                     htmlFor={id}
                 >
                     {label}
@@ -44,7 +48,7 @@ export const Input: React.FC<InputProps> = ({
                     className={twMerge(
                         "flex h-10 w-full rounded-md border border-input px-3 py-2 text-base bg-transparent focus-visible:outline-none focus-visible:ring focus-visible:ring-ring focus-visible:ring-offset md:text-sm",
                         isSearch && "pl-10" // ← espacio para el ícono
-                    )}
+                    , classNameInput)}
                 />
             </div>
         </div>

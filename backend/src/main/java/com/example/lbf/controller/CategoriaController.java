@@ -24,7 +24,7 @@ import java.util.List;
  * Proporciona endpoints para crear, actualizar, eliminar y consultar categorías.
  */
 @RestController
-@RequestMapping("/api/categorias")
+@RequestMapping("/lbf/categorias")
 @CrossOrigin(origins = "*")
 @Tag(name = "Categorías", description = "API para la gestión de categorías de productos")
 public class CategoriaController {

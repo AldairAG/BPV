@@ -7,7 +7,7 @@ export const USER_ROUTES={
 }
 
 export const ADMIN_ROUTES={
-    ADMIN: "/admin/*",
+    ADMIN: "/admin",
     HOME: "inicio",
     PRODUCTOS: "productos",
     CREAR_PRODUCTO: "crear-producto",

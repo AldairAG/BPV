@@ -1,5 +1,7 @@
 package com.example.lbf.service.usuario;
 
+import com.example.lbf.auth.AuthService;
+import com.example.lbf.dto.response.LoginResponse;
 import com.example.lbf.entities.Usuario;
 import com.example.lbf.entities.Venta;
 import com.example.lbf.repository.UsuarioRepository;
@@ -18,9 +20,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-    
+
     @Autowired
     private VentaRepository ventaRepository;
+
+    @Autowired
+    private AuthService authService;
 
     @Override
     @Transactional
@@ -67,13 +72,27 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean validarCredenciales(String username, String contrasena) {
+    public LoginResponse validarCredenciales(String username, String contrasena) {
         Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(username);
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-            return usuario.getContrasena().equals(contrasena) && usuario.getEstado();
+            // Generar un token JWT
+            String token = authService.authenticate(usuario, contrasena,
+                    usuario.getRol());
+
+            LoginResponse loginResponse = LoginResponse.builder()
+                    .token(token)
+                    .usuario(usuarioOpt.get())
+                    .succes(true)
+                    .build();
+
+            return loginResponse;
         }
-        return false;
+
+        return LoginResponse.builder()
+                .succes(false)
+                .build();
+
     }
 
     @Override

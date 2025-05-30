@@ -24,7 +24,7 @@ import java.util.List;
  * así como para gestionar el stock y buscar productos por diferentes criterios.
  */
 @RestController
-@RequestMapping("/api/productos")
+@RequestMapping("/lbf/productos")
 @CrossOrigin(origins = "*")
 @Tag(name = "Productos", description = "API para la gestión de productos del sistema")
 public class ProductoController {

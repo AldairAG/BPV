@@ -26,7 +26,7 @@ public class Venta {
     private Usuario usuario;
 
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference("vendido-venta")
     private List<ProductoVendido> productosVendidos;
 
     private BigDecimal total;

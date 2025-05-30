@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from './apiClient';
 import type { UsuarioType } from '../types/UsuarioType';
 import type { LoginRequest, LoginResponse } from '../types/LoginTypes';
@@ -70,11 +71,21 @@ export const UserService = {
    * @returns Los datos del usuario si las credenciales son válidas
    */
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await apiClient.post<UsuarioType>(`${BASE_URL}/login`, credentials);
-    return {
-      usuario: response.data,
-      // El token tendría que venir del backend si implementas JWT
-    };
+    try {
+      const response = await apiClient.post<LoginResponse>(`${BASE_URL}/login`, credentials);
+
+      // En el caso actual, el backend no devuelve un token, solo el usuario
+      // Si se implementa JWT en el futuro, el token vendría en la respuesta
+      return {
+        usuario: response.data.usuario,
+        token: response.data.token // O response.headers['authorization'] si implementas JWT
+      };
+    } catch (error: any) {
+      if (error.response && error.response.status === 401) {
+        throw new Error("Credenciales inválidas");
+      }
+      throw error;
+    }
   },
 
   /**

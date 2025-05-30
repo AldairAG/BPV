@@ -25,7 +25,7 @@ public class Categoria {
     private String color;
 
     @OneToMany(mappedBy = "categoria")
-    @JsonManagedReference
+    @JsonManagedReference("categoria-producto")
     private List<Producto> productos;
 
 }

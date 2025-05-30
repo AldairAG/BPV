@@ -1,5 +1,8 @@
 package com.example.lbf.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,10 +22,12 @@ public class ProductoVendido {
 
     @ManyToOne
     @JoinColumn(name = "venta_id")
+    @JsonBackReference("vendido-venta")
     private Venta venta;
 
     @ManyToOne
     @JoinColumn(name = "producto_id")
+    @JsonBackReference("vendido-producto")
     private Producto producto;
 
     private Float cantidad;

@@ -1,11 +1,14 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../constants/routes";
 import { ShoppingCartIcon, UserGroupIcon } from "@heroicons/react/24/outline";
-import { Boxes, ChartNoAxesCombined, Menu, Package, X } from "lucide-react";
+import { Boxes, ChartNoAxesCombined, LogOut, Menu, Package, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Button } from "../components/ui/Button";
+import useUser from "../hooks/useUser";
 
 const AdminLayout = () => {
     const navigate = useNavigate();
+    const { logout } = useUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -15,6 +18,13 @@ const AdminLayout = () => {
         // Cerrar el menú después de navegar en dispositivos móviles
         if (isMobile) {
             setIsMenuOpen(false);
+        }
+    };
+
+    // Manejar el cierre de sesión
+    const handleLogout = () => {
+        if (window.confirm("¿Está seguro que desea cerrar sesión?")) {
+            logout();
         }
     };
 
@@ -79,7 +89,7 @@ const AdminLayout = () => {
                 </button>
 
                 {/* Menú horizontal para escritorio */}
-                <div className="hidden md:flex flex-row items-center gap-2 ml-auto mr-4">
+                <div className="hidden md:flex flex-row items-center gap-2 ml-auto">
                     {navItems.map((item, index) => (
                         <button 
                             key={index}
@@ -90,6 +100,15 @@ const AdminLayout = () => {
                             <span>{item.label}</span>
                         </button>
                     ))}
+                    
+                    {/* Botón de cerrar sesión */}
+                    <Button 
+                        onClick={handleLogout}
+                        className="ml-4 mr-2"
+                    >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Cerrar sesión
+                    </Button>
                 </div>
             </header>
 
@@ -107,6 +126,15 @@ const AdminLayout = () => {
                                 <span>{item.label}</span>
                             </button>
                         ))}
+                        
+                        {/* Botón de cerrar sesión en móvil */}
+                        <button 
+                            onClick={handleLogout}
+                            className="flex gap-2 items-center text-red-400 hover:bg-red-900/20 px-3 py-3 rounded-md transition-colors mt-2 text-left"
+                        >
+                            <LogOut className="h-5 w-5" />
+                            <span>Cerrar sesión</span>
+                        </button>
                     </nav>
                 </div>
             )}

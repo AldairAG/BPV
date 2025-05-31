@@ -26,10 +26,16 @@ public class Producto {
     private String nombre;
     private Float precio;
     private Float stock;
+    private String codigoBarras;
+    private Float precioVenta;
+    private Float precioCompra;
+    private Float stockMinimo;
+    private String tipo;
+    private Boolean activo;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")
-    @JsonBackReference("categoria-producto")
+    //@JsonBackReference("categoria-producto")
     private Categoria categoria;
 
     @OneToMany(mappedBy = "producto")

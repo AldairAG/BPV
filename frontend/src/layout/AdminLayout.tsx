@@ -18,7 +18,7 @@ const AdminLayout = () => {
 
                 <div className="flex flex-row items-center gap-4 ml-auto mr-4">
                     <button 
-                        onClick={() => handleNavigation(ADMIN_ROUTES.HOME)} 
+                        onClick={() => handleNavigation(ADMIN_ROUTES.VENTAS_PANEL)} 
                         className="flex gap-2 hover:bg-gray-700 px-3 py-1 rounded-md "
                     >
                         <ShoppingCartIcon className="h-5 w-5 text-sky-500" />

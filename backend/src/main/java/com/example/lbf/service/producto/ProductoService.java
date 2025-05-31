@@ -1,12 +1,12 @@
 package com.example.lbf.service.producto;
 
 import com.example.lbf.entities.Producto;
-import com.example.lbf.entities.Categoria;
+import com.example.lbf.dto.request.NuevoProductoRequest;
 
 import java.util.List;
 
 public interface ProductoService {
-    Producto crearProducto(Producto producto);
+    Producto crearProducto(NuevoProductoRequest producto);
     Producto actualizarProducto(Producto producto);
     void eliminarProducto(Long productoId);
     Producto getProductoById(Long productoId);

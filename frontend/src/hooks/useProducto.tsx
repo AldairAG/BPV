@@ -96,6 +96,7 @@ export const useProducto = () => {
   const createProducto = async (producto: Omit<ProductoType, 'productoId'>): Promise<ProductoType | null> => {
     try {
       console.log('Creando producto:', producto);
+      
       const nuevoProducto = await ProductoService.crearProducto(producto);
       dispatch(addProducto(nuevoProducto));
       return nuevoProducto;

@@ -6,6 +6,11 @@ interface CardProps {
     className?: string
 }
 
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
+    children?: React.ReactNode;
+    className?: string;
+}
+
 const Card: React.FC<CardProps> = ({ children, className }) => {
     return (
         <div className={twMerge("bg-gray-800 shadow-md rounded-lg p-4 mb-4 space-x-2", className)}>
@@ -46,9 +51,9 @@ const CardContent: React.FC<CardProps> = ({ children, className }) => {
     )
 }
 
-const Badge: React.FC<CardProps> = ({ children, className }) => {
+const Badge: React.FC<BadgeProps> = ({ children, className, ...props }) => {
     return (
-        <span className={twMerge("text-xs font-semibold px-4 py-1 rounded-full bg-gray-700 text-white", className)}>
+        <span className={twMerge("text-xs font-semibold px-4 py-1 rounded-full bg-gray-700 text-white", className)} {...props}>
             {children}
         </span>
     )

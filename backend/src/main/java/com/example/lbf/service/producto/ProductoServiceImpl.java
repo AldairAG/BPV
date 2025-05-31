@@ -1,6 +1,7 @@
 package com.example.lbf.service.producto;
 
 import com.example.lbf.entities.Producto;
+import com.example.lbf.dto.request.NuevoProductoRequest;
 import com.example.lbf.entities.Categoria;
 import com.example.lbf.repository.ProductoRepository;
 import com.example.lbf.repository.CategoriaRepository;
@@ -23,8 +24,26 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Override
     @Transactional
-    public Producto crearProducto(Producto producto) {
-        return productoRepository.save(producto);
+    public Producto crearProducto(NuevoProductoRequest producto) {
+        // Verificar si la categoría existe
+        Optional<Categoria> categoriaOpt = categoriaRepository.findById(producto.getCategoria().getCategoriaId());
+        if (!categoriaOpt.isPresent()) {
+            throw new IllegalArgumentException("Categoría no encontrada");
+        }
+        Categoria categoria = categoriaOpt.get();
+        // Crear el nuevo producto
+        Producto nuevoProducto = new Producto();
+        nuevoProducto.setNombre(producto.getNombre());
+        nuevoProducto.setPrecio(producto.getPrecioVenta());
+        nuevoProducto.setStock(producto.getStock());
+        nuevoProducto.setCodigoBarras(producto.getCodigoBarras());
+        nuevoProducto.setPrecioVenta(producto.getPrecioVenta());
+        nuevoProducto.setPrecioCompra(producto.getPrecioCosto());
+        nuevoProducto.setStockMinimo(producto.getStockMinimo());
+        nuevoProducto.setActivo(producto.getActivo());
+        nuevoProducto.setCategoria(categoria);
+        // Guardar el producto en la base de datos
+        return productoRepository.save(nuevoProducto);
     }
 
     @Override

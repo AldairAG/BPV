@@ -9,7 +9,7 @@ import lombok.Setter;
 import jakarta.persistence.OneToMany;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Getter
@@ -25,7 +25,8 @@ public class Categoria {
     private String color;
 
     @OneToMany(mappedBy = "categoria")
-    @JsonManagedReference("categoria-producto")
+    //@JsonManagedReference("categoria-producto")
+    @JsonIgnore
     private List<Producto> productos;
 
 }

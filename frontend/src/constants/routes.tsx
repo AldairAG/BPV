@@ -8,6 +8,8 @@ export const USER_ROUTES={
 
 export const ADMIN_ROUTES={
     ADMIN: "/admin",
+    VENTAS: "ventas",
+    VENTAS_PANEL: "panel-ventas",
     HOME: "inicio",
     PRODUCTOS: "productos",
     CREAR_PRODUCTO: "crear-producto",

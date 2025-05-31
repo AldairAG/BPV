@@ -1,5 +1,6 @@
 package com.example.lbf.controller;
 
+import com.example.lbf.dto.request.NuevoProductoRequest;
 import com.example.lbf.entities.Producto;
 import com.example.lbf.service.producto.ProductoService;
 
@@ -42,7 +43,7 @@ public class ProductoController {
     @PostMapping
     public ResponseEntity<Producto> crearProducto(
             @Parameter(description = "Datos del producto a crear", required = true)
-            @RequestBody Producto producto) {
+            @RequestBody NuevoProductoRequest producto) {
         Producto nuevoProducto = productoService.crearProducto(producto);
         return new ResponseEntity<>(nuevoProducto, HttpStatus.CREATED);
     }

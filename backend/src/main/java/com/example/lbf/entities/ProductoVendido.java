@@ -31,6 +31,7 @@ public class ProductoVendido {
     private Producto producto;
 
     private Float cantidad;
+    private Float precioUnitario;
     private Float descuento;
     private Float subtotal;
 }

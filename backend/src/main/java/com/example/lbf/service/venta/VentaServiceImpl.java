@@ -3,12 +3,8 @@ package com.example.lbf.service.venta;
 import com.example.lbf.entities.Venta;
 import com.example.lbf.entities.Usuario;
 import com.example.lbf.entities.ProductoVendido;
-import com.example.lbf.entities.Producto;
 import com.example.lbf.repository.VentaRepository;
 import com.example.lbf.service.producto.ProductoService;
-import com.example.lbf.repository.ProductoRepository;
-import com.example.lbf.repository.ProductoVendidoRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,12 +19,6 @@ public class VentaServiceImpl implements VentaService {
 
     @Autowired
     private VentaRepository ventaRepository;
-    
-    @Autowired
-    private ProductoRepository productoRepository;
-    
-    @Autowired
-    private ProductoVendidoRepository productoVendidoRepository;
     
     @Autowired
     private ProductoService productoService;

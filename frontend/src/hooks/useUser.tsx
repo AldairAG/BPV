@@ -86,8 +86,6 @@ export const useUser = () => {
    * Verifica si el usuario tiene un rol específico
    */
   const hasRole = (role: string): boolean => {
-    console.log(`Verificando rol: ${role}, roles del usuario: ${roles}`);
-    
     return roles.includes(role);
   };
 

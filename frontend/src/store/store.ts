@@ -6,6 +6,7 @@ import { combineReducers } from 'redux';
 
 import userReducer from './slices/userSlice'; // Importa el slice de auth con datos de ususario
 import categoriaReducer from './slices/categoriaSlice'; // Importa el slice de las categorias
+import productoSlice from './slices/productoSlice'; // Importa el slice de productos
 
 // Configuración de Redux-Persist
 const persistConfig = {
@@ -18,6 +19,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   user: userReducer,
   categoria: categoriaReducer,
+  producto: productoSlice,
 });
 
 // Aplica persistencia al reducer combinado

@@ -1,63 +1,129 @@
-import { Droplets, Package, SquarePen, Trash2 } from "lucide-react";
+import { Droplets, Package, ShoppingCart, Plus, Check, SquarePen, Trash2 } from "lucide-react";
 import { Badge, Card } from "../ui/Card";
+import type { ProductoType } from "../../types/ProductoType";
 
-const ItemProductoCajero = () => {
+interface ItemProductoCajeroProps {
+    producto: ProductoType;
+    onAddToCart: () => void;
+    inCart?: boolean;
+    quantity?: number;
+}
+
+const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({ 
+    producto, 
+    onAddToCart, 
+    inCart = false,
+    quantity = 0
+}) => {
+    // Verificar si hay stock disponible
+    const outOfStock = producto.stock <= 0;
+    const lowStock = producto.stock <= producto.stockMinimo;
+
     return (
-        <Card className="rounded-lg border text-card-foreground shadow-sm 
-            overflow-hidden hover:shadow-md transition-shadow bg-gray-700
-            border-t-blue-500 p-2 border-t-5"
+        <Card className={`rounded-lg border text-card-foreground shadow-sm 
+            overflow-hidden transition-all bg-gray-700 border-0
+            ${inCart ? 'border-t-green-500 hover:shadow-green-600/20' : 'border-t-blue-500 hover:shadow-blue-600/20'} 
+            p-2 border-t-2 hover:shadow-lg relative`}
         >
+            {inCart && (
+                <div className="absolute -top-2 -right-2 rounded-full bg-green-500 p-1">
+                    <Check className="w-4 h-4 text-white" />
+                </div>
+            )}
+            
             <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
-                    <div className="p-2 rounded-full bg-white">
-                        <Droplets className="w-5 h-5 text-blue-700" />
+                    <div className={`p-2 rounded-full ${outOfStock ? 'bg-red-100' : 'bg-white'}`}>
+                        {producto.tipo === "Unidad" ? (
+                            <Package className={`w-5 h-5 ${outOfStock ? 'text-red-700' : 'text-blue-700'}`} />
+                        ) : (
+                            <Droplets className={`w-5 h-5 ${outOfStock ? 'text-red-700' : 'text-blue-700'}`} />
+                        )}
                     </div>
+                    
+                    {inCart && quantity > 0 && (
+                        <div className="bg-green-100 text-green-800 rounded-full px-2 py-1 text-xs font-bold">
+                            {quantity}
+                        </div>
+                    )}
                 </div>
 
-                <h3 className="font-medium text-lg mb-1 
-                    line-clamp-2">
-                    Detergente Multiusos
+                <h3 className="font-medium text-lg mb-1 line-clamp-2 text-white">
+                    {producto.nombre || "sin nombre"}
                 </h3>
 
                 <div className="flex justify-between items-center mb-2">
-                    <Badge className="bg-blue-100 text-blue-700">
-                        Limpiadores
+                    <Badge 
+                        className="bg-blue-100 text-blue-700"
+                        style={{ backgroundColor: producto.categoria?.color, color: '#fff' }}
+                    >
+                        {producto.categoria?.nombre || "Sin Categoría"}
                     </Badge>
-                    <p className="font-bold text-blue-700">
-                        $45.99
+                    <p className="font-bold text-blue-300">
+                        ${producto.precioVenta.toFixed(2) || "0.00"}
                     </p>
                 </div>
 
-                <div className="text-xs text-gray-500 mb-2">
+                <div className="text-xs text-gray-300 mb-2">
                     <div className="flex items-center gap-2">
-                        <Package className="w-3 h-3 text-gray-500" />
+                        <Package className="w-3 h-3 text-gray-300" />
                         <span className="text-sm">
-                            Unidad
+                            {producto.tipo || "sin unidad"}
                         </span>
                     </div>
                 </div>
 
-                <div className="text-xs text-gray-500 mb-3">
-                    Stock: 25 unidad
+                <div className={`text-xs mb-3 ${lowStock ? 'text-red-400' : 'text-gray-300'}`}>
+                    Stock: {producto.stock || "0"} {producto.tipo === "Unidad" ? "unidades" : "lt"}
+                    {lowStock && producto.stock > 0 && (
+                        <span className="ml-2 px-2 py-1 text-xs bg-red-900/30 text-red-400 rounded-full">
+                            Stock bajo
+                        </span>
+                    )}
+                    {outOfStock && (
+                        <span className="ml-2 px-2 py-1 text-xs bg-red-900/30 text-red-400 rounded-full">
+                            Sin stock
+                        </span>
+                    )}
                 </div>
-
             </div>
+            
             <div className="flex items-center p-3 pt-0">
-                <button className="text-white inline-flex items-center 
-                    justify-center gap-2 whitespace-nowrap text-sm 
-                    font-medium ring-offset-background transition-colors 
-                    focus-visible:outline-none focus-visible:ring-2 
-                    focus-visible:ring-ring focus-visible:ring-offset-2 
-                    disabled:pointer-events-none disabled:opacity-50 
-                    [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 
-                    [&amp;_svg]:shrink-0 bg-blue-700 text-primary-foreground 
-                    hover:bg-primary/90 h-9 rounded-md px-3 w-full">
-                    Agregar
-                </button>
+                {inCart ? (
+                    <button 
+                        onClick={onAddToCart}
+                        className="text-white inline-flex items-center 
+                            justify-center gap-2 whitespace-nowrap text-sm 
+                            font-medium transition-colors 
+                            focus-visible:outline-none
+                            bg-green-600 hover:bg-green-700
+                            h-9 rounded-md px-3 w-full"
+                        title="Agregar más unidades"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Agregar más
+                    </button>
+                ) : (
+                    <button 
+                        onClick={onAddToCart}
+                        disabled={outOfStock}
+                        className="text-white inline-flex items-center 
+                            justify-center gap-2 whitespace-nowrap text-sm 
+                            font-medium transition-colors 
+                            focus-visible:outline-none
+                            bg-blue-700 hover:bg-blue-800
+                            disabled:bg-gray-600 disabled:text-gray-400
+                            h-9 rounded-md px-3 w-full"
+                    >
+                        <ShoppingCart className="w-4 h-4" />
+                        {outOfStock ? "Sin stock" : "Agregar"}
+                    </button>
+                )}
             </div>
         </Card>
     );
 }
+
 export default ItemProductoCajero;
 
 export const ItemProducto = () => {

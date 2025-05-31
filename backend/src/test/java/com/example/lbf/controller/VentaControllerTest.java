@@ -29,7 +29,6 @@ import com.example.lbf.repository.CategoriaRepository;
 import com.example.lbf.repository.ProductoRepository;
 import com.example.lbf.repository.UsuarioRepository;
 import com.example.lbf.repository.VentaRepository;
-import com.example.lbf.controller.VentaController.VentaRequest;
 
 /**
  * Pruebas de integración para el controlador de Ventas.

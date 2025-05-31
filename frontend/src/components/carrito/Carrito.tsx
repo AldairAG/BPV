@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import { Trash2, MinusCircle, PlusCircle, ShoppingCart, Percent, CheckCircle } from "lucide-react";
+import { Trash2, MinusCircle, PlusCircle, ShoppingCart, Percent, CheckCircle, User, Search, Printer } from "lucide-react";
 import { useCarrito, type CarritoItem } from "../../hooks/useCarrito";
 import { Card, CardContent, CardHead, CardTittle } from "../ui/Card";
 import { Button } from "../ui/Button";
+import { Input } from "../ui/Input";
+import PrinterService from "../../service/PrinterService";
+import useUser from "../../hooks/useUser";
 
 interface CarritoProps {
     items: CarritoItem[];
@@ -13,7 +16,6 @@ interface CarritoProps {
     onClearCart: () => void;
     onProcessPurchase: () => Promise<void>;
 }
-
 
 const Carrito: React.FC<CarritoProps> = ({
     items,
@@ -27,7 +29,20 @@ const Carrito: React.FC<CarritoProps> = ({
     const [updatingId, setUpdatingId] = useState<number | null>(null);
     const [descuentos, setDescuentos] = useState<Record<number, number>>({});
     const [ventaCompletada, setVentaCompletada] = useState(false);
-    const {procesarVenta}=useCarrito();
+    const [nombreCliente, setNombreCliente] = useState("");
+    const [clienteBuscando, setClienteBuscando] = useState(false);
+    const [imprimiendo, setImprimiendo] = useState(false);
+    const [errorImpresion, setErrorImpresion] = useState<string | null>(null);
+    
+    const {
+        procesarVenta, 
+        buscarOCrearCliente, 
+        clienteSeleccionado,
+        seleccionarCliente
+    } = useCarrito();
+    
+    const { user } = useUser();
+    
     const [detallesVenta, setDetallesVenta] = useState({
         total: 0,
         timestamp: ""
@@ -84,12 +99,39 @@ const Carrito: React.FC<CarritoProps> = ({
             [productoId]: descuentoLimitado
         }));
     };
+    
+    // Buscar o crear cliente
+    const handleBuscarCliente = async () => {
+        if (!nombreCliente.trim()) {
+            seleccionarCliente(null);
+            return;
+        }
+        
+        setClienteBuscando(true);
+        try {
+            await buscarOCrearCliente(nombreCliente);
+        } finally {
+            setClienteBuscando(false);
+        }
+    };
+    
+    // Limpiar cliente seleccionado
+    const handleLimpiarCliente = () => {
+        seleccionarCliente(null);
+        setNombreCliente("");
+    };
 
     // Procesar la compra
     const handleProcessPurchase = async () => {
         if (!isEmpty && !loading) {
             try {
+                // Si hay un nombre de cliente pero no está seleccionado, intentar buscarlo o crearlo
+                if (nombreCliente.trim() && !clienteSeleccionado) {
+                    await buscarOCrearCliente(nombreCliente);
+                }
+                
                 await onProcessPurchase();
+                
                 // Guardar detalles para mostrar en la confirmación
                 setDetallesVenta({
                     total: totalFinal,
@@ -98,11 +140,55 @@ const Carrito: React.FC<CarritoProps> = ({
 
                 // Procesar la venta
                 await procesarVenta(includeIVA);
+                
                 // Mostrar mensaje de éxito
                 setVentaCompletada(true);
+                
+                // Limpiar cliente seleccionado
+                seleccionarCliente(null);
+                setNombreCliente("");
             } catch (error) {
                 console.error("Error al procesar la venta:", error);
             }
+        }
+    };
+
+    // Función para imprimir ticket
+    const handlePrintTicket = async () => {
+        if (!ventaCompletada) return;
+        
+        setImprimiendo(true);
+        setErrorImpresion(null);
+        
+        try {
+            // Generar número de ticket único
+            const ticketNumber = `${Date.now().toString().slice(-6)}`;
+            
+            // Preparar datos para impresión
+            const ticketData = {
+                ticketNumber,
+                items,
+                subtotal,
+                iva,
+                total: totalFinal,
+                cliente: clienteSeleccionado,
+                fecha: new Date().toLocaleString(),
+                vendedor: user?.nombre || 'Usuario Sistema',
+                conIva: includeIVA,
+                descuentos
+            };
+            
+            // Imprimir ticket
+            const success = await PrinterService.printTicket(ticketData);
+            
+            if (!success) {
+                setErrorImpresion("No se pudo imprimir el ticket. Verifique la conexión con la impresora.");
+            }
+        } catch (error) {
+            console.error("Error al imprimir ticket:", error);
+            setErrorImpresion("Error al imprimir ticket: " + (error instanceof Error ? error.message : "Error desconocido"));
+        } finally {
+            setImprimiendo(false);
         }
     };
 
@@ -128,7 +214,66 @@ const Carrito: React.FC<CarritoProps> = ({
             </CardHead>
 
             <CardContent className="flex flex-col gap-4 p-4">
-                {/* Mensaje de venta completada */}
+                {/* Sección para asignar cliente */}
+                {!isEmpty && !ventaCompletada && (
+                    <div className="border border-gray-700 rounded-lg p-3 bg-gray-750">
+                        <h3 className="text-sm font-medium flex items-center gap-2 mb-2">
+                            <User className="h-4 w-4 text-blue-400" />
+                            Cliente
+                        </h3>
+                        
+                        {clienteSeleccionado ? (
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <span className="text-sm font-medium">{clienteSeleccionado.nombre}</span>
+                                    <span className="text-xs text-gray-400 ml-2">
+                                        ID: {clienteSeleccionado.idCliente}
+                                    </span>
+                                </div>
+                                <Button 
+                                    className="text-xs bg-transparent hover:bg-gray-700 text-gray-400"
+                                    onClick={handleLimpiarCliente}
+                                >
+                                    Cambiar
+                                </Button>
+                            </div>
+                        ) : (
+                            <div className="flex gap-2">
+                                <Input
+                                    id="nombreCliente"
+                                    type="text"
+                                    placeholder="Nombre del cliente"
+                                    value={nombreCliente}
+                                    onChange={(e) => setNombreCliente(e.target.value)}
+                                    className="flex-1"
+                                    disabled={loading || clienteBuscando}
+                                />
+                                <Button
+                                    onClick={handleBuscarCliente}
+                                    disabled={loading || clienteBuscando || !nombreCliente.trim()}
+                                    className="bg-blue-600 hover:bg-blue-700"
+                                >
+                                    {clienteBuscando ? (
+                                        <span className="flex items-center gap-1">
+                                            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Buscando
+                                        </span>
+                                    ) : (
+                                        <span className="flex items-center gap-1">
+                                            <Search className="h-4 w-4" />
+                                            Buscar
+                                        </span>
+                                    )}
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Mensaje de venta completada con botón de impresión */}
                 {ventaCompletada && (
                     <div className="flex flex-col items-center justify-center py-8 text-center border border-green-500 bg-green-900/20 rounded-lg mb-4">
                         <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
@@ -136,19 +281,55 @@ const Carrito: React.FC<CarritoProps> = ({
                         <p className="text-gray-300 mt-2">
                             Total: <span className="font-bold">${detallesVenta.total.toFixed(2)}</span>
                         </p>
+                        {clienteSeleccionado && (
+                            <p className="text-gray-300 mt-1">
+                                Cliente: <span className="font-medium">{clienteSeleccionado.nombre}</span>
+                            </p>
+                        )}
                         <p className="text-gray-400 text-sm mt-1">
                             {detallesVenta.timestamp}
                         </p>
-                        <Button 
-                            className="mt-6 bg-green-600 hover:bg-green-700 text-white"
-                            onClick={() => {
-                                setVentaCompletada(false);
-                                // Esto es opcional, por si quieres comenzar una nueva venta
-                                onClearCart();
-                            }}
-                        >
-                            Realizar nueva venta
-                        </Button>
+                        
+                        {/* Botón para imprimir ticket */}
+                        <div className="flex flex-col gap-2 w-full max-w-xs mt-6">
+                            <Button 
+                                onClick={handlePrintTicket}
+                                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
+                                disabled={imprimiendo}
+                            >
+                                {imprimiendo ? (
+                                    <>
+                                        <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Imprimiendo...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Printer className="h-4 w-4" />
+                                        Imprimir ticket
+                                    </>
+                                )}
+                            </Button>
+                            
+                            <Button 
+                                className="bg-green-600 hover:bg-green-700 text-white"
+                                onClick={() => {
+                                    setVentaCompletada(false);
+                                    onClearCart();
+                                }}
+                            >
+                                Realizar nueva venta
+                            </Button>
+                        </div>
+                        
+                        {/* Mensaje de error de impresión */}
+                        {errorImpresion && (
+                            <div className="mt-4 p-3 bg-red-900/20 border border-red-500 rounded text-red-300 text-sm w-full max-w-xs">
+                                {errorImpresion}
+                            </div>
+                        )}
                     </div>
                 )}
 

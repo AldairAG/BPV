@@ -31,6 +31,7 @@ export interface ProductoVendidoType {
  */
 export interface VentaRequest {
   usuarioId: number;
+  clienteId?: number | null;  // Agregar campo para el ID del cliente
   productos: ProductoVendidoType[];
   conIva: boolean;
 }

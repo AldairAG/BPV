@@ -25,6 +25,12 @@ public class Venta {
     @JsonBackReference
     private Usuario usuario;
 
+    // Agregar relación muchos a uno con Cliente
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    @JsonBackReference("cliente-venta")
+    private Cliente cliente;
+
     @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL)
     @JsonManagedReference("vendido-venta")
     private List<ProductoVendido> productosVendidos;

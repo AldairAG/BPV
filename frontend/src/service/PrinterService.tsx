@@ -130,41 +130,42 @@ export const PrinterService = {
       // Unir todos los comandos en un solo string
       const commandString = commands.join('');
       
-      // Enviar a la impresora Elegate IM09
-      // Esto depende de cómo esté configurada la impresora en el sistema
-      // Ejemplo usando la API Web Serial (requiere permisos)
+      // Enviar a la impresora por USB
       if ('serial' in navigator) {
-        // Solicitar acceso a la impresora a través del puerto serie
-        const port = await navigator.serial.requestPort();
-        await port.open({ baudRate: 9600 }); // La velocidad puede variar según la configuración
-        
-        // Convertir comandos a Uint8Array
-        const encoder = new TextEncoder();
-        const data = encoder.encode(commandString);
-        
-        // Enviar datos a la impresora
-        const writer = port.writable.getWriter();
-        await writer.write(data);
-        writer.releaseLock();
-        
-        // Cerrar puerto
-        await port.close();
-        
-        return true;
+        try {
+          // Solicitar acceso a la impresora a través del puerto serie USB
+          const port = await navigator.serial.requestPort();
+          
+          // Ajusta estos parámetros según la configuración de tu impresora
+          // Común para impresoras térmicas: 9600, pero puede variar (19200, 38400, etc.)
+          await port.open({ 
+            baudRate: 9600,
+            dataBits: 8,
+            stopBits: 1,
+            parity: 'none',
+            flowControl: 'none'
+          });
+          
+          // Convertir comandos a Uint8Array
+          const encoder = new TextEncoder();
+          const data = encoder.encode(commandString);
+          
+          // Enviar datos a la impresora
+          const writer = port.writable.getWriter();
+          await writer.write(data);
+          writer.releaseLock();
+          
+          // Cerrar puerto
+          await port.close();
+          
+          return true;
+        } catch (err) {
+          console.error('Error específico al conectar con impresora USB:', err);
+          throw new Error(`No se pudo conectar con la impresora USB: ${err.message}`);
+        }
       } else {
-        // Alternativa: enviar a través de un servicio de backend
-        // que maneje la comunicación con la impresora
-        console.warn('API Web Serial no disponible, intente usar el backend');
-        
-        // Código para enviar al backend (implementar según tu arquitectura)
-        // const response = await fetch('/api/print-ticket', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify({ commands: commandString })
-        // });
-        // return response.ok;
-        
-        throw new Error('Impresión no disponible en este navegador');
+        // Mensaje más claro sobre compatibilidad
+        throw new Error('La impresión USB directa solo está disponible en Chrome/Edge y en conexiones seguras (HTTPS o localhost)');
       }
     } catch (error) {
       console.error('Error al imprimir ticket:', error);

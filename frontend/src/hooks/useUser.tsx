@@ -115,6 +115,8 @@ export const useUser = () => {
    */
   const createUser = async (userData: UsuarioType): Promise<UsuarioType | null> => {
     try {
+      console.log('Creating user with data:', userData);
+      userData.id=null;
       const newUser = await UserService.crearUsuario(userData);
       return newUser;
     } catch (error: any) {

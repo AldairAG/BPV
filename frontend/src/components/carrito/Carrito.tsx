@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Trash2, MinusCircle, PlusCircle, ShoppingCart, Percent, CheckCircle } from "lucide-react";
-import type { CarritoItem } from "../../hooks/useCarrito";
+import { useCarrito, type CarritoItem } from "../../hooks/useCarrito";
 import { Card, CardContent, CardHead, CardTittle } from "../ui/Card";
 import { Button } from "../ui/Button";
 
@@ -27,6 +27,7 @@ const Carrito: React.FC<CarritoProps> = ({
     const [updatingId, setUpdatingId] = useState<number | null>(null);
     const [descuentos, setDescuentos] = useState<Record<number, number>>({});
     const [ventaCompletada, setVentaCompletada] = useState(false);
+    const {procesarVenta}=useCarrito();
     const [detallesVenta, setDetallesVenta] = useState({
         total: 0,
         timestamp: ""
@@ -94,6 +95,9 @@ const Carrito: React.FC<CarritoProps> = ({
                     total: totalFinal,
                     timestamp: new Date().toLocaleString()
                 });
+
+                // Procesar la venta
+                await procesarVenta(includeIVA);
                 // Mostrar mensaje de éxito
                 setVentaCompletada(true);
             } catch (error) {

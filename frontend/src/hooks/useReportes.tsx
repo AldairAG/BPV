@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useCallback } from 'react';
-import ReporteService, { 
-  type ProductoVenta, 
-  type UsuarioVenta, 
-  type CategoriaVenta, 
+import ReporteService, {
+  type ProductoVenta,
+  type UsuarioVenta,
+  type CategoriaVenta,
   type VentaDiaria,
   type VentaMensual,
   type ProductoStock
@@ -21,7 +21,7 @@ const useReportes = () => {
   const [ventasMensuales, setVentasMensuales] = useState<VentaMensual[]>([]);
   const [productosBajoStock, setProductosBajoStock] = useState<ProductoStock[]>([]);
   const [ingresoTotal, setIngresoTotal] = useState<number>(0);
-  
+
   // Estado para manejar carga y errores
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +30,7 @@ const useReportes = () => {
    * Cargar productos más vendidos
    */
   const cargarProductosMasVendidos = useCallback(async (
-    fechaInicio: string, 
+    fechaInicio: string,
     fechaFin: string,
     limite: number = 10
   ) => {
@@ -38,8 +38,7 @@ const useReportes = () => {
       setLoading(true);
       setError(null);
       const data = await ReporteService.getProductosMasVendidos(fechaInicio, fechaFin, limite);
-      console.log('Productos más vendidos:', data);
-      
+
       setProductosMasVendidos(data);
       return data;
     } catch (err: any) {
@@ -54,7 +53,7 @@ const useReportes = () => {
    * Cargar ventas por usuario
    */
   const cargarVentasPorUsuario = useCallback(async (
-    fechaInicio: string, 
+    fechaInicio: string,
     fechaFin: string
   ) => {
     try {
@@ -75,7 +74,7 @@ const useReportes = () => {
    * Cargar ventas por categoría
    */
   const cargarVentasPorCategoria = useCallback(async (
-    fechaInicio: string, 
+    fechaInicio: string,
     fechaFin: string
   ) => {
     try {
@@ -96,7 +95,7 @@ const useReportes = () => {
    * Cargar ventas diarias
    */
   const cargarVentasDiarias = useCallback(async (
-    fechaInicio: string, 
+    fechaInicio: string,
     fechaFin: string
   ) => {
     try {
@@ -153,7 +152,7 @@ const useReportes = () => {
    * Calcular ingreso total
    */
   const calcularIngresoTotal = useCallback(async (
-    fechaInicio: string, 
+    fechaInicio: string,
     fechaFin: string
   ) => {
     try {
@@ -177,7 +176,7 @@ const useReportes = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Ejecutar todas las solicitudes en paralelo
       const [
         ventasHoy,
@@ -186,7 +185,8 @@ const useReportes = () => {
         productosBajo,
         ventasUltimaSemana,
         ventasMesActual,
-        ventasAnuales
+        ventasAnuales,
+        productosMasVendidos
       ] = await Promise.all([
         ReporteService.getVentasHoy(),
         ReporteService.getVentasSemanaActual(),
@@ -194,15 +194,17 @@ const useReportes = () => {
         ReporteService.getProductosBajoStock(),
         ReporteService.getVentasUltimaSemana(),
         ReporteService.getVentasMesActual(),
-        ReporteService.getVentasAñoActual()
+        ReporteService.getVentasAñoActual(),
+        ReporteService.getProductosMasVendidos('1970-01-01', '2100-12-31', 10) // Todos los tiempos
       ]);
-      
+
       // Actualizar todos los estados
       setIngresoTotal(ventasHoy);
       setProductosBajoStock(productosBajo);
       setVentasDiarias(ventasUltimaSemana);
       setVentasMensuales(ventasAnuales);
-      
+      setProductosMasVendidos(productosMasVendidos);
+
       // Devolver los datos como un objeto para facilitar su uso
       return {
         ventasHoy,
@@ -216,7 +218,7 @@ const useReportes = () => {
     } catch (err: any) {
       setError('Error al cargar dashboard');
       console.log('Error al cargar dashboard:', err);
-      
+
       return null;
     } finally {
       setLoading(false);
@@ -235,14 +237,14 @@ const useReportes = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const blob = await ReporteService.descargarReporte(
-        tipoReporte, 
-        fechaInicio, 
-        fechaFin, 
+        tipoReporte,
+        fechaInicio,
+        fechaFin,
         formato
       );
-      
+
       // Crear URL para el blob y descargar
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -252,7 +254,7 @@ const useReportes = () => {
       a.click();
       window.URL.revokeObjectURL(url);
       a.remove();
-      
+
       return true;
     } catch (err: any) {
       setError(err.message || 'Error al descargar reporte');
@@ -273,7 +275,7 @@ const useReportes = () => {
     ingresoTotal,
     loading,
     error,
-    
+
     // Métodos para cargar datos
     cargarProductosMasVendidos,
     cargarVentasPorUsuario,

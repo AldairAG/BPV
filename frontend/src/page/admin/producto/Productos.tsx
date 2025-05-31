@@ -10,11 +10,12 @@ import useProducto from "../../../hooks/useProducto";
 import useCategoria from "../../../hooks/useCategoria";
 import type { ProductoType } from "../../../types/ProductoType";
 import type { CategoriaType } from "../../../types/CategoriaType";
+import { TIPOS_PRODUCTO } from "../../../constants/tipoProducto";
 
 // Tipos de unidades disponibles
 const TIPOS_UNIDAD = [
-    { value: "Unidad", label: "Por pieza/unidad" },
-    { value: "Líquido", label: "A granel - Líquido (litros)" },
+    { value: TIPOS_PRODUCTO.PIEZA, label: "Por pieza/unidad" },
+    { value: TIPOS_PRODUCTO.GRANEL, label: "A granel (litros)" },
 ];
 
 // Esquema de validación para el formulario de producto

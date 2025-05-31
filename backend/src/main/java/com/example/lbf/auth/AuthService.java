@@ -20,7 +20,7 @@ public class AuthService {
 
     public String authenticate(Usuario usuario, String password, String rol) {
 
-        if (!usuario.getContrasena().equals(password) || !usuario.getEstado()) {
+        if (!usuario.getContrasena().equals(password) || !usuario.getActivo()) {
             throw new RuntimeException("inicio de sesión fallido: usuario o contraseña incorrectos");
         }
 

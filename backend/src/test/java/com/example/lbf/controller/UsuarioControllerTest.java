@@ -43,7 +43,7 @@ public class UsuarioControllerTest extends BaseIntegrationTest {
         admin.setContrasena("admin123");
         admin.setNombre("Administrador");
         admin.setRol("ADMIN");
-        admin.setEstado(true);
+        admin.setActivo(true);
         admin.setUltimoAcceso(LocalDateTime.now());
         
         Usuario vendedor = new Usuario();
@@ -51,7 +51,7 @@ public class UsuarioControllerTest extends BaseIntegrationTest {
         vendedor.setContrasena("vend123");
         vendedor.setNombre("Vendedor Prueba");
         vendedor.setRol("VENDEDOR");
-        vendedor.setEstado(true);
+        vendedor.setActivo(true);
         vendedor.setUltimoAcceso(LocalDateTime.now());
         
         usuarioRepository.saveAll(Arrays.asList(admin, vendedor));
@@ -160,7 +160,7 @@ public class UsuarioControllerTest extends BaseIntegrationTest {
         
         // Verificar que el usuario ha sido desactivado
         Usuario deactivated = usuarioRepository.findById(usuarioId).orElseThrow();
-        assert deactivated.getEstado() == false;
+        assert deactivated.getActivo() == false;
     }
     
     @Test

@@ -30,7 +30,19 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public Usuario crearUsuario(Usuario usuario) {
-        usuario.setEstado(true);
+        // Verificar si ya existen 2 sucursales
+        long sucursalesCount = usuarioRepository.countDistinctSucursal();
+        if (sucursalesCount >= 2 && usuarioRepository.countBySucursal(usuario.getSucursal()) == 0) {
+            throw new IllegalStateException("No se pueden crear más de 2 sucursales.");
+        }
+
+        // Verificar si ya existen 3 usuarios en la sucursal
+        long usuariosEnSucursal = usuarioRepository.countBySucursal(usuario.getSucursal());
+        if (usuariosEnSucursal >= 3) {
+            throw new IllegalStateException("No se pueden crear más de 3 usuarios por sucursal.");
+        }
+
+        usuario.setActivo(true);
         usuario.setUltimoAcceso(LocalDateTime.now());
         return usuarioRepository.save(usuario);
     }
@@ -47,7 +59,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         Optional<Usuario> usuarioOpt = usuarioRepository.findById(usuarioId);
         if (usuarioOpt.isPresent()) {
             Usuario usuario = usuarioOpt.get();
-            usuario.setEstado(false);
+            usuario.setActivo(false);
             usuarioRepository.save(usuario);
         }
     }

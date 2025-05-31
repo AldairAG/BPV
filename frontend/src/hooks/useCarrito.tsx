@@ -204,7 +204,6 @@ export const useCarrito = () => {
         setError('Debes iniciar sesión para realizar una venta');
         return null;
       }
-      
       // Verificar que haya productos en el carrito
       if (carritoItems.length === 0) {
         setError('El carrito está vacío');

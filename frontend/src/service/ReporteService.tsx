@@ -57,9 +57,6 @@ const ReporteService = {
       params: { fechaInicio, fechaFin, limite }
     });
 
-    console.log('Productos más vendidos:', response.data);
-    
-
     // Transformar el objeto de respuesta a un array de objetos ProductoVenta
     return response.data
   },
@@ -79,13 +76,7 @@ const ReporteService = {
     });
 
     // Transformar el objeto de respuesta a un array de objetos UsuarioVenta
-    return Object.entries(response.data).map(([usuarioKey, total]) => {
-      const usuario = JSON.parse(usuarioKey) as UsuarioType;
-      return {
-        usuario,
-        total: parseFloat(total as string)
-      };
-    });
+    return response.data
   },
 
   /**
@@ -103,10 +94,7 @@ const ReporteService = {
     });
 
     // Transformar el objeto de respuesta a un array de objetos CategoriaVenta
-    return Object.entries(response.data).map(([categoria, total]) => ({
-      categoria,
-      total: parseFloat(total as string)
-    }));
+    return response.data
   },
 
   /**
@@ -124,10 +112,7 @@ const ReporteService = {
     });
 
     // Transformar el objeto de respuesta a un array de objetos VentaDiaria
-    return Object.entries(response.data).map(([fecha, total]) => ({
-      fecha,
-      total: parseFloat(total as string)
-    }));
+    return response.data
   },
 
   /**
@@ -141,10 +126,7 @@ const ReporteService = {
     });
 
     // Transformar el objeto de respuesta a un array de objetos VentaMensual
-    return Object.entries(response.data).map(([mes, total]) => ({
-      mes: parseInt(mes),
-      total: parseFloat(total as string)
-    }));
+    return response.data
   },
 
   /**
@@ -170,13 +152,7 @@ const ReporteService = {
   getProductosBajoStock: async (): Promise<ProductoStock[]> => {
     const response = await apiClient.get(`${BASE_URL}/productos-bajo-stock`);
     // Transformar el objeto de respuesta a un array de objetos ProductoStock
-    return Object.entries(response.data).map(([productoKey, porcentaje]) => {
-      const producto = JSON.parse(productoKey) as ProductoType;
-      return {
-        producto,
-        porcentajeStock: parseFloat(porcentaje as string)
-      };
-    });
+    return response.data
   },
 
   /**

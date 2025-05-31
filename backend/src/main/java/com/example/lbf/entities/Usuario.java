@@ -29,9 +29,11 @@ public class Usuario {
 
     private LocalDateTime ultimoAcceso;
 
-    private Boolean estado;
+    private Boolean activo;
 
     private String rol;
+
+    private String sucursal;
 
     @OneToMany(mappedBy = "usuario")
     @JsonManagedReference

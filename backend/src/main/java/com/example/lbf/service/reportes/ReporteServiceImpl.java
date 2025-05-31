@@ -60,20 +60,24 @@ public class ReporteServiceImpl implements ReporteService {
     public List<VentaPorUsuarioDTO> getVentasPorUsuario(LocalDate fechaInicio, LocalDate fechaFin) {
         List<Venta> ventas = ventaRepository.findByFechaBetween(fechaInicio, fechaFin);
 
-        Map<Usuario, BigDecimal> ventasPorUsuario = new HashMap<>();
+        Map<Usuario, BigDecimal> ventasPorUsuarioMap = new HashMap<>();
 
         for (Venta venta : ventas) {
             Usuario usuario = venta.getUsuario();
             BigDecimal total = venta.getTotal();
 
-            ventasPorUsuario.put(usuario,
-                    ventasPorUsuario.getOrDefault(usuario, BigDecimal.ZERO).add(total));
+            ventasPorUsuarioMap.put(usuario,
+                    ventasPorUsuarioMap.getOrDefault(usuario, BigDecimal.ZERO).add(total));
         }
 
         // Convertir el Map a una lista de DTOs
-        return ventasPorUsuario.entrySet().stream()
-                .map(entry -> new VentaPorUsuarioDTO(entry.getKey(), entry.getValue()))
-                .collect(Collectors.toList());
+        List<VentaPorUsuarioDTO> ventasPorUsuario = new ArrayList<>();
+        
+        for (Map.Entry<Usuario, BigDecimal> entry : ventasPorUsuarioMap.entrySet()) {
+            ventasPorUsuario.add(new VentaPorUsuarioDTO(entry.getKey(), entry.getValue()));
+        }
+        
+        return ventasPorUsuario;
     }
 
     @Override
@@ -101,21 +105,27 @@ public class ReporteServiceImpl implements ReporteService {
     public List<VentaDiariaDTO> getVentasDiarias(LocalDate fechaInicio, LocalDate fechaFin) {
         List<Venta> ventas = ventaRepository.findByFechaBetween(fechaInicio, fechaFin);
 
-        Map<LocalDate, BigDecimal> ventasDiarias = new HashMap<>();
+        Map<LocalDate, BigDecimal> ventasDiariasMap = new HashMap<>();
 
         for (Venta venta : ventas) {
             LocalDate fecha = venta.getFecha();
             BigDecimal total = venta.getTotal();
 
-            ventasDiarias.put(fecha,
-                    ventasDiarias.getOrDefault(fecha, BigDecimal.ZERO).add(total));
+            ventasDiariasMap.put(fecha,
+                    ventasDiariasMap.getOrDefault(fecha, BigDecimal.ZERO).add(total));
         }
 
         // Convertir el Map a una lista de DTOs
-        return ventasDiarias.entrySet().stream()
-                .map(entry -> new VentaDiariaDTO(entry.getKey(), entry.getValue()))
-                .sorted((a, b) -> a.getFecha().compareTo(b.getFecha())) // Ordenar por fecha
-                .collect(Collectors.toList());
+        List<VentaDiariaDTO> ventasDiarias = new ArrayList<>();
+        
+        for (Map.Entry<LocalDate, BigDecimal> entry : ventasDiariasMap.entrySet()) {
+            ventasDiarias.add(new VentaDiariaDTO(entry.getKey(), entry.getValue()));
+        }
+        
+        // Ordenar por fecha
+        ventasDiarias.sort((a, b) -> a.getFecha().compareTo(b.getFecha()));
+        
+        return ventasDiarias;
     }
 
     @Override
@@ -126,21 +136,27 @@ public class ReporteServiceImpl implements ReporteService {
 
         List<Venta> ventas = ventaRepository.findByFechaBetween(inicioAño, finAño);
 
-        Map<Integer, BigDecimal> ventasMensuales = new HashMap<>();
+        Map<Integer, BigDecimal> ventasMensualesMap = new HashMap<>();
 
         for (Venta venta : ventas) {
             int mes = venta.getFecha().getMonthValue();
             BigDecimal total = venta.getTotal();
 
-            ventasMensuales.put(mes,
-                    ventasMensuales.getOrDefault(mes, BigDecimal.ZERO).add(total));
+            ventasMensualesMap.put(mes,
+                    ventasMensualesMap.getOrDefault(mes, BigDecimal.ZERO).add(total));
         }
 
         // Convertir el Map a una lista de DTOs
-        return ventasMensuales.entrySet().stream()
-                .map(entry -> new VentaMensualDTO(entry.getKey(), entry.getValue()))
-                .sorted((a, b) -> Integer.compare(a.getMes(), b.getMes())) // Ordenar por mes
-                .collect(Collectors.toList());
+        List<VentaMensualDTO> ventasMensuales = new ArrayList<>();
+        
+        for (Map.Entry<Integer, BigDecimal> entry : ventasMensualesMap.entrySet()) {
+            ventasMensuales.add(new VentaMensualDTO(entry.getKey(), entry.getValue()));
+        }
+        
+        // Ordenar por mes
+        ventasMensuales.sort((a, b) -> Integer.compare(a.getMes(), b.getMes()));
+        
+        return ventasMensuales;
     }
 
     @Override

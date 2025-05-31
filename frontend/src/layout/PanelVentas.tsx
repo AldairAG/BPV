@@ -86,16 +86,33 @@ const PanelVentas = () => {
   };
 
   // Función para agregar producto al carrito
-  const handleAddToCart = async (producto: ProductoType) => {
-    const success = await addToCart(producto);
-    if (success) {
-      toast.success(`${producto.nombre} agregado al carrito`);
+  const handleAddToCart = async (producto: ProductoType, cantidad?: number) => {
+    try {
+      // Si es un producto a granel (líquido) y no se proporciona cantidad,
+      // el componente ItemProductoCajero se encargará de mostrar el modal
+      // y luego llamará de nuevo a esta función con la cantidad seleccionada
+      
+      const success = await addToCart(producto, cantidad);
+      console.log(`Producto agregado al carrito: ${producto.nombre}, Cantidad: ${cantidad}`);
+      
+      
+      if (success) {
+        // Personalizar mensaje según tipo de producto
+        const mensaje = producto.tipo === "Liquido" && cantidad 
+          ? `${producto.nombre} (${cantidad.toFixed(3)} L) agregado al carrito`
+          : `${producto.nombre} agregado al carrito`;
+        
+        toast.success(mensaje);
+      }
+    } catch (error) {
+      console.error("Error al agregar al carrito:", error);
+      toast.error("No se pudo agregar el producto al carrito");
     }
   };
 
   // Función para procesar la venta
   const handleProcessVenta = async () => {
-    setProcessingVenta(true);
+    setProcessingVenta(true);                               
     try {
       const ventaRealizada = await procesarVenta(true); // true para incluir IVA
       if (ventaRealizada) {
@@ -215,7 +232,7 @@ const PanelVentas = () => {
                       <ItemProductoCajero
                         key={producto.productoId}
                         producto={producto}
-                        onAddToCart={() => handleAddToCart(producto)}
+                        onAddToCart={(cantidad) => handleAddToCart(producto, cantidad)}
                         inCart={isInCart(producto.productoId)}
                         quantity={getCartItemQuantity(producto.productoId)}
                       />
@@ -271,10 +288,14 @@ const PanelVentas = () => {
                                 ) : (
                                   <button
                                     className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-md text-xs"
-                                    onClick={() => handleAddToCart(producto)}
+                                    onClick={() => {
+                                      // Si es líquido, mostrará el modal desde ItemProductoCajero
+                                      // Enviamos undefined para que el componente maneje la cantidad
+                                      handleAddToCart(producto, undefined);
+                                    }}
                                     disabled={producto.stock <= 0 || loading}
                                   >
-                                    Agregar
+                                    {producto.tipo === "Liquido" ? "Seleccionar cantidad" : "Agregar"}
                                   </button>
                                 )}
                               </div>

@@ -71,7 +71,7 @@ public class VentaControllerTest extends BaseIntegrationTest {
         vendedor.setContrasena("vend123");
         vendedor.setNombre("Vendedor Prueba");
         vendedor.setRol("VENDEDOR");
-        vendedor.setEstado(true);
+        vendedor.setActivo(true);
         vendedor.setUltimoAcceso(LocalDateTime.now());
         
         usuarioRepository.save(vendedor);

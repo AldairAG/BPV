@@ -9,6 +9,7 @@ import { store } from './store/store'
 import Productos from "./page/admin/producto/Productos";
 import Usuarios from "./page/admin/usuario/Usuarios";
 import Categorias from './page/admin/categoria/Categorias';
+import Reportes from './page/admin/reportes/Reportes';
 
 function App() {
 
@@ -22,7 +23,7 @@ function App() {
             <Route index Component={Productos} />
             <Route path={ADMIN_ROUTES.CATEGORIAS} Component={Categorias} />
             <Route path={ADMIN_ROUTES.USUARIOS} Component={Usuarios} />
-            <Route path={ADMIN_ROUTES.REPORTES} Component={AdminLayout} />
+            <Route path={ADMIN_ROUTES.REPORTES} Component={Reportes} />
             <Route path={ADMIN_ROUTES.VENTAS_PANEL} Component={PanelVentas} />
           </Route>
 

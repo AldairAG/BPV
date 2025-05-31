@@ -5,12 +5,13 @@ interface TabsProps {
     defaultValue: string;
     children: React.ReactNode;
     className?: string;
+    onChange?: (value: string) => void;
 }
 
 interface TabsListProps {
     children: React.ReactNode;
     activeTab?: string;
-    setActiveTab?: React.Dispatch<React.SetStateAction<string>>;
+    setActiveTab?: (value: string) => void;
     className?: string;
 }
 
@@ -18,7 +19,7 @@ interface TabsTriggerProps {
     value: string;
     children: React.ReactNode;
     activeTab?: string;
-    setActiveTab?: React.Dispatch<React.SetStateAction<string>>;
+    setActiveTab?: (value: string) => void;
     className?: string;
     activeClassName?: string;
     inactiveClassName?: string;
@@ -31,23 +32,31 @@ interface TabsContentProps {
     className?: string;
 }
 
-const Tabs: React.FC<TabsProps> = ({ defaultValue, children, className }) => {
-    const [activeTab, setActiveTab] = useState<string>(defaultValue);
+const Tabs: React.FC<TabsProps> = ({ defaultValue, children, className, onChange }) => {
+    const [activeTab, setActiveTabState] = useState<string>(defaultValue);
+
+    // Custom setActiveTab that calls onChange if provided
+    const setActiveTab = (value: string) => {
+        setActiveTabState(value);
+        if (onChange) {
+            onChange(value);
+        }
+    };
 
     const childrenWithProps = React.Children.map(children, (child) => {
         if (isValidElement(child) && child.type === TabsList) {
             return cloneElement(child as React.ReactElement<TabsTriggerProps>, { activeTab, setActiveTab });
-        } 
+        }
         if (isValidElement(child) && child.type === TabsContent) {
             return cloneElement(child as React.ReactElement<TabsContentProps>, { activeTab });
         } else return null;
-    })
+    });
 
     return (
         <div className={twMerge("w-full", className)}>
             {childrenWithProps}
         </div>
-    )
+    );
 };
 
 const TabsList: React.FC<TabsListProps> = ({ children, activeTab, setActiveTab, className }) => {

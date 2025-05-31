@@ -1,18 +1,24 @@
 package com.example.lbf.service.reportes;
 
-import com.example.lbf.entities.Producto;
-import com.example.lbf.entities.Usuario;
+import com.example.lbf.dto.response.*;
 
-import java.time.LocalDate;
-import java.util.Map;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 public interface ReporteService {
-    Map<Producto, Integer> getProductosMasVendidos(LocalDate fechaInicio, LocalDate fechaFin, int limite);
-    Map<Usuario, BigDecimal> getVentasPorUsuario(LocalDate fechaInicio, LocalDate fechaFin);
-    Map<String, BigDecimal> getVentasPorCategoria(LocalDate fechaInicio, LocalDate fechaFin);
-    Map<LocalDate, BigDecimal> getVentasDiarias(LocalDate fechaInicio, LocalDate fechaFin);
-    Map<Integer, BigDecimal> getVentasMensuales(int año);
+    
+    List<ProductosMasVendidosResponse> getProductosMasVendidos(LocalDate fechaInicio, LocalDate fechaFin, int limite);
+    
+    List<VentaPorUsuarioDTO> getVentasPorUsuario(LocalDate fechaInicio, LocalDate fechaFin);
+    
+    List<VentaPorCategoriaDTO> getVentasPorCategoria(LocalDate fechaInicio, LocalDate fechaFin);
+    
+    List<VentaDiariaDTO> getVentasDiarias(LocalDate fechaInicio, LocalDate fechaFin);
+    
+    List<VentaMensualDTO> getVentasMensuales(int año);
+    
     BigDecimal calcularIngresoTotal(LocalDate fechaInicio, LocalDate fechaFin);
-    Map<Producto, Float> getProductosBajoStock();
+    
+    List<ProductoBajoStockDTO> getProductosBajoStock();
 }

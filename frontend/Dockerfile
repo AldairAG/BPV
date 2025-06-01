@@ -1,32 +1,27 @@
-FROM node:18-alpine AS build
-
+# Etapa 1: Construcción del frontend
+FROM node:18-alpine AS builder
 WORKDIR /app
-
-# Copiar archivos de dependencias
-COPY package.json package-lock.json* ./
-
-# Instalar dependencias
-RUN npm ci
-
-# Copiar código fuente
+# Copia los archivos de configuración de Node.js
+COPY package.json package-lock.json ./
+RUN npm install
+# Copia el resto del código fuente
 COPY . .
-
-# Establecer variable de entorno para la URL de la API
-ENV VITE_API_URL=http://localhost:8080
-
-# Construir la aplicación
+# Construye el proyecto frontend
 RUN npm run build
 
-# Etapa de producción usando Nginx
+# Muestra el contenido del directorio src para depurar
+RUN ls -l src
+RUN ls -l src/constants
+RUN npm run build
+
+# Etapa 2: Servir con Nginx
 FROM nginx:alpine
-
-# Copiar configuración de Nginx personalizada
-COPY --from=build /app/dist /usr/share/nginx/html
-
-# Agregar configuración de Nginx para SPA (Single Page Application)
-RUN rm /etc/nginx/conf.d/default.conf
-COPY nginx.conf /etc/nginx/conf.d/
-
+# Copia el archivo de configuración de Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copia los archivos generados por el frontend
+COPY --from=builder /app/dist /usr/share/nginx/html
+# Expone el puerto 80
 EXPOSE 80
-
+# Inicia Nginx
 CMD ["nginx", "-g", "daemon off;"]
+

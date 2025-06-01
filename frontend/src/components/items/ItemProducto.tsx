@@ -39,7 +39,7 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
     };
 
     // Confirmar cantidad seleccionada en el modal
-    const handleConfirmGranel = async (productoId: number, cantidad: number) => {
+    const handleConfirmGranel = async ( cantidad: number) => {
         console.log(`Cantidad seleccionada para ${producto.nombre}:`, cantidad);
         await onAddToCart(cantidad);
     };

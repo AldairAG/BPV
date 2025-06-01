@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useCallback } from 'react';
-import ClienteService, { type ClienteType } from '../service/clienteService';
+import ClienteService, { type ClienteType } from '../service/ClienteService';
 
 /**
  * Hook personalizado para gestionar clientes

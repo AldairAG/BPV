@@ -1,6 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type ClienteType } from "./clienteService";
+import { type ClienteType } from "./ClienteService";
 import { type CarritoItem } from "../hooks/useCarrito";
+
+// TypeScript declaration for Web Serial API
+interface SerialPort {
+  open(options: SerialOptions): Promise<void>;
+  writable: WritableStream<Uint8Array>;
+  close(): Promise<void>;
+}
+interface SerialOptions {
+  baudRate: number;
+  dataBits?: number;
+  stopBits?: number;
+  parity?: "none" | "even" | "odd";
+  flowControl?: "none" | "hardware";
+}
+interface NavigatorWithSerial extends Navigator {
+  serial: {
+    requestPort(options?: any): Promise<SerialPort>;
+    getPorts(): Promise<SerialPort[]>;
+  };
+}
+declare const navigator: NavigatorWithSerial;
 
 interface TicketData {
   ticketNumber: string;
@@ -161,7 +182,15 @@ export const PrinterService = {
           return true;
         } catch (err) {
           console.error('Error específico al conectar con impresora USB:', err);
-          throw new Error(`No se pudo conectar con la impresora USB: ${err.message}`);
+          let errorMessage = '';
+          if (err instanceof Error) {
+            errorMessage = err.message;
+          } else if (typeof err === 'string') {
+            errorMessage = err;
+          } else {
+            errorMessage = JSON.stringify(err);
+          }
+          throw new Error(`No se pudo conectar con la impresora USB: ${errorMessage}`);
         }
       } else {
         // Mensaje más claro sobre compatibilidad

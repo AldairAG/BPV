@@ -238,7 +238,7 @@ const Productos = () => {
                                         placeholder="0.00"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.precioVenta}
+                                        value={values.precioVenta??0}
                                     />
                                     <ErrorMessage
                                         name="precioVenta"
@@ -256,7 +256,7 @@ const Productos = () => {
                                         placeholder="0.00"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.precioCosto}
+                                        value={values.precioCosto??0}
                                     />
                                     <ErrorMessage
                                         name="precioCosto"
@@ -277,7 +277,7 @@ const Productos = () => {
                                         placeholder="0"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.stock}
+                                        value={values.stock??0}
                                         step={values.tipo !== 'Unidad' ? '0.01' : '1'}
                                     />
                                     <ErrorMessage
@@ -296,7 +296,7 @@ const Productos = () => {
                                         placeholder="0"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.stockMinimo}
+                                        value={values.stockMinimo??0}
                                         step={values.tipo !== 'Unidad' ? '0.01' : '1'}
                                     />
                                     <ErrorMessage

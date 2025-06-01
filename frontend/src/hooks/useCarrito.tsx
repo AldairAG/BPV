@@ -6,7 +6,7 @@ import useCliente from './useCliente';
 import VentaService from '../service/VentaService';
 import type { ProductoType } from '../types/ProductoType';
 import type { VentaType, VentaRequest } from '../types/VentaTypes';
-import type { ClienteType } from '../service/clienteService';
+import type { ClienteType } from '../service/ClienteService';
 
 // Definir el tipo para los items del carrito
 export type CarritoItem = {

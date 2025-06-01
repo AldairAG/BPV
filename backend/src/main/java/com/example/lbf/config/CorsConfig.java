@@ -16,7 +16,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173","http://vps-4813471-x.dattaweb.com")); // Origen permitido
+        configuration.setAllowedOrigins(List.of("http://localhost:5173","vps-5038974-x.dattaweb.com")); // Origen permitido
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // Métodos
                                                                                                             // permitidos
         configuration.setAllowedHeaders(Arrays.asList("*")); // Encabezados permitidos

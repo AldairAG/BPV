@@ -6,7 +6,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      DB_URL: jdbc:postgresql://localhost:5432/db_lbf
+      DB_URL: jdbc:postgresql://200.58.100.28:5432/db_lbf
       DB_USER_NAME: postgres
       DB_PASSWORD: 1234
     restart: always

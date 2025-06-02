@@ -1,7 +1,7 @@
 import type { CategoriaType } from "./CategoriaType";
 
 // Interfaces for the Producto-related types
-export type ProductoType= {
+export type ProductoType = {
   productoId: number;
   nombre: string;
   precioVenta: number;
@@ -12,4 +12,5 @@ export type ProductoType= {
   categoria: CategoriaType;
   activo: boolean;
   tipo: string;
+  descuentos?: number[]; // Array de hasta 4 descuentos en porcentaje
 }

@@ -40,25 +40,34 @@ const ProductoSchema = Yup.object().shape({
     tipo: Yup.string()
         .required("El tipo de unidad es obligatorio")
         .oneOf(TIPOS_UNIDAD.map(t => t.value), "Tipo de unidad no válido"),
+    descuentos: Yup.array().of(
+        Yup.number()
+            .transform((value, originalValue) =>
+                originalValue === "" ? undefined : value)
+            .nullable()
+            .min(0, "El descuento no puede ser negativo")
+            .max(100, "El descuento no puede ser mayor a 100%")
+    )
 });
 
 const Productos = () => {
     // Modal para crear/editar producto
     const { isOpen, openModal, closeModal } = useModal();
-    
+
     // Estado para manejar la edición
     const [editMode, setEditMode] = useState(false);
     const [initialValues, setInitialValues] = useState<{
         nombre: string;
-        precioVenta: number|string;
-        precioCosto: number|string;
-        stock: number|string;
-        stockMinimo: number|string;
+        precioVenta: number | string;
+        precioCosto: number | string;
+        stock: number | string;
+        stockMinimo: number | string;
         codigoBarras: string;
         categoria: CategoriaType | null;
         activo: boolean;
-        tipo: string; 
+        tipo: string;
         productoId: number;
+        descuentos: (number | string)[]; // Agregar descuentos
     }>({
         nombre: "",
         precioVenta: "",
@@ -69,15 +78,16 @@ const Productos = () => {
         categoria: null,
         activo: true,
         productoId: 0,
-        tipo: 'Unidad'
+        tipo: TIPOS_PRODUCTO.PIEZA, // Valor por defecto
+        descuentos: ["", "", "", ""] // Inicializar con 4 descuentos vacíos
     });
-    
+
     const [searchTerm, setSearchTerm] = useState("");
-    
+
     // Obtener los métodos y estados de useProducto
-    const { 
+    const {
         productosFiltrados,
-        fetchProductos, 
+        fetchProductos,
         createProducto,
         updateProductoById,
         deleteProducto,
@@ -113,8 +123,9 @@ const Productos = () => {
             codigoBarras: "",
             categoria: null,
             activo: true,
-            tipo: "Unidad",
-            productoId: 0
+            tipo: TIPOS_PRODUCTO.PIEZA, // Valor por defecto
+            productoId: 0,
+            descuentos: ["", "", "", ""]
         });
         openModal();
     };
@@ -126,7 +137,11 @@ const Productos = () => {
             ...producto,
             codigoBarras: producto.codigoBarras ?? "",
             // Si el tipo no está definido, usar 'Unidad' como valor predeterminado
-            tipo: producto.tipo || "Unidad"
+            tipo: producto.tipo || TIPOS_PRODUCTO.PIEZA,
+            // Si hay descuentos, usarlos; si no, inicializar con array vacío
+            descuentos: producto.descuentos?.length
+                ? [...producto.descuentos, ...Array(4 - producto.descuentos.length).fill("")]
+                : ["", "", "", ""]
         });
         seleccionarProducto(producto);
         openModal();
@@ -142,10 +157,20 @@ const Productos = () => {
     // Función para manejar el envío del formulario
     const handleSubmit = async (values: any) => {
         try {
+            // Limpiar descuentos, eliminar valores vacíos y convertir a números
+            const descuentos = values.descuentos
+                .map((d: string | number) => d === "" ? null : Number(d))
+                .filter((d: number | null) => d !== null && d > 0);
+
+            const productData = {
+                ...values,
+                descuentos
+            };
+
             if (editMode && values.productoId) {
-                await updateProductoById(values.productoId, values);
+                await updateProductoById(values.productoId, productData);
             } else {
-                await createProducto(values);
+                await createProducto(productData);
             }
             closeModal();
             fetchProductos(); // Recargar la lista después de crear/editar
@@ -164,9 +189,9 @@ const Productos = () => {
 
     return (
         <section className="flex flex-col w-full h-full p-4">
-            <ModalTemplate 
-                isOpen={isOpen} 
-                onClose={closeModal} 
+            <ModalTemplate
+                isOpen={isOpen}
+                onClose={closeModal}
                 title={editMode ? "Editar Producto" : "Nuevo Producto"}
             >
                 <Formik
@@ -344,8 +369,8 @@ const Productos = () => {
                                     </option>
                                     {categorias.map((categoria) => (
                                         <option
-                                            className="text-gray-500" 
-                                            key={categoria.categoriaId} 
+                                            className="text-gray-500"
+                                            key={categoria.categoriaId}
                                             value={categoria.categoriaId}
                                         >
                                             {categoria.nombre}
@@ -373,6 +398,41 @@ const Productos = () => {
                                 </label>
                             </div>
 
+                            {/* Agregar después del campo "activo" y antes del botón de Guardar */}
+                            <div className="mt-4 border-t pt-4">
+                                <h3 className="text-sm font-medium mb-2">Descuentos por cantidad (opcional)</h3>
+                                <p className="text-xs text-gray-500 mb-3">
+                                    Define hasta 4 niveles de descuento en porcentaje según la cantidad comprada
+                                </p>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    {[0, 1, 2, 3].map((index) => (
+                                        <div key={index} className="flex flex-col">
+                                            <label htmlFor={`descuentos[${index}]`} className="text-xs font-medium mb-1">
+                                                Descuento {index + 1} (%)
+                                            </label>
+                                            <Input
+                                                id={`descuentos[${index}]`}
+                                                name={`descuentos[${index}]`}
+                                                type="number"
+                                                placeholder={`Ej: ${(index + 1) * 5}`}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.descuentos[index]}
+                                                min="0"
+                                                max="100"
+                                                step="0.1"
+                                            />
+                                            <ErrorMessage
+                                                name={`descuentos[${index}]`}
+                                                component="div"
+                                                className="text-red-500 text-xs mt-1"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
@@ -384,25 +444,27 @@ const Productos = () => {
                 </Formik>
             </ModalTemplate>
 
-            <div className="flex justify-between items-center mb-6">
+            <div className="grid grid-cols-1 justify-between items-center mb-6 space-y-2">
                 <h1 className="text-2xl font-bold">Gestión de Productos</h1>
-                <div className="flex items-center space-x-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
                         id="search"
-                        className="w-xs"
+                        className="w-full"
                         placeholder="Buscar productos..."
                         type="search"
                         value={searchTerm}
                         onChange={handleSearchChange}
                     />
-                    <Button onClick={handleOpenCreateModal}>
-                        <Plus className={"w-5 h-5 mr-2"} />
-                        Nuevo Producto
+                    <Button onClick={handleOpenCreateModal}
+                        className="w-auto flex items-center justify-center"
+                    >
+                        <Plus className={"w-5 h-5"} />
+                        <span>Nuevo Producto</span>
                     </Button>
                 </div>
             </div>
 
-            <div className="rounded-lg border shadow-sm overflow-hidden">
+            <div className="rounded-lg border shadow-sm overflow-auto">
                 <div className="relative w-full overflow-auto">
                     <table className="w-full caption-bottom text-sm">
                         <thead className="[&amp;_tr]:border-b">
@@ -412,14 +474,15 @@ const Productos = () => {
                                 <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">Tipo</th>
                                 <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">Precio</th>
                                 <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">Stock</th>
+                                <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">Descuentos</th>
                                 <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="[&amp;_tr:last-child]:border-0">
                             {productosFiltrados.length > 0 ? (
                                 productosFiltrados.map((producto) => (
-                                    <tr 
-                                        key={producto.productoId} 
+                                    <tr
+                                        key={producto.productoId}
                                         className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                                     >
                                         <td className="p-4 align-middle">
@@ -434,8 +497,8 @@ const Productos = () => {
                                             <div className="flex items-center gap-2">
                                                 {producto.categoria && (
                                                     <>
-                                                        <div 
-                                                            className="w-3 h-3 rounded-full" 
+                                                        <div
+                                                            className="w-3 h-3 rounded-full"
                                                             style={{ backgroundColor: producto.categoria.color }}
                                                         ></div>
                                                         <span>{producto.categoria.nombre}</span>
@@ -449,8 +512,8 @@ const Productos = () => {
                                         <td className="p-4 align-middle text-right">{formatPrice(producto.precioVenta)}</td>
                                         <td className="p-4 align-middle text-right">
                                             <span className={`${producto.stock <= producto.stockMinimo ? 'text-red-500 font-bold' : ''}`}>
-                                                {producto.tipo === 'Unidad' 
-                                                    ? producto.stock 
+                                                {producto.tipo === 'Unidad'
+                                                    ? producto.stock
                                                     : producto.stock.toFixed(2)}
                                             </span>
                                             <span className="text-xs text-gray-500 ml-1">
@@ -463,13 +526,28 @@ const Productos = () => {
                                             )}
                                         </td>
                                         <td className="p-4 align-middle text-right">
+                                            {producto.descuentos && producto.descuentos.some(d => d > 0) ? (
+                                                <div className="flex flex-col items-end">
+                                                    {producto.descuentos
+                                                        .filter(d => d > 0)
+                                                        .map((descuento, idx) => (
+                                                            <span key={idx} className="text-xs text-green-600">
+                                                                {descuento}%
+                                                            </span>
+                                                        ))}
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-gray-500">Sin descuentos</span>
+                                            )}
+                                        </td>
+                                        <td className="p-4 align-middle text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Button 
+                                                <Button
                                                     onClick={() => handleOpenEditModal(producto)}
                                                 >
                                                     <Pencil className="w-4 h-4" />
                                                 </Button>
-                                                <Button 
+                                                <Button
                                                     onClick={() => handleDelete(producto.productoId)}
                                                 >
                                                     <Trash2 className="w-4 h-4" />

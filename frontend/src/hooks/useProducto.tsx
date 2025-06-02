@@ -17,6 +17,7 @@ import {
 } from '../store/slices/productoSlice';
 import type { ProductoType } from '../types/ProductoType';
 import { ProductoService } from '../service/ProductoService';
+import { TIPOS_PRODUCTO } from '../constants/tipoProducto';
 
 /**
  * Hook personalizado `useProducto` para gestionar el estado de productos en la aplicación.
@@ -95,9 +96,11 @@ export const useProducto = () => {
    */
   const createProducto = async (producto: Omit<ProductoType, 'productoId'>): Promise<ProductoType | null> => {
     try {
-      console.log('Creando producto:', producto);
-      
+      if (producto.tipo==null) {
+        producto.tipo = TIPOS_PRODUCTO.PIEZA;
+      }
       const nuevoProducto = await ProductoService.crearProducto(producto);
+      console.log('Producto creado:', nuevoProducto);
       dispatch(addProducto(nuevoProducto));
       return nuevoProducto;
     } catch (error: any) {

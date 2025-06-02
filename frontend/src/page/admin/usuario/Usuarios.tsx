@@ -24,9 +24,9 @@ const UsuarioSchema = Yup.object().shape({
     username: Yup.string()
         .required("El nombre de usuario es obligatorio")
         .min(3, "El nombre de usuario debe tener al menos 3 caracteres"),
-/*     email: Yup.string()
-        .required("El email es obligatorio")
-        .email("Email no válido"), */
+    /*     email: Yup.string()
+            .required("El email es obligatorio")
+            .email("Email no válido"), */
     contrasena: Yup.string()
         .when('id', {
             is: (id: number) => !id, // Solo requerido si es nuevo usuario (sin ID)
@@ -130,11 +130,11 @@ const Usuarios = () => {
     const handleOpenEditModal = (usuario: UsuarioType) => {
         setEditMode(true);
         setInitialValues({
-                    ...usuario,
-                    id: usuario.id ?? 0,
-                    contrasena: "", // No incluir contraseña en edición
-                    sucursal: usuario.sucursal || "" // Manejar caso donde sucursal no existe
-                });
+            ...usuario,
+            id: usuario.id ?? 0,
+            contrasena: "", // No incluir contraseña en edición
+            sucursal: usuario.sucursal || "" // Manejar caso donde sucursal no existe
+        });
         openModal();
     };
 
@@ -181,7 +181,7 @@ const Usuarios = () => {
     };
 
     return (
-        <main className="flex-1 container mx-auto px-4 py-6">
+        <main className=" w-full px-4 py-6">
             <ModalTemplate
                 isOpen={isOpen}
                 onClose={closeModal}
@@ -351,21 +351,24 @@ const Usuarios = () => {
             </ModalTemplate>
 
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
-                <div className="flex items-center space-x-4">
-                    <Input
-                        id="search"
-                        className="w-md"
-                        placeholder="Buscar usuarios..."
-                        type="search"
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                    />
-                    <Button onClick={handleOpenCreateModal}>
-                        <Plus className={'w-5 h-5 mr-2'} />
-                        Nuevo Usuario
-                    </Button>
+                <div className="w-full space-y-2">
+                    <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 items-center gap-4 w-full">
+                        <Input
+                            id="search"
+                            className="w-full"
+                            placeholder="Buscar usuarios..."
+                            type="search"
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                        />
+                        <Button onClick={handleOpenCreateModal}>
+                            <Plus className={'w-5 h-5 mr-2'} />
+                            Nuevo Usuario
+                        </Button>
+                    </div>
                 </div>
+
             </div>
             <div className="rounded-lg border shadow-sm overflow-hidden">
                 <div className="relative w-full overflow-auto">
@@ -396,9 +399,9 @@ const Usuarios = () => {
                                         </td>
                                         <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
                                             <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent hover:bg-primary/80 ${usuario.rol === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                                                    usuario.rol === 'CAJERO' ? 'bg-indigo-100 text-indigo-800' :
-                                                        usuario.rol === 'VENDEDOR' ? 'bg-blue-100 text-blue-800' :
-                                                            'bg-gray-100 text-gray-800'
+                                                usuario.rol === 'CAJERO' ? 'bg-indigo-100 text-indigo-800' :
+                                                    usuario.rol === 'VENDEDOR' ? 'bg-blue-100 text-blue-800' :
+                                                        'bg-gray-100 text-gray-800'
                                                 }`}>
                                                 {usuario.rol}
                                             </div>
@@ -427,8 +430,8 @@ const Usuarios = () => {
                                                 </button>
                                                 <span className="ml-2">
                                                     <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${usuario.activo ?
-                                                            'bg-green-50 text-green-700 border-green-200' :
-                                                            'bg-red-50 text-red-700 border-red-200'
+                                                        'bg-green-50 text-green-700 border-green-200' :
+                                                        'bg-red-50 text-red-700 border-red-200'
                                                         }`}>
                                                         {usuario.activo ? (
                                                             <>

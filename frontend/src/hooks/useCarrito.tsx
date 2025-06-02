@@ -2,11 +2,10 @@
 import { useState, useCallback, useEffect } from 'react';
 import useProducto from './useProducto';
 import useUser from './useUser';
-import useCliente from './useCliente';
 import VentaService from '../service/VentaService';
 import type { ProductoType } from '../types/ProductoType';
 import type { VentaType, VentaRequest } from '../types/VentaTypes';
-import type { ClienteType } from '../service/ClienteService';
+import useCliente from './useCliente';
 
 // Definir el tipo para los items del carrito
 export type CarritoItem = {
@@ -28,12 +27,11 @@ export const useCarrito = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ventaRealizada, setVentaRealizada] = useState<VentaType | null>(null);
-  const [clienteSeleccionado, setClienteSeleccionado] = useState<ClienteType | null>(null);
   
   // Hooks relacionados
   const { verificarDisponibilidad, fetchProductos } = useProducto();
+  const { clienteSeleccionado} = useCliente();
   const { user } = useUser();
-  const { createCliente, buscarClientesPorNombre } = useCliente();
   
   // Cargar carrito desde localStorage al iniciar
   useEffect(() => {
@@ -58,57 +56,7 @@ export const useCarrito = () => {
     }
   }, [carritoItems]);
 
-  /**
-   * Selecciona un cliente para la venta
-   * @param cliente Cliente a seleccionar
-   */
-  const seleccionarCliente = useCallback((cliente: ClienteType | null) => {
-    setClienteSeleccionado(cliente);
-  }, []);
 
-  /**
-   * Busca o crea un cliente por nombre
-   * @param nombreCliente Nombre del cliente a buscar o crear
-   * @returns El cliente encontrado o creado
-   */
-  const buscarOCrearCliente = useCallback(async (nombreCliente: string): Promise<ClienteType | null> => {
-    if (!nombreCliente.trim()) {
-      setClienteSeleccionado(null);
-      return null;
-    }
-
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // Buscar clientes con ese nombre
-      const clientesEncontrados: ClienteType[] = (await buscarClientesPorNombre(nombreCliente)) ?? [];
-      
-      // Si existe un cliente con ese nombre exacto, seleccionarlo
-      const clienteExacto = clientesEncontrados.find(
-        c => c.nombre.toLowerCase() === nombreCliente.toLowerCase()
-      );
-      
-      if (clienteExacto) {
-        setClienteSeleccionado(clienteExacto);
-        return clienteExacto;
-      }
-      
-      // Si no existe, crear un nuevo cliente
-      const nuevoCliente = await createCliente({
-        nombre: nombreCliente
-      });
-      
-      setClienteSeleccionado(nuevoCliente);
-      return nuevoCliente;
-    } catch (err: any) {
-      console.error('Error al buscar o crear cliente:', err);
-      setError('Error al buscar o crear cliente');
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, [buscarClientesPorNombre, createCliente]);
 
   /**
    * Añade un producto al carrito
@@ -279,11 +227,14 @@ export const useCarrito = () => {
           return null;
         }
       }
+
+      console.log(clienteSeleccionado, 'Cliente seleccionado para la venta');
+      
       
       // Preparar request para crear venta
       const ventaRequest: VentaRequest = {
         usuarioId: user.id,
-        clienteId: clienteSeleccionado?.idCliente || null,
+        clienteId: clienteSeleccionado?.idCliente || null, // Puede ser null si no hay cliente seleccionado
         productos: carritoItems.map(item => ({
           productoVendidoId: null, // Placeholder, will be set by backend
           precioUnitario: item.producto.precioVenta,
@@ -294,6 +245,9 @@ export const useCarrito = () => {
         })),
         conIva
       };
+
+      console.log('Procesando venta con datos:', ventaRequest);
+      
 
       // Enviar solicitud al servidor
       const ventaCreada = await VentaService.crearVenta(ventaRequest);
@@ -315,7 +269,7 @@ export const useCarrito = () => {
     } finally {
       setLoading(false);
     }
-  }, [carritoItems, user, clearCart, verificarDisponibilidad, fetchProductos, clienteSeleccionado]);
+  }, [carritoItems, user, clearCart, verificarDisponibilidad, fetchProductos]);
 
   /**
    * Anula una venta existente
@@ -407,23 +361,20 @@ export const useCarrito = () => {
     return item ? item.cantidad : 0;
   }, [carritoItems]);
 
+
+
   return {
     // Estado
     carritoItems,
     loading,
     error,
     ventaRealizada,
-    clienteSeleccionado,
     
     // Acciones básicas del carrito
     addToCart,
     removeFromCart,
     updateCartItemQuantity,
     clearCart,
-    
-    // Gestión de cliente
-    seleccionarCliente,
-    buscarOCrearCliente,
     
     // Cálculos
     calcularTotal,
@@ -439,7 +390,8 @@ export const useCarrito = () => {
     isInCart,
     getCartItemQuantity,
     isEmpty: carritoItems.length === 0,
-    itemCount: carritoItems.length
+    itemCount: carritoItems.length,
+
   };
 };
 

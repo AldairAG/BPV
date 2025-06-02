@@ -1,5 +1,6 @@
 package com.example.lbf.dto.request;
 
+import java.util.List;
 import com.example.lbf.entities.Categoria;
 
 import lombok.Getter;
@@ -14,5 +15,6 @@ public class NuevoProductoRequest {
     private Float precioVenta;
     private Float stock;
     private Float stockMinimo;
-
+    private String tipo;
+    private List<Float> descuentos; // Lista de descuentos en porcentaje
 }

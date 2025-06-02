@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import {DownloadIcon,AlertTriangleIcon } from "lucide-react";
+import { AlertTriangleIcon } from "lucide-react";
 import useReportes from "../../../hooks/useReportes";
-import { Button } from "../../../components/ui/Button";
 import { Card, CardContent, CardHead, CardTittle } from "../../../components/ui/Card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/navigation/Tabs";
 import { DatePickerWithRange } from "../../../components/ui/DatePickerWithRange";
@@ -21,6 +20,7 @@ import {
   Legend,
   ResponsiveContainer
 } from "recharts";
+import { TIPOS_PRODUCTO } from "../../../constants/tipoProducto";
 
 // Helpers para fechas
 const hoy = new Date();
@@ -40,7 +40,7 @@ const formatearPrecio = (valor: number): string => {
 
 // Colores para gráficos
 const COLORS = [
-  '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', 
+  '#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8',
   '#82CA9D', '#F44336', '#E91E63', '#9C27B0', '#673AB7'
 ];
 
@@ -71,7 +71,6 @@ const Reportes = () => {
     cargarProductosBajoStock,
     //calcularIngresoTotal,
     cargarDashboard,
-    descargarReporte
   } = useReportes();
 
   // Cargar dashboard al montar
@@ -118,18 +117,18 @@ const Reportes = () => {
   };
 
   // Manejar descarga de reportes
-  const handleDescargarReporte = async (formato: 'pdf' | 'excel') => {
+/*   const handleDescargarReporte = async (formato: 'pdf' | 'excel') => {
     let tipoReporte: 'ventas' | 'productos' | 'stock' = 'ventas';
-    
+
     if (tabActual === 'productos') tipoReporte = 'productos';
     if (tabActual === 'stock') tipoReporte = 'stock';
-    
+
     const success = await descargarReporte(tipoReporte, fechaInicio, fechaFin, formato);
-    
+
     if (success) {
       toast.success(`Reporte descargado en formato ${formato.toUpperCase()}`);
     }
-  };
+  }; */
 
   // Nombres de los meses para gráfico mensual
   const MESES = [
@@ -140,25 +139,28 @@ const Reportes = () => {
   return (
     <div className="flex flex-col w-full h-full p-4 bg-gray-50 dark:bg-gray-900">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Reportes y Estadísticas</h1>
-        
-        {/* Filtros y acciones */}
-        <div className="flex items-center gap-4">
-          {tabActual !== 'dashboard' && tabActual !== 'mensual' && tabActual !== 'stock' && (
-            <div className="bg-white dark:bg-gray-800 rounded-md shadow p-2">
-              <DatePickerWithRange
-                onChange={handleDateRangeChange}
-                initialDateFrom={unMesAtras}
-                initialDateTo={hoy}
-              />
-            </div>
-          )}
-          
+
+        <div className="flex flex-col sm:flex-row items-start gap-4 w-full">
+          <h1 className="text-2xl font-bold">Reportes y Estadísticas</h1>
+
+          {/* Filtros y acciones */}
+          <div className="flex items-center gap-4">
+            {tabActual !== 'dashboard' && tabActual !== 'mensual' && tabActual !== 'stock' && (
+              <div className="bg-white dark:bg-gray-800 rounded-md shadow p-2">
+                <DatePickerWithRange
+                  onChange={handleDateRangeChange}
+                  initialDateFrom={unMesAtras}
+                  initialDateTo={hoy}
+                />
+              </div>
+            )}
+          </div>
+
           {tabActual === 'mensual' && (
             <select
               value={anio}
               onChange={(e) => setAnio(parseInt(e.target.value))}
-              className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md p-2"
+              className=" bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md p-2"
             >
               {[...Array(5)].map((_, i) => {
                 const year = new Date().getFullYear() - i;
@@ -170,7 +172,7 @@ const Reportes = () => {
               })}
             </select>
           )}
-          
+
           {tabActual === 'productos' && (
             <select
               value={limite}
@@ -183,8 +185,8 @@ const Reportes = () => {
               <option value={50}>Top 50</option>
             </select>
           )}
-          
-          <div className="flex gap-2">
+
+{/*           <div className="flex gap-2">
             <Button
               onClick={() => handleDescargarReporte('pdf')}
               disabled={loading}
@@ -199,7 +201,7 @@ const Reportes = () => {
               <DownloadIcon className="w-4 h-4 mr-2" />
               Excel
             </Button>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -212,12 +214,12 @@ const Reportes = () => {
       )}
 
       {/* Tabs para diferentes reportes */}
-      <Tabs 
-        defaultValue="dashboard" 
+      <Tabs
+        defaultValue="dashboard"
         onChange={setTabActual}
         className="w-full"
       >
-        <TabsList className="mb-6">
+        <TabsList className="mb-6 overflow-auto">
           <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
           <TabsTrigger value="productos">Productos Más Vendidos</TabsTrigger>
           <TabsTrigger value="usuarios">Ventas por Usuario</TabsTrigger>
@@ -251,7 +253,7 @@ const Reportes = () => {
                 </span>
               </CardContent>
             </Card>
-            
+
             <Card className="bg-white dark:bg-gray-800">
               <CardHead>
                 <CardTittle>Productos con Stock Bajo</CardTittle>
@@ -262,7 +264,7 @@ const Reportes = () => {
                 </span>
               </CardContent>
             </Card>
-            
+
             <Card className="bg-white dark:bg-gray-800">
               <CardHead>
                 <CardTittle>Ventas del Mes</CardTittle>
@@ -285,17 +287,17 @@ const Reportes = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={ventasDiarias}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="fecha" 
+                    <XAxis
+                      dataKey="fecha"
                       tickFormatter={(value) => {
                         const date = new Date(value);
                         return `${date.getDate()}/${date.getMonth() + 1}`;
                       }}
                     />
-                    <YAxis 
+                    <YAxis
                       tickFormatter={(value) => `$${value.toLocaleString()}`}
                     />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value) => [`$${(value as number).toLocaleString()}`, 'Ventas']}
                       labelFormatter={(label) => {
                         const date = new Date(label);
@@ -303,11 +305,11 @@ const Reportes = () => {
                       }}
                     />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="total" 
-                      stroke="#0088FE" 
-                      activeDot={{ r: 8 }} 
+                    <Line
+                      type="monotone"
+                      dataKey="total"
+                      stroke="#0088FE"
+                      activeDot={{ r: 8 }}
                       name="Ventas"
                     />
                   </LineChart>
@@ -323,19 +325,19 @@ const Reportes = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={productosMasVendidos.slice(0, 5)}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="producto.nombre" 
+                    <XAxis
+                      dataKey="producto.nombre"
                       tickFormatter={(value) => value.length > 15 ? `${value.substring(0, 15)}...` : value}
                     />
                     <YAxis />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value) => [`${value} unidades`, 'Cantidad']}
                       labelFormatter={(label) => label}
                     />
                     <Legend />
-                    <Bar 
-                      dataKey="cantidad" 
-                      fill="#00C49F" 
+                    <Bar
+                      dataKey="cantidad"
+                      fill="#00C49F"
                       name="Cantidad vendida"
                     />
                   </BarChart>
@@ -353,7 +355,7 @@ const Reportes = () => {
                   Productos con Stock Bajo
                 </CardTittle>
               </CardHead>
-              <CardContent className="divide-y dark:divide-gray-700">
+              <CardContent className="divide-y dark:divide-gray-700 flex flex-col">
                 {productosBajoStock.slice(0, 5).map((item) => (
                   <div key={item.producto.productoId} className="py-3 flex justify-between items-center">
                     <div>
@@ -364,11 +366,11 @@ const Reportes = () => {
                     </div>
                     <div className="text-right">
                       <p className="text-red-600 dark:text-red-400 font-bold">
-                        {item.producto.stock} {item.producto.tipo === "Líquido" ? "lt" : item.producto.tipo === "Sólido" ? "kg" : "uds"}
+                        {item.producto.stock} {item.producto.tipo === "Líquido" ? "lt" : item.producto.tipo === TIPOS_PRODUCTO.GRANEL ? "Lt" : "uds"}
                       </p>
                       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-1">
-                        <div 
-                          className="bg-red-600 h-2.5 rounded-full" 
+                        <div
+                          className="bg-red-600 h-2.5 rounded-full"
                           style={{ width: `${Math.min(item.porcentajeStock * 100, 100)}%` }}
                         ></div>
                       </div>
@@ -377,7 +379,7 @@ const Reportes = () => {
                 ))}
                 {productosBajoStock.length > 5 && (
                   <div className="py-3 text-center">
-                    <button 
+                    <button
                       className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
                       onClick={() => setTabActual('stock')}
                     >
@@ -401,8 +403,8 @@ const Reportes = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={productosMasVendidos}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="producto.nombre" 
+                    <XAxis
+                      dataKey="producto.nombre"
                       tickFormatter={(value) => value.length > 15 ? `${value.substring(0, 15)}...` : value}
                       interval={0}
                       angle={-45}
@@ -410,14 +412,14 @@ const Reportes = () => {
                       height={80}
                     />
                     <YAxis />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value) => [`${value} unidades`, 'Cantidad']}
                       labelFormatter={(label) => label}
                     />
                     <Legend />
-                    <Bar 
-                      dataKey="cantidad" 
-                      fill="#0088FE" 
+                    <Bar
+                      dataKey="cantidad"
+                      fill="#0088FE"
                       name="Cantidad vendida"
                     >
                       {productosMasVendidos.map((_, index) => (
@@ -428,7 +430,7 @@ const Reportes = () => {
                 </ResponsiveContainer>
               </div>
 
-              <div className="overflow-x-auto mt-6">
+              <div className="overflow-x-auto mt-6 sm:w-full">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-100 dark:bg-gray-800">
                     <tr>
@@ -458,8 +460,8 @@ const Reportes = () => {
                           <div className="flex items-center">
                             {item.producto.categoria && (
                               <>
-                                <div 
-                                  className="w-3 h-3 rounded-full mr-2" 
+                                <div
+                                  className="w-3 h-3 rounded-full mr-2"
                                   style={{ backgroundColor: item.producto.categoria.color }}
                                 ></div>
                                 <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -493,23 +495,23 @@ const Reportes = () => {
             <CardContent>
               <div className="h-96 mb-6">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart 
+                  <BarChart
                     data={ventasPorUsuario}
                     margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="usuario.nombre" 
+                    <XAxis
+                      dataKey="usuario.nombre"
                     />
                     <YAxis tickFormatter={(value) => `$${value.toLocaleString()}`} />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value) => [formatearPrecio(value as number), 'Total']}
                       labelFormatter={(label) => `Usuario: ${label}`}
                     />
                     <Legend />
-                    <Bar 
-                      dataKey="total" 
-                      name="Total vendido" 
+                    <Bar
+                      dataKey="total"
+                      name="Total vendido"
                       fill="#8884d8"
                     >
                       {ventasPorUsuario.map((_, index) => (
@@ -520,7 +522,7 @@ const Reportes = () => {
                 </ResponsiveContainer>
               </div>
 
-              <div className="overflow-x-auto mt-6">
+              <div className="overflow-x-auto mt-6 sm:w-full">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-100 dark:bg-gray-800">
                     <tr>
@@ -598,7 +600,7 @@ const Reportes = () => {
                 </ResponsiveContainer>
               </div>
 
-              <div className="overflow-x-auto mt-6">
+              <div className="overflow-x-auto mt-6 sm:w-full">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-100 dark:bg-gray-800">
                     <tr>
@@ -617,13 +619,13 @@ const Reportes = () => {
                     {ventasPorCategoria.map((item, index) => {
                       const totalGeneral = ventasPorCategoria.reduce((sum, item) => sum + item.total, 0);
                       const porcentaje = (item.total / totalGeneral) * 100;
-                      
+
                       return (
                         <tr key={item.categoria} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div 
-                                className="w-4 h-4 rounded-full mr-2" 
+                              <div
+                                className="w-4 h-4 rounded-full mr-2"
                                 style={{ backgroundColor: COLORS[index % COLORS.length] }}
                               ></div>
                               <div className="text-sm font-medium text-gray-900 dark:text-white">
@@ -637,11 +639,11 @@ const Reportes = () => {
                           <td className="px-6 py-4 whitespace-nowrap text-right">
                             <div className="text-sm text-gray-900 dark:text-white">{porcentaje.toFixed(1)}%</div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-1">
-                              <div 
-                                className="h-2.5 rounded-full" 
-                                style={{ 
-                                  width: `${porcentaje}%`, 
-                                  backgroundColor: COLORS[index % COLORS.length] 
+                              <div
+                                className="h-2.5 rounded-full"
+                                style={{
+                                  width: `${porcentaje}%`,
+                                  backgroundColor: COLORS[index % COLORS.length]
                                 }}
                               ></div>
                             </div>
@@ -670,15 +672,15 @@ const Reportes = () => {
                     margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                      dataKey="fecha" 
+                    <XAxis
+                      dataKey="fecha"
                       tickFormatter={(value) => {
                         const date = new Date(value);
                         return `${date.getDate()}/${date.getMonth() + 1}`;
                       }}
                     />
                     <YAxis tickFormatter={(value) => `$${value.toLocaleString()}`} />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value) => [formatearPrecio(value as number), 'Total']}
                       labelFormatter={(label) => {
                         const date = new Date(label);
@@ -686,18 +688,18 @@ const Reportes = () => {
                       }}
                     />
                     <Legend />
-                    <Line 
-                      type="monotone" 
-                      dataKey="total" 
-                      stroke="#0088FE" 
-                      activeDot={{ r: 8 }} 
+                    <Line
+                      type="monotone"
+                      dataKey="total"
+                      stroke="#0088FE"
+                      activeDot={{ r: 8 }}
                       name="Ventas"
                     />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
 
-              <div className="overflow-x-auto mt-6">
+              <div className="overflow-x-auto mt-6 sm:w-full">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-100 dark:bg-gray-800">
                     <tr>
@@ -717,7 +719,7 @@ const Reportes = () => {
                       const fecha = new Date(item.fecha);
                       const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
                       const diaSemana = diasSemana[fecha.getDay()];
-                      
+
                       return (
                         <tr key={item.fecha} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -762,13 +764,13 @@ const Reportes = () => {
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="nombreMes" />
                     <YAxis tickFormatter={(value) => `$${value.toLocaleString()}`} />
-                    <Tooltip 
+                    <Tooltip
                       formatter={(value) => [formatearPrecio(value as number), 'Total']}
                     />
                     <Legend />
-                    <Bar 
-                      dataKey="total" 
-                      fill="#00C49F" 
+                    <Bar
+                      dataKey="total"
+                      fill="#00C49F"
                       name="Ventas mensuales"
                     >
                       {ventasMensuales.map((_, index) => (
@@ -779,7 +781,7 @@ const Reportes = () => {
                 </ResponsiveContainer>
               </div>
 
-              <div className="overflow-x-auto mt-6">
+              <div className="overflow-x-auto mt-6 sm:w-full">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-100 dark:bg-gray-800">
                     <tr>
@@ -831,7 +833,7 @@ const Reportes = () => {
               </CardTittle>
             </CardHead>
             <CardContent>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto sm:w-full">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-100 dark:bg-gray-800">
                     <tr>
@@ -870,8 +872,8 @@ const Reportes = () => {
                           <div className="flex items-center">
                             {item.producto.categoria && (
                               <>
-                                <div 
-                                  className="w-3 h-3 rounded-full mr-2" 
+                                <div
+                                  className="w-3 h-3 rounded-full mr-2"
                                   style={{ backgroundColor: item.producto.categoria.color }}
                                 ></div>
                                 <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -898,13 +900,13 @@ const Reportes = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                            <div 
-                              className="bg-red-600 h-2.5 rounded-full" 
-                              style={{ width: `${Math.min(item.porcentajeStock * 100, 100)}%` }}
+                            <div
+                              className="bg-red-600 h-2.5 rounded-full"
+                              style={{ width: `${Math.min(item.producto.stock * 100/item.producto.stockMinimo)}%` }}
                             ></div>
                           </div>
                           <div className="text-xs text-center mt-1 text-gray-500 dark:text-gray-400">
-                            {Math.round(item.porcentajeStock * 100)}% del mínimo
+                            {Math.round(item.producto.stock * 100/item.producto.stockMinimo)}% del mínimo
                           </div>
                         </td>
                       </tr>

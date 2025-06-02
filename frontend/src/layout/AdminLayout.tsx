@@ -140,7 +140,7 @@ const AdminLayout = () => {
             )}
 
             {/* Contenido principal */}
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-y-auto">
                 <Outlet/>
             </div>
         </section>

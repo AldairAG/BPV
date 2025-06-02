@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useCallback } from 'react';
-import ClienteService, { type ClienteType } from '../service/ClienteService';
+import ClienteService from '../service/ClienteService';
+import type { ClienteType } from '../types/ClienteType';
 
 /**
  * Hook personalizado para gestionar clientes
@@ -91,6 +92,7 @@ export const useCliente = () => {
      * Selecciona un cliente para edición (sin hacer petición al backend)
      */
     const seleccionarCliente = useCallback((cliente: ClienteType) => {
+        console.log(cliente); 
         setClienteSeleccionado(cliente);
     }, []);
 

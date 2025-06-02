@@ -41,7 +41,23 @@ public class ProductoServiceImpl implements ProductoService {
         nuevoProducto.setPrecioCompra(producto.getPrecioCosto());
         nuevoProducto.setStockMinimo(producto.getStockMinimo());
         nuevoProducto.setActivo(producto.getActivo());
+        
+        // Validación opcional para los descuentos
+        if (producto.getDescuentos() != null) {
+            // Verificar que los descuentos estén en un rango válido (0-100%)
+            for (Float descuento : producto.getDescuentos()) {
+                if (descuento < 0 || descuento > 100) {
+                    throw new IllegalArgumentException("Los descuentos deben estar entre 0 y 100%");
+                }
+            }
+            nuevoProducto.setDescuentos(producto.getDescuentos());
+        } else {
+            nuevoProducto.setDescuentos(null);
+        }
+        
         nuevoProducto.setCategoria(categoria);
+        nuevoProducto.setTipo(producto.getTipo());
+        System.out.println(nuevoProducto.getDescuentos());
         // Guardar el producto en la base de datos
         return productoRepository.save(nuevoProducto);
     }

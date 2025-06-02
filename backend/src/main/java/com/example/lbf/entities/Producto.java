@@ -2,6 +2,7 @@ package com.example.lbf.entities;
 
 import java.util.List;
 
+import com.example.lbf.entities.converters.DescuentosConverter;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -11,6 +12,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.persistence.JoinColumn;
@@ -32,6 +35,11 @@ public class Producto {
     private Float stockMinimo;
     private String tipo;
     private Boolean activo;
+    
+    // Nuevo campo para descuentos
+    @Convert(converter = DescuentosConverter.class)
+    @Column(name = "descuentos", columnDefinition = "TEXT")
+    private List<Float> descuentos;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")

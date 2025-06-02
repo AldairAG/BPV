@@ -14,7 +14,6 @@ export const ProductoService = {
    */
   crearProducto: async (producto: Omit<ProductoType, 'productoId'>): Promise<ProductoType> => {
     console.log('Creando producto:', producto);
-    
     const response = await apiClient.post<ProductoType>(BASE_URL, producto);
     return response.data;
   },

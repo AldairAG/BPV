@@ -1,14 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import type { ClienteType } from '../types/ClienteType';
 import { apiClient } from './apiClient';
 
-// Definición del tipo Cliente basado en la entidad del backend
-export interface ClienteType {
-    idCliente: number | null;
-    nombre: string;
-    ventas?: any[]; // Opcional porque normalmente no necesitamos cargar todas las ventas
-}
-
-const BASE_URL = '/lbf/clientes';
+const BASE_URL = '/clientes';
 
 /**
  * Servicio para gestionar operaciones con clientes

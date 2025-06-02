@@ -63,7 +63,6 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
         >
             <div
                 className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md mx-auto p-6 shadow-lg relative"
-                onClick={(e) => e.stopPropagation()}
             >
                 <button
                     onClick={onClose}

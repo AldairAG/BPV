@@ -30,7 +30,6 @@ const getRoleFromToken = (token: string): string[] => {
     
     // Asumiendo que el rol está en el claim 'rol' y solo hay un rol
     const rol = payload.rol;
-    console.log('Rol extraído del token:', rol);
     
     return rol ? [rol] : [];
   } catch (error) {

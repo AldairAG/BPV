@@ -7,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHead, CardTittle } from "../com
 import { Input } from "../components/ui/Input";
 import { ArrowRightEndOnRectangleIcon } from "@heroicons/react/24/outline";
 import useUser from "../hooks/useUser";
-import { ADMIN_ROUTES, USER_ROUTES } from "../constants/routes";
 
 // Esquema de validación con Yup
 const LoginSchema = Yup.object().shape({
@@ -18,7 +17,7 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
-    const { login, navigateTo, hasRole } = useUser();
+    const { login } = useUser();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -30,14 +29,7 @@ const Login = () => {
         try {
             const success = await login(values.username, values.contrasena);
             
-            if (success) {
-                // Si el login fue exitoso, navegamos según el rol
-                if (hasRole("ADMIN")) {
-                    navigateTo(ADMIN_ROUTES.ADMIN);
-                } else if (hasRole("USER")) {                    
-                    navigateTo(USER_ROUTES.HOME);
-                }
-            } else {
+            if (!success) {
                 // Si el login falló pero no lanzó un error
                 setError("Credenciales inválidas");
             }

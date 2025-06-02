@@ -96,6 +96,8 @@ export const ProductoService = {
    */
   getProductosBajoStock: async (stockMinimo: number): Promise<ProductoType[]> => {
     const response = await apiClient.get<ProductoType[]>(`${BASE_URL}/bajo-stock?stockMinimo=${stockMinimo}`);
+    console.log('Productos bajo stock:', response.data);
+    
     return response.data;
   },
 

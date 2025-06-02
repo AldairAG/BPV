@@ -14,7 +14,7 @@ interface CarritoProps {
     onRemoveItem: (productoId: number) => void;
     onUpdateQuantity: (productoId: number, cantidad: number) => Promise<boolean>;
     onClearCart: () => void;
-    onProcessPurchase: () => Promise<void>;
+    onProcessPurchase: (conIva:boolean) => Promise<void>;
 }
 
 const Carrito: React.FC<CarritoProps> = ({
@@ -33,16 +33,16 @@ const Carrito: React.FC<CarritoProps> = ({
     const [clienteBuscando, setClienteBuscando] = useState(false);
     const [imprimiendo, setImprimiendo] = useState(false);
     const [errorImpresion, setErrorImpresion] = useState<string | null>(null);
-    
+
     const {
-        procesarVenta, 
-        buscarOCrearCliente, 
+        procesarVenta,
+        buscarOCrearCliente,
         clienteSeleccionado,
         seleccionarCliente
     } = useCarrito();
-    
+
     const { user } = useUser();
-    
+
     const [detallesVenta, setDetallesVenta] = useState({
         total: 0,
         timestamp: ""
@@ -68,10 +68,10 @@ const Carrito: React.FC<CarritoProps> = ({
     };
 
     const totalFinal = calcularTotalConDescuentos();
-    
+
     // Calcular montos
-    const subtotal = includeIVA ? totalFinal / 1.16 : totalFinal;
-    const iva = includeIVA ? totalFinal - subtotal : 0;
+    const subtotal = totalFinal;
+    const iva = includeIVA ? totalFinal * 0.16 : 0;
 
     // Manejar cambios en la cantidad
     const handleQuantityChange = async (productoId: number, newQuantity: number) => {
@@ -93,20 +93,20 @@ const Carrito: React.FC<CarritoProps> = ({
         const descuento = parseInt(value, 10) || 0;
         // Limitar el descuento entre 0 y 100%
         const descuentoLimitado = Math.min(Math.max(0, descuento), 100);
-        
+
         setDescuentos(prev => ({
             ...prev,
             [productoId]: descuentoLimitado
         }));
     };
-    
+
     // Buscar o crear cliente
     const handleBuscarCliente = async () => {
         if (!nombreCliente.trim()) {
             seleccionarCliente(null);
             return;
         }
-        
+
         setClienteBuscando(true);
         try {
             await buscarOCrearCliente(nombreCliente);
@@ -114,7 +114,7 @@ const Carrito: React.FC<CarritoProps> = ({
             setClienteBuscando(false);
         }
     };
-    
+
     // Limpiar cliente seleccionado
     const handleLimpiarCliente = () => {
         seleccionarCliente(null);
@@ -129,21 +129,21 @@ const Carrito: React.FC<CarritoProps> = ({
                 if (nombreCliente.trim() && !clienteSeleccionado) {
                     await buscarOCrearCliente(nombreCliente);
                 }
-                
-                await onProcessPurchase();
-                
+
+                await onProcessPurchase(includeIVA);
+
                 // Guardar detalles para mostrar en la confirmación
                 setDetallesVenta({
-                    total: totalFinal,
+                    total: totalFinal+iva,
                     timestamp: new Date().toLocaleString()
                 });
-
+                
                 // Procesar la venta
                 await procesarVenta(includeIVA);
-                
+
                 // Mostrar mensaje de éxito
                 setVentaCompletada(true);
-                
+
                 // Limpiar cliente seleccionado
                 seleccionarCliente(null);
                 setNombreCliente("");
@@ -156,31 +156,31 @@ const Carrito: React.FC<CarritoProps> = ({
     // Función para imprimir ticket
     const handlePrintTicket = async () => {
         if (!ventaCompletada) return;
-        
+
         setImprimiendo(true);
         setErrorImpresion(null);
-        
+
         try {
             // Generar número de ticket único
             const ticketNumber = `${Date.now().toString().slice(-6)}`;
-            
+
             // Preparar datos para impresión
             const ticketData = {
                 ticketNumber,
                 items,
                 subtotal,
                 iva,
-                total: totalFinal,
+                total: totalFinal+iva,
                 cliente: clienteSeleccionado,
                 fecha: new Date().toLocaleString(),
                 vendedor: user?.nombre || 'Usuario Sistema',
                 conIva: includeIVA,
                 descuentos
             };
-            
+
             // Imprimir ticket
             const success = await PrinterService.printTicket(ticketData);
-            
+
             if (!success) {
                 setErrorImpresion("No se pudo imprimir el ticket. Verifique la conexión con la impresora.");
             }
@@ -221,7 +221,7 @@ const Carrito: React.FC<CarritoProps> = ({
                             <User className="h-4 w-4 text-blue-400" />
                             Cliente
                         </h3>
-                        
+
                         {clienteSeleccionado ? (
                             <div className="flex items-center justify-between">
                                 <div>
@@ -230,7 +230,7 @@ const Carrito: React.FC<CarritoProps> = ({
                                         ID: {clienteSeleccionado.idCliente}
                                     </span>
                                 </div>
-                                <Button 
+                                <Button
                                     className="text-xs bg-transparent hover:bg-gray-700 text-gray-400"
                                     onClick={handleLimpiarCliente}
                                 >
@@ -289,10 +289,10 @@ const Carrito: React.FC<CarritoProps> = ({
                         <p className="text-gray-400 text-sm mt-1">
                             {detallesVenta.timestamp}
                         </p>
-                        
+
                         {/* Botón para imprimir ticket */}
                         <div className="flex flex-col gap-2 w-full max-w-xs mt-6">
-                            <Button 
+                            <Button
                                 onClick={handlePrintTicket}
                                 className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
                                 disabled={imprimiendo}
@@ -312,8 +312,8 @@ const Carrito: React.FC<CarritoProps> = ({
                                     </>
                                 )}
                             </Button>
-                            
-                            <Button 
+
+                            <Button
                                 className="bg-green-600 hover:bg-green-700 text-white"
                                 onClick={() => {
                                     setVentaCompletada(false);
@@ -323,7 +323,7 @@ const Carrito: React.FC<CarritoProps> = ({
                                 Realizar nueva venta
                             </Button>
                         </div>
-                        
+
                         {/* Mensaje de error de impresión */}
                         {errorImpresion && (
                             <div className="mt-4 p-3 bg-red-900/20 border border-red-500 rounded text-red-300 text-sm w-full max-w-xs">
@@ -349,7 +349,7 @@ const Carrito: React.FC<CarritoProps> = ({
                             const descuento = descuentos[item.producto.productoId] || 0;
                             const precioConDescuento = item.producto.precioVenta * (1 - descuento / 100);
                             const subtotalItem = precioConDescuento * item.cantidad;
-                            
+
                             return (
                                 <div key={item.producto.productoId} className="flex flex-col py-3 border-b border-gray-700 last:border-0">
                                     <div className="flex items-center justify-between">
@@ -396,7 +396,7 @@ const Carrito: React.FC<CarritoProps> = ({
                                             </button>
                                         </div>
                                     </div>
-                                    
+
                                     {/* Sección para descuento por producto */}
                                     <div className="mt-2 flex items-center justify-between">
                                         <div className="flex items-center gap-2 bg-gray-700 rounded px-2 py-1">
@@ -441,7 +441,7 @@ const Carrito: React.FC<CarritoProps> = ({
                         <span className="text-gray-300">IVA (16%)</span>
                         <span className="text-right">${iva.toFixed(2)}</span>
                         <span className="text-xl font-bold">Total</span>
-                        <span className="text-right font-bold text-xl text-blue-400">${totalFinal.toFixed(2)}</span>
+                        <span className="text-right font-bold text-xl text-blue-400">${(totalFinal+iva).toFixed(2)}</span>
 
                         <div className="col-span-2 text-sm flex items-center mt-2">
                             <input

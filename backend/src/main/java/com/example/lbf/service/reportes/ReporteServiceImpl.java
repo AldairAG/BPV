@@ -168,7 +168,7 @@ public class ReporteServiceImpl implements ReporteService {
     @Override
     @Transactional(readOnly = true)
     public List<ProductoBajoStockDTO> getProductosBajoStock() {
-        List<Producto> productos = productoRepository.findByStockLessThan(10.0f);
+        List<Producto> productos = productoRepository.findProductosConBajoStock();
 
         return productos.stream()
                 .filter(producto -> producto.getStock() <= producto.getStockMinimo())

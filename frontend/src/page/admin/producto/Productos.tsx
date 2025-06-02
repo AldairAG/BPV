@@ -50,10 +50,10 @@ const Productos = () => {
     const [editMode, setEditMode] = useState(false);
     const [initialValues, setInitialValues] = useState<{
         nombre: string;
-        precioVenta: number|null;
-        precioCosto: number|null;
-        stock: number|null;
-        stockMinimo: number|null;
+        precioVenta: number|string;
+        precioCosto: number|string;
+        stock: number|string;
+        stockMinimo: number|string;
         codigoBarras: string;
         categoria: CategoriaType | null;
         activo: boolean;
@@ -61,10 +61,10 @@ const Productos = () => {
         productoId: number;
     }>({
         nombre: "",
-        precioVenta: null,
-        precioCosto: null,
-        stock: null,
-        stockMinimo: null,
+        precioVenta: "",
+        precioCosto: "",
+        stock: "",
+        stockMinimo: "",
         codigoBarras: "",
         categoria: null,
         activo: true,
@@ -106,10 +106,10 @@ const Productos = () => {
         setEditMode(false);
         setInitialValues({
             nombre: "",
-            precioVenta: null,
-            precioCosto: null,
-            stock: null,
-            stockMinimo: null,
+            precioVenta: "",
+            precioCosto: "",
+            stock: "",
+            stockMinimo: "",
             codigoBarras: "",
             categoria: null,
             activo: true,
@@ -238,7 +238,7 @@ const Productos = () => {
                                         placeholder="0.00"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.precioVenta??0}
+                                        value={values.precioVenta}
                                     />
                                     <ErrorMessage
                                         name="precioVenta"
@@ -256,7 +256,7 @@ const Productos = () => {
                                         placeholder="0.00"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.precioCosto??0}
+                                        value={values.precioCosto}
                                     />
                                     <ErrorMessage
                                         name="precioCosto"
@@ -277,7 +277,7 @@ const Productos = () => {
                                         placeholder="0"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.stock??0}
+                                        value={values.stock}
                                         step={values.tipo !== 'Unidad' ? '0.01' : '1'}
                                     />
                                     <ErrorMessage
@@ -296,7 +296,7 @@ const Productos = () => {
                                         placeholder="0"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.stockMinimo??0}
+                                        value={values.stockMinimo}
                                         step={values.tipo !== 'Unidad' ? '0.01' : '1'}
                                     />
                                     <ErrorMessage

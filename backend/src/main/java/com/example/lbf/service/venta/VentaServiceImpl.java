@@ -30,24 +30,30 @@ public class VentaServiceImpl implements VentaService {
         venta.setUsuario(usuario);
         venta.setFecha(LocalDate.now());
         venta.setConIva(conIva);
-        
+
         // Calcular total de la venta
         BigDecimal total = BigDecimal.ZERO;
         for (ProductoVendido pv : productos) {
             Float subtotal = pv.getCantidad() * pv.getProducto().getPrecio() * (1 - pv.getDescuento() / 100);
             pv.setSubtotal(subtotal);
             total = total.add(BigDecimal.valueOf(subtotal));
-            
+
             // Asociar a la venta
             pv.setVenta(venta);
-            
+
             // Actualizar stock
             productoService.actualizarStock(pv.getProducto().getProductoId(), -pv.getCantidad());
         }
-        
+
+        // Si conIva es true, agregar el 16% al total
+        if (conIva) {
+            BigDecimal iva = total.multiply(BigDecimal.valueOf(0.16));
+            total = total.add(iva);
+        }
+
         venta.setTotal(total);
         venta.setProductosVendidos(productos);
-        
+
         return ventaRepository.save(venta);
     }
 

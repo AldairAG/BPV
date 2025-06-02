@@ -250,11 +250,11 @@ export const useCarrito = () => {
    * @param conIva Indica si la venta incluye IVA
    * @returns La venta creada si tuvo éxito
    */
-  const procesarVenta = useCallback(async (conIva: boolean = true): Promise<VentaType | null> => {
+  const procesarVenta = useCallback(async (conIva: boolean): Promise<VentaType | null> => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // Verificar que haya un usuario logueado
       if (!user || !user.id) {
         setError('Debes iniciar sesión para realizar una venta');
@@ -279,7 +279,7 @@ export const useCarrito = () => {
           return null;
         }
       }
-       
+      
       // Preparar request para crear venta
       const ventaRequest: VentaRequest = {
         usuarioId: user.id,
@@ -294,7 +294,7 @@ export const useCarrito = () => {
         })),
         conIva
       };
-      
+
       // Enviar solicitud al servidor
       const ventaCreada = await VentaService.crearVenta(ventaRequest);
       

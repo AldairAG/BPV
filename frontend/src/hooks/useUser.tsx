@@ -9,7 +9,7 @@ import {
 import type { UsuarioType } from '../types/UsuarioType';
 import type { LoginRequest } from '../types/LoginTypes';
 import UserService from '../service/UserService';
-import { USER_ROUTES } from '../constants/routes';
+import { ADMIN_ROUTES, USER_ROUTES } from '../constants/routes';
 
 /**
  * Hook personalizado `useUser` para gestionar el estado del usuario y la navegación en la aplicación.
@@ -63,13 +63,21 @@ export const useUser = () => {
    */
   const login = async (username: string, contrasena: string): Promise<boolean> => {
     try {
-
       const credentials: LoginRequest = { username, contrasena };
       const response = await UserService.login(credentials);
-      
+
       if (response.token) {
-        // Usar setUserData en lugar de dispatch directo
+        // Primero guarda el usuario y token en el estado global
         setUserData(response.usuario, response.token);
+
+        // Luego navega según el rol del usuario autenticado
+        // Usar los roles del usuario recién autenticado
+        const userRoles = response.usuario.rol || [];
+        if (userRoles == "ADMIN") {
+          navigateTo(ADMIN_ROUTES.ADMIN);
+        } else if (userRoles == "USER") {
+          navigateTo(USER_ROUTES.HOME);
+        }
         return true;
       } else {
         alert('Credenciales inválidas');
@@ -116,7 +124,7 @@ export const useUser = () => {
   const createUser = async (userData: UsuarioType): Promise<UsuarioType | null> => {
     try {
       console.log('Creating user with data:', userData);
-      userData.id=null;
+      userData.id = null;
       const newUser = await UserService.crearUsuario(userData);
       return newUser;
     } catch (error: any) {

@@ -111,10 +111,10 @@ const PanelVentas = () => {
   };
 
   // Función para procesar la venta
-  const handleProcessVenta = async () => {
+  const handleProcessVenta = async (conIva:boolean) => {
     setProcessingVenta(true);                               
     try {
-      const ventaRealizada = await procesarVenta(true); // true para incluir IVA
+      const ventaRealizada = await procesarVenta(conIva); // true para incluir IVA
       if (ventaRealizada) {
         toast.success(`Venta realizada con éxito. Total: $${ventaRealizada.total.toFixed(2)}`);
         // Recargar productos para reflejar nuevo stock

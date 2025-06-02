@@ -12,7 +12,7 @@ services:
     restart: always
 
   frontend:
-    build: 
+    build:
       context: frontend
       dockerfile: Dockerfile
     ports:
@@ -22,6 +22,8 @@ services:
       - app_lbf
     volumes:
       - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    environment:
+      - VITE_API_BASE_URL=http://vps-5038974-x.dattaweb.com:8080/lbf
 
 networks:
   my_custom_network:

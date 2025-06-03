@@ -12,6 +12,7 @@ import { useEffect, useState, useRef } from "react";
 import type { ProductoType } from "../types/ProductoType";
 import type { CategoriaType } from "../types/CategoriaType";
 import { toast } from "react-hot-toast";
+import type { ClienteType } from "../types/ClienteType";
 
 const PanelVentas = () => {
   // Hooks
@@ -142,10 +143,12 @@ const PanelVentas = () => {
   };
 
   // Función para procesar la venta
-  const handleProcessVenta = async (conIva: boolean) => {
+  const handleProcessVenta = async (conIva: boolean,cliente:ClienteType|null) => {
     setProcessingVenta(true);
     try {
-      const ventaRealizada = await procesarVenta(conIva);
+      console.log(cliente);
+      
+      const ventaRealizada = await procesarVenta(conIva,cliente);
       if (ventaRealizada) {
         toast.success(`Venta realizada con éxito. Total: $${ventaRealizada.total.toFixed(2)}`);
         fetchProductos();

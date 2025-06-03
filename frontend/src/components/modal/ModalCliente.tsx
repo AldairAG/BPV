@@ -7,13 +7,15 @@ import type { ClienteType } from '../../types/ClienteType';
 
 interface ModalClienteProps {
     onClose: () => void;
+    onSelectCliente:(cliente:ClienteType)=> void;
 }
 
-const ModalCliente: React.FC<ModalClienteProps> = ({ onClose }) => {
+const ModalCliente: React.FC<ModalClienteProps> = ({ onClose,onSelectCliente }) => {
     // Estados para controlar el modo de vista
     const [modo, setModo] = useState<'buscar' | 'crear'>('buscar');
     const [busqueda, setBusqueda] = useState('');
     const [buscando, setBuscando] = useState(false);
+    const [clienteSelect,setCliente]=useState<ClienteType | null>(null);
 
     // Estado para el formulario de nuevo cliente
     const [nuevoCliente, setNuevoCliente] = useState({
@@ -54,12 +56,10 @@ const ModalCliente: React.FC<ModalClienteProps> = ({ onClose }) => {
 
     // Manejar selección de cliente
     const handleSeleccionarCliente = (cliente: ClienteType) => {
-        seleccionarCliente(cliente);
-
-        seleccionarCliente(cliente);
-
+        onSelectCliente(cliente);
+        setCliente(cliente);
         // Cerrar el modal después de seleccionar
-        onClose();
+        //onClose();
     };
 
     // Manejar cambios en el formulario de nuevo cliente
@@ -99,8 +99,8 @@ const ModalCliente: React.FC<ModalClienteProps> = ({ onClose }) => {
             <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
                 <button
                     className={`py-2 px-4 flex-1 text-center ${modo === 'buscar'
-                            ? 'border-b-2 border-blue-500 font-medium text-blue-500'
-                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                        ? 'border-b-2 border-blue-500 font-medium text-blue-500'
+                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                         }`}
                     onClick={() => setModo('buscar')}
                 >
@@ -108,8 +108,8 @@ const ModalCliente: React.FC<ModalClienteProps> = ({ onClose }) => {
                 </button>
                 <button
                     className={`py-2 px-4 flex-1 text-center ${modo === 'crear'
-                            ? 'border-b-2 border-blue-500 font-medium text-blue-500'
-                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                        ? 'border-b-2 border-blue-500 font-medium text-blue-500'
+                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
                         }`}
                     onClick={() => setModo('crear')}
                 >
@@ -178,7 +178,7 @@ const ModalCliente: React.FC<ModalClienteProps> = ({ onClose }) => {
                                 <div
                                     key={cliente.idCliente}
                                     className={`p-3 border-b dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-800 flex justify-between items-center ${clienteSeleccionado?.idCliente === cliente.idCliente ?
-                                            'bg-blue-50 dark:bg-blue-900/20' : ''
+                                        'bg-blue-50 dark:bg-blue-900/20' : ''
                                         }`}
                                 >
                                     <div>
@@ -191,12 +191,12 @@ const ModalCliente: React.FC<ModalClienteProps> = ({ onClose }) => {
                                     <Button
                                         onClick={() => handleSeleccionarCliente(cliente)}
                                         className={
-                                            clienteSeleccionado?.idCliente === cliente.idCliente
+                                            clienteSelect?.idCliente == cliente.idCliente
                                                 ? "bg-green-600 hover:bg-green-700"
                                                 : "bg-blue-600 hover:bg-blue-700"
                                         }
                                     >
-                                        {clienteSeleccionado?.idCliente === cliente.idCliente ? (
+                                        {clienteSelect?.idCliente == cliente.idCliente ? (
                                             <CheckCircle className="h-4 w-4" />
                                         ) : (
                                             "Seleccionar"

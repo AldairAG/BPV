@@ -2,7 +2,9 @@ package com.example.lbf.service.venta;
 
 import com.example.lbf.entities.Venta;
 import com.example.lbf.entities.Usuario;
+import com.example.lbf.dto.request.VentaRequest;
 import com.example.lbf.entities.ProductoVendido;
+import com.example.lbf.repository.ClienteRepository;
 import com.example.lbf.repository.VentaRepository;
 import com.example.lbf.service.producto.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,21 +21,32 @@ public class VentaServiceImpl implements VentaService {
 
     @Autowired
     private VentaRepository ventaRepository;
-    
+
     @Autowired
     private ProductoService productoService;
 
+    @Autowired
+    private ClienteRepository clienteRepository;
+
     @Override
     @Transactional
-    public Venta crearVenta(Usuario usuario, List<ProductoVendido> productos, Boolean conIva) {
+    public Venta crearVenta(Usuario usuario, VentaRequest ventaRequest) {
+
         Venta venta = new Venta();
         venta.setUsuario(usuario);
         venta.setFecha(LocalDate.now());
-        venta.setConIva(conIva);
+        venta.setConIva(ventaRequest.getConIva());
+        venta.setCliente(null);
+        ;
+
+        clienteRepository.findById(ventaRequest.getClienteId())
+                .ifPresent(cliente -> {
+                    venta.setCliente(cliente);
+                });
 
         // Calcular total de la venta
         BigDecimal total = BigDecimal.ZERO;
-        for (ProductoVendido pv : productos) {
+        for (ProductoVendido pv : ventaRequest.getProductos()) {
             Float subtotal = pv.getCantidad() * pv.getProducto().getPrecio() * (1 - pv.getDescuento() / 100);
             pv.setSubtotal(subtotal);
             total = total.add(BigDecimal.valueOf(subtotal));
@@ -46,13 +59,13 @@ public class VentaServiceImpl implements VentaService {
         }
 
         // Si conIva es true, agregar el 16% al total
-        if (conIva) {
+        if (ventaRequest.getConIva() != null && ventaRequest.getConIva()) {
             BigDecimal iva = total.multiply(BigDecimal.valueOf(0.16));
             total = total.add(iva);
         }
 
         venta.setTotal(total);
-        venta.setProductosVendidos(productos);
+        venta.setProductosVendidos(ventaRequest.getProductos());
 
         return ventaRepository.save(venta);
     }
@@ -96,12 +109,12 @@ public class VentaServiceImpl implements VentaService {
         Optional<Venta> ventaOpt = ventaRepository.findById(ventaId);
         if (ventaOpt.isPresent()) {
             Venta venta = ventaOpt.get();
-            
+
             // Devolver stock de productos
             for (ProductoVendido pv : venta.getProductosVendidos()) {
                 productoService.actualizarStock(pv.getProducto().getProductoId(), pv.getCantidad());
             }
-            
+
             ventaRepository.deleteById(ventaId);
         }
     }

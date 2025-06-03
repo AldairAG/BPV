@@ -8,6 +8,7 @@ import useUser from "../../hooks/useUser";
 import ModalTemplate, { useModal } from "../modal/ModalTemplate";
 import ModalCliente from "../modal/ModalCliente";
 import useCliente from "../../hooks/useCliente";
+import type { ClienteType } from "../../types/ClienteType";
 
 interface CarritoProps {
     items: CarritoItem[];
@@ -16,7 +17,7 @@ interface CarritoProps {
     onRemoveItem: (productoId: number) => void;
     onUpdateQuantity: (productoId: number, cantidad: number) => Promise<boolean>;
     onClearCart: () => void;
-    onProcessPurchase: (conIva:boolean) => Promise<void>;
+    onProcessPurchase: (conIva:boolean,cliente:ClienteType|null) => Promise<void>;
 }
 
 const Carrito: React.FC<CarritoProps> = ({
@@ -44,6 +45,7 @@ const Carrito: React.FC<CarritoProps> = ({
     // Obtener información del cliente
     const { 
         clienteSeleccionado, 
+        seleccionarCliente,
         clearSeleccion, 
     } = useCliente();
 
@@ -112,7 +114,9 @@ const Carrito: React.FC<CarritoProps> = ({
     const handleProcessPurchase = async () => {
         if (!isEmpty && !loading) {
             try {
-                await onProcessPurchase(includeIVA);
+                console.log(clienteSeleccionado);
+                
+                await onProcessPurchase(includeIVA,clienteSeleccionado);
 
                 // Guardar detalles para mostrar en la confirmación
                 setDetallesVenta({
@@ -121,7 +125,7 @@ const Carrito: React.FC<CarritoProps> = ({
                 });
                 
                 // Procesar la venta
-                await procesarVenta(includeIVA);
+                await procesarVenta(includeIVA,clienteSeleccionado);
 
                 // Mostrar mensaje de éxito
                 setVentaCompletada(true);
@@ -170,6 +174,9 @@ const Carrito: React.FC<CarritoProps> = ({
         }
     };
 
+    const handleSelectCliente = (cliente:ClienteType) => {
+        seleccionarCliente(cliente);
+    }
     // Mostrar en consola cuando cambia el cliente seleccionado
     useEffect(() => {
         console.log("Cliente seleccionado en Carrito:", clienteSeleccionado);
@@ -220,7 +227,7 @@ const Carrito: React.FC<CarritoProps> = ({
                                 )}
                             </div>
                             
-                            {clienteSeleccionado ? (
+                            {clienteSeleccionado?.idCliente !=null? (
                                 <div className="flex flex-col">
                                     <span className="text-white font-medium">{clienteSeleccionado.nombre}</span>
                                     <span className="text-xs text-gray-400">ID: {clienteSeleccionado.idCliente}</span>
@@ -472,6 +479,7 @@ const Carrito: React.FC<CarritoProps> = ({
                 title="Agregar Cliente a la Venta"
             >
                 <ModalCliente 
+                    onSelectCliente={handleSelectCliente}
                     onClose={closeModal} 
                 />
             </ModalTemplate>

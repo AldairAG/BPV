@@ -5,7 +5,7 @@ import useUser from './useUser';
 import VentaService from '../service/VentaService';
 import type { ProductoType } from '../types/ProductoType';
 import type { VentaType, VentaRequest } from '../types/VentaTypes';
-import useCliente from './useCliente';
+import type { ClienteType } from '../types/ClienteType';
 
 // Definir el tipo para los items del carrito
 export type CarritoItem = {
@@ -30,7 +30,6 @@ export const useCarrito = () => {
   
   // Hooks relacionados
   const { verificarDisponibilidad, fetchProductos } = useProducto();
-  const { clienteSeleccionado} = useCliente();
   const { user } = useUser();
   
   // Cargar carrito desde localStorage al iniciar
@@ -198,7 +197,7 @@ export const useCarrito = () => {
    * @param conIva Indica si la venta incluye IVA
    * @returns La venta creada si tuvo éxito
    */
-  const procesarVenta = useCallback(async (conIva: boolean): Promise<VentaType | null> => {
+  const procesarVenta = useCallback(async (conIva: boolean,cliente:ClienteType|null): Promise<VentaType | null> => {
     try {
       setLoading(true);
       setError(null);
@@ -228,13 +227,13 @@ export const useCarrito = () => {
         }
       }
 
-      console.log(clienteSeleccionado, 'Cliente seleccionado para la venta');
+      console.log(cliente, 'Cliente seleccionado para la venta');
       
       
       // Preparar request para crear venta
       const ventaRequest: VentaRequest = {
         usuarioId: user.id,
-        clienteId: clienteSeleccionado?.idCliente || null, // Puede ser null si no hay cliente seleccionado
+        clienteId: cliente?.idCliente || null, // Puede ser null si no hay cliente seleccionado
         productos: carritoItems.map(item => ({
           productoVendidoId: null, // Placeholder, will be set by backend
           precioUnitario: item.producto.precioVenta,

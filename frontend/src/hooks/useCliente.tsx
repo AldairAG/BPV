@@ -91,8 +91,7 @@ export const useCliente = () => {
     /**
      * Selecciona un cliente para edición (sin hacer petición al backend)
      */
-    const seleccionarCliente = useCallback((cliente: ClienteType) => {
-        console.log(cliente); 
+    const seleccionarCliente = useCallback((cliente: ClienteType) => { 
         setClienteSeleccionado(cliente);
     }, []);
 

@@ -56,7 +56,7 @@ public class VentaController {
             return ResponseEntity.badRequest().build();
         }
 
-        Venta venta = ventaService.crearVenta(usuario, ventaRequest.getProductos(), ventaRequest.getConIva());
+        Venta venta = ventaService.crearVenta(usuario, ventaRequest);
         return new ResponseEntity<>(venta, HttpStatus.CREATED);
     }
 

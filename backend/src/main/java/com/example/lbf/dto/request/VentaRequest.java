@@ -25,4 +25,6 @@ import lombok.Setter;
         private Boolean conIva;
 
         private Float descuento;
+
+        private Long clienteId;
     }

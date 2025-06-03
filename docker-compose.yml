@@ -1,12 +1,12 @@
-version: '3.8'  # <-- Asegúrate de tener esta línea al inicio
-
 services:
   app_lbf:
     build: 
       context: backend
       dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"  # importante: no necesitas publicar el puerto
+    networks:
+      - my_custom_network
     environment:
       DB_URL: jdbc:postgresql://200.58.100.28:5432/db_lbf
       DB_USER_NAME: postgres
@@ -20,14 +20,15 @@ services:
     ports:
       - "80:80"
       - "443:443"
-    restart: always
     depends_on:
       - app_lbf
     volumes:
       - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
     environment:
-      - VITE_API_BASE_URL=https://laburbujafeliz.com:8080/lbf
+      - VITE_API_BASE_URL=https://laburbujafeliz.com/lbf
+    networks:
+      - my_custom_network
 
 networks:
   my_custom_network:

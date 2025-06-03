@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type ClienteType } from "./ClienteService";
+import { type ClienteType } from "../types/ClienteType";
 import { type CarritoItem } from "../hooks/useCarrito";
 
 // TypeScript declaration for Web Serial API

@@ -166,7 +166,7 @@ const PanelVentas = () => {
   };
 
   return (
-    <section className="flex flex-col w-full text-white bg-gray-900 overflow-auto">
+    <section className="flex flex-col w-full text-white bg-gray-900">
       {/* Header responsive */}
       {hasRole(ROLES.USER) && (
         <header className="flex items-center justify-between h-16 bg-gray-900 
@@ -267,9 +267,9 @@ const PanelVentas = () => {
       )}
 
       {/* Contenido principal responsive */}
-      <main className="flex flex-col lg:flex-row w-full h-[calc(100vh-4rem)] overflow-hidden">
+      <main className="flex flex-col lg:flex-row w-full">
         {/* Panel de productos (se oculta en móvil cuando se muestra el carrito) */}
-        <div className={`w-full lg:w-2/3 xl:w-3/4 flex-shrink-0 overflow-y-auto ${showCarrito ? 'hidden lg:block' : 'block'}`}>
+        <div className={`w-full lg:w-2/3 xl:w-3/4 flex-shrink-0 ${showCarrito ? 'hidden lg:block' : 'block'}`}>
 
           <div className="p-3 md:p-4 lg:p-6 space-y-4">
             <div className="flex flex-col sm:flex-row justify-between gap-2 sm:items-center">
@@ -339,7 +339,7 @@ const PanelVentas = () => {
                 ))}
               </CardHead>
 
-              <CardContent className="mt-2 md:mt-4 overflow-auto">
+              <CardContent className="mt-2 md:mt-4 overflow-y-auto">
                 {productosFiltrados.length === 0 ? (
                   <div className="text-center py-8 text-gray-400">
                     {searchTerm || selectedCategoria !== null
@@ -441,7 +441,7 @@ const PanelVentas = () => {
         </div>
 
         {/* Carrito (se muestra en pantalla completa en móvil cuando está activo) */}
-        <aside className={`w-full lg:w-1/3 xl:w-1/4 h-full overflow-y-auto ${showCarrito ? 'block' : 'hidden lg:block'
+        <aside className={`w-full lg:w-1/3 xl:w-1/4 ${showCarrito ? 'block' : 'hidden lg:block'
           }`}>
           <div className="p-3 md:p-4 lg:p-0 lg:pr-4 lg:pt-6 h-full overflow-y-auto">
             {/* Botón de volver en móvil */}

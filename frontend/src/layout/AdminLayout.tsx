@@ -104,10 +104,12 @@ const AdminLayout = () => {
                     {/* Botón de cerrar sesión */}
                     <Button 
                         onClick={handleLogout}
-                        className="ml-4 mr-2"
+                        className=""
                     >
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Cerrar sesión
+                        <LogOut className="h-4 w-4" />
+                        <span className="max-[880px]:hidden">
+                            Cerrar sesión
+                        </span>
                     </Button>
                 </div>
             </header>

@@ -59,7 +59,7 @@ const Productos = () => {
     const [initialValues, setInitialValues] = useState<{
         nombre: string;
         precioVenta: number | string;
-        precioCosto: number | string;
+        precioCompra: number | string;
         stock: number | string;
         stockMinimo: number | string;
         codigoBarras: string;
@@ -71,7 +71,7 @@ const Productos = () => {
     }>({
         nombre: "",
         precioVenta: "",
-        precioCosto: "",
+        precioCompra: "",
         stock: "",
         stockMinimo: "",
         codigoBarras: "",
@@ -117,7 +117,7 @@ const Productos = () => {
         setInitialValues({
             nombre: "",
             precioVenta: "",
-            precioCosto: "",
+            precioCompra: "",
             stock: "",
             stockMinimo: "",
             codigoBarras: "",
@@ -132,6 +132,8 @@ const Productos = () => {
 
     // Función para abrir el modal de edición
     const handleOpenEditModal = (producto: ProductoType) => {
+        console.log("Producto a editar:", producto);
+        
         setEditMode(true);
         setInitialValues({
             ...producto,
@@ -273,18 +275,18 @@ const Productos = () => {
                                 </div>
                                 <div>
                                     <Input
-                                        id="precioCosto"
+                                        id="precioCompra"
                                         label="Precio de costo"
-                                        name="precioCosto"
+                                        name="precioCompra"
                                         type="number"
                                         required
                                         placeholder="0.00"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.precioCosto}
+                                        value={values.precioCompra}
                                     />
                                     <ErrorMessage
-                                        name="precioCosto"
+                                        name="precioCompra"
                                         component="div"
                                         className="text-red-500 text-sm mt-1"
                                     />

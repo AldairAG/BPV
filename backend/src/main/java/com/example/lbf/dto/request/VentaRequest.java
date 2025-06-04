@@ -15,7 +15,7 @@ import lombok.Setter;
     @Getter
     @Setter
     public class VentaRequest {
-        @Schema(description = "ID del usuario que realiza la venta", required = true)
+        @Schema(description = "ID del usuario que realiza la venta")
         private Long usuarioId;
         
         @Schema(description = "Lista de productos vendidos con sus cantidades y precios", required = true)

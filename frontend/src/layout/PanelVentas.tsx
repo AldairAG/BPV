@@ -146,8 +146,6 @@ const PanelVentas = () => {
   const handleProcessVenta = async (conIva: boolean,cliente:ClienteType|null) => {
     setProcessingVenta(true);
     try {
-      console.log(cliente);
-      
       const ventaRealizada = await procesarVenta(conIva,cliente);
       if (ventaRealizada) {
         toast.success(`Venta realizada con éxito. Total: $${ventaRealizada.total.toFixed(2)}`);

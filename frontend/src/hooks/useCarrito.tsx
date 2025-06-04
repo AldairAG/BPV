@@ -227,9 +227,6 @@ export const useCarrito = () => {
         }
       }
 
-      console.log(cliente, 'Cliente seleccionado para la venta');
-      
-      
       // Preparar request para crear venta
       const ventaRequest: VentaRequest = {
         usuarioId: user.id,
@@ -244,9 +241,6 @@ export const useCarrito = () => {
         })),
         conIva
       };
-
-      console.log('Procesando venta con datos:', ventaRequest);
-      
 
       // Enviar solicitud al servidor
       const ventaCreada = await VentaService.crearVenta(ventaRequest);

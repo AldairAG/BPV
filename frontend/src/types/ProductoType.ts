@@ -2,10 +2,11 @@ import type { CategoriaType } from "./CategoriaType";
 
 // Interfaces for the Producto-related types
 export type ProductoType = {
+  id: number;
   productoId: number;
   nombre: string;
   precioVenta: number;
-  precioCosto: number;
+  precioCompra: number;
   stock: number;
   stockMinimo: number;
   codigoBarras?: string;

@@ -23,7 +23,7 @@ export interface ProductoVendidoType {
   precioUnitario: number;
   subtotal: number;
   producto: ProductoType;
-  descuento?: number; // Descuento opcional
+  descuento?: number|0; // Descuento opcional
 }
 
 /**
@@ -34,4 +34,10 @@ export interface VentaRequest {
   clienteId?: number | null;  // Agregar campo para el ID del cliente
   productos: ProductoVendidoType[];
   conIva: boolean;
+}
+
+export interface VentaMonitoreoResponse {
+  usuario: UsuarioType;
+  venta: VentaType;
+  productosVendidos: ProductoType[];
 }

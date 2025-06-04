@@ -180,6 +180,8 @@ const ReporteService = {
     
     const fechaInicio = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
     const fechaInicioStr = fechaInicio.toISOString().split('T')[0];
+
+    console.log(ReporteService.getVentasDiarias(fechaInicioStr, fechaFin));
     
     return ReporteService.getVentasDiarias(fechaInicioStr, fechaFin);
   },

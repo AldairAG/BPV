@@ -103,29 +103,15 @@ public class ReporteServiceImpl implements ReporteService {
     @Override
     @Transactional(readOnly = true)
     public List<VentaDiariaDTO> getVentasDiarias(LocalDate fechaInicio, LocalDate fechaFin) {
-        List<Venta> ventas = ventaRepository.findByFechaBetween(fechaInicio, fechaFin);
-
-        Map<LocalDate, BigDecimal> ventasDiariasMap = new HashMap<>();
-
-        for (Venta venta : ventas) {
-            LocalDate fecha = venta.getFecha();
-            BigDecimal total = venta.getTotal();
-
-            ventasDiariasMap.put(fecha,
-                    ventasDiariasMap.getOrDefault(fecha, BigDecimal.ZERO).add(total));
-        }
-
-        // Convertir el Map a una lista de DTOs
-        List<VentaDiariaDTO> ventasDiarias = new ArrayList<>();
-        
-        for (Map.Entry<LocalDate, BigDecimal> entry : ventasDiariasMap.entrySet()) {
-            ventasDiarias.add(new VentaDiariaDTO(entry.getKey(), entry.getValue()));
-        }
-        
-        // Ordenar por fecha
-        ventasDiarias.sort((a, b) -> a.getFecha().compareTo(b.getFecha()));
-        
-        return ventasDiarias;
+        return ventaRepository.findByFechaBetween(fechaInicio, fechaFin).stream()
+            .collect(Collectors.groupingBy(
+                Venta::getFecha,
+                Collectors.mapping(Venta::getTotal, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+            ))
+            .entrySet().stream()
+            .map(entry -> new VentaDiariaDTO(entry.getKey(), entry.getValue()))
+            .sorted((a, b) -> a.getFecha().compareTo(b.getFecha()))
+            .collect(Collectors.toList());
     }
 
     @Override

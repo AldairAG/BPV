@@ -1,4 +1,4 @@
-import type { VentaRequest, VentaType } from '../types/VentaTypes';
+import type { VentaMonitoreoResponse, VentaRequest, VentaType } from '../types/VentaTypes';
 import { apiClient } from './apiClient';
 
 const BASE_URL = '/ventas';
@@ -13,6 +13,8 @@ export const VentaService = {
    * @returns La venta creada con su ID asignado
    */
   crearVenta: async (ventaRequest: VentaRequest): Promise<VentaType> => {
+    console.log('Creando venta:', ventaRequest);
+    
     const response = await apiClient.post<VentaType>(BASE_URL, ventaRequest);
     return response.data;
   },
@@ -57,6 +59,19 @@ export const VentaService = {
    */
   getVentasByRangoDeFechas: async (fechaInicio: string, fechaFin: string): Promise<VentaType[]> => {
     const response = await apiClient.get<VentaType[]>(`${BASE_URL}/rango`, {
+      params: { fechaInicio, fechaFin }
+    });
+    return response.data;
+  },
+
+  /**
+   * Obtiene todas las ventas realizadas entre un rango de fechas
+   * @param fechaInicio Fecha de inicio en formato 'YYYY-MM-DD'
+   * @param fechaFin Fecha de fin en formato 'YYYY-MM-DD'
+   * @returns Lista de ventas en el rango de fechas
+   */
+  getVentasByRangoDeFechasParaMonitoreo: async (fechaInicio: string, fechaFin: string): Promise<VentaMonitoreoResponse[]> => {
+    const response = await apiClient.get<VentaMonitoreoResponse[]>(`${BASE_URL}/rango-monitoreo`, {
       params: { fechaInicio, fechaFin }
     });
     return response.data;

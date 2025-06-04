@@ -36,13 +36,13 @@ public class VentaServiceImpl implements VentaService {
         venta.setUsuario(usuario);
         venta.setFecha(LocalDate.now());
         venta.setConIva(ventaRequest.getConIva());
-        venta.setCliente(null);
-        ;
 
-        clienteRepository.findById(ventaRequest.getClienteId())
+        if (ventaRequest.getClienteId() != null) {
+            clienteRepository.findById(ventaRequest.getClienteId())
                 .ifPresent(cliente -> {
-                    venta.setCliente(cliente);
+                venta.setCliente(cliente);
                 });
+        }
 
         // Calcular total de la venta
         BigDecimal total = BigDecimal.ZERO;

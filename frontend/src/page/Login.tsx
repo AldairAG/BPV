@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHead, CardTittle } from "../com
 import { Input } from "../components/ui/Input";
 import { ArrowRightEndOnRectangleIcon } from "@heroicons/react/24/outline";
 import useUser from "../hooks/useUser";
+import logo from "../assets/logo.png"; // Asegúrate de tener una imagen de logo en esta ruta
 
 // Esquema de validación con Yup
 const LoginSchema = Yup.object().shape({
@@ -44,7 +45,8 @@ const Login = () => {
     return (
         <div className="min-h-screen flex items-center justify-center px-4 bg-gray-900">
             <div className="w-full max-w-md">
-                <div className="text-center mb-8">
+                <div className="text-center mb-8 flex flex-col items-center">
+                    <img src={logo} alt="logo" className="w-30 h-30 md:w-50 md:h-50"/>
                     <h1 className="text-3xl font-bold text-sky-600">La Burbuja Feliz</h1>
                     <p className="text-gray-400">Sistema de Punto de Venta para Artículos de Limpieza</p>
                 </div>

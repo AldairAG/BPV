@@ -132,7 +132,7 @@ const Reportes = () => {
 
           {/* Filtros y acciones */}
           <div className="flex items-center gap-4">
-            {tabActual !== 'dashboard' && tabActual !== 'mensual' && tabActual !== 'stock' && tabActual !== 'ventas' && (
+            {tabActual !== 'dashboard' && tabActual !== 'mensual' && tabActual !== 'stock' && (
               <div className="bg-white dark:bg-gray-800 rounded-md shadow p-2">
                 <DatePickerWithRange
                   onChange={handleDateRangeChange}

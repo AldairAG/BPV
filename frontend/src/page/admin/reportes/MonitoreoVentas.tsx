@@ -23,9 +23,15 @@ const formatearPrecio = (valor: number): string => {
 const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
   // Estados para el monitoreo de ventas
   const [ventasFiltradas, setVentasFiltradas] = useState<VentaMonitoreoResponse[]>([]);
+  const [ventasOriginales, setVentasOriginales] = useState<VentaMonitoreoResponse[]>([]);
   const [ventaSeleccionada, setVentaSeleccionada] = useState<VentaMonitoreoResponse | null>(null);
   const [imprimiendo, setImprimiendo] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [filtroCliente, setFiltroCliente] = useState<string>("");
+  const [clientesUnicos, setClientesUnicos] = useState<{ id: number, nombre: string }[]>([]);
+  // Añadir nuevos estados para filtrar por hora
+  const [filtroHoraInicio, setFiltroHoraInicio] = useState<string>("");
+  const [filtroHoraFin, setFiltroHoraFin] = useState<string>("");
 
   // Usar el hook de modal para gestionar el estado del modal
   const { isOpen, openModal, closeModal } = useModal();
@@ -35,17 +41,45 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
     cargarVentas();
   }, [fechaInicio, fechaFin]);
 
+  // Extraer los clientes únicos de las ventas
+  useEffect(() => {
+    if (ventasOriginales.length > 0) {
+      const clientes = ventasOriginales
+        .filter(venta => venta.cliente?.idCliente)
+        .map(venta => ({
+          id: venta.cliente.idCliente,
+          nombre: venta.cliente.nombre || "Cliente sin nombre"
+        }));
+
+      // Eliminar duplicados
+      const clientesMap = new Map();
+      clientes.forEach(cliente => {
+        if (!clientesMap.has(cliente.id)) {
+          clientesMap.set(cliente.id, cliente);
+        }
+      });
+
+      const clientesUnicosArray = Array.from(clientesMap.values());
+
+      // Ordenar alfabéticamente
+      clientesUnicosArray.sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+      setClientesUnicos(clientesUnicosArray);
+    }
+  }, [ventasOriginales]);
+
   // Función para cargar ventas
   const cargarVentas = async () => {
     setLoading(true);
     try {
       const response = await VentaService.getVentasByRangoDeFechasParaMonitoreo(fechaInicio, fechaFin);
-      console.log("Ventas cargadas:", response);
 
       // Ordenar por fecha más reciente por defecto
       const ventasOrdenadas = [...response].sort(
         (a, b) => new Date(b.venta.fecha).getTime() - new Date(a.venta.fecha).getTime()
       );
+
+      setVentasOriginales(ventasOrdenadas);
       setVentasFiltradas(ventasOrdenadas);
     } catch (error) {
       console.error("Error al cargar ventas:", error);
@@ -53,6 +87,63 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Función para manejar el cambio de hora de inicio
+  const handleFiltroHoraInicioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFiltroHoraInicio(e.target.value);
+    aplicarFiltros(filtroCliente, e.target.value, filtroHoraFin);
+  };
+
+  // Función para manejar el cambio de hora de fin
+  const handleFiltroHoraFinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFiltroHoraFin(e.target.value);
+    aplicarFiltros(filtroCliente, filtroHoraInicio, e.target.value);
+  };
+
+  // Función para aplicar todos los filtros a la vez
+  const aplicarFiltros = (clienteId: string, horaInicio: string, horaFin: string) => {
+    let ventasFiltradas = [...ventasOriginales];
+    
+    // Filtrar por cliente si hay uno seleccionado
+    if (clienteId !== "") {
+      ventasFiltradas = ventasFiltradas.filter(
+        venta => venta.cliente?.idCliente === parseInt(clienteId)
+      );
+    }
+    
+    // Filtrar por hora de inicio si está definida
+    if (horaInicio) {
+      ventasFiltradas = ventasFiltradas.filter(venta => {
+        // Convertir hora de la venta a formato comparable
+        const horaVenta = venta.venta.hora ? 
+          venta.venta.hora.replace(/\s?[AP]M$/i, "").trim() : 
+          "00:00";
+        
+        return horaVenta >= horaInicio;
+      });
+    }
+    
+    // Filtrar por hora de fin si está definida
+    if (horaFin) {
+      ventasFiltradas = ventasFiltradas.filter(venta => {
+        // Convertir hora de la venta a formato comparable
+        const horaVenta = venta.venta.hora ? 
+          venta.venta.hora.replace(/\s?[AP]M$/i, "").trim() : 
+          "00:00";
+        
+        return horaVenta <= horaFin;
+      });
+    }
+    
+    setVentasFiltradas(ventasFiltradas);
+  };
+
+  // Manejar el cambio del filtro de cliente
+  const handleFiltroClienteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const clienteId = e.target.value;
+    setFiltroCliente(clienteId);
+    aplicarFiltros(clienteId, filtroHoraInicio, filtroHoraFin);
   };
 
   // Ver detalle de venta
@@ -89,7 +180,8 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
         iva: response.venta.conIva ? (response.venta.total - response.venta.productosVendidos.reduce((total, pv) => total + pv.subtotal, 0)) : 0,
         total: response.venta.total,
         fecha: new Date(response.venta.fecha).toLocaleString(),
-        vendedor: response.venta.usuario?.nombre || "Desconocido",
+        vendedor: response.usuario?.nombre || "Desconocido",
+        cliente: response.cliente || null,
         conIva: response.venta.conIva,
         descuentos: response.venta.productosVendidos.reduce((acc, pv) => {
           if (pv.descuento) {
@@ -128,8 +220,13 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
 
         <div className="mb-4 grid grid-cols-2 gap-4">
           <div>
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha</h4>
-            <p className="text-sm">{ventaSeleccionada.venta.fecha}</p>
+            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha y Hora</h4>
+            <p className="text-sm">
+              {new Date(ventaSeleccionada.venta.fecha).toLocaleDateString()} 
+              <span className="ml-2 text-gray-600 dark:text-gray-400">
+                {new Date(ventaSeleccionada.venta.hora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              </span>
+            </p>
           </div>
           <div>
             <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Usuario</h4>
@@ -143,12 +240,24 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
             <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Total</h4>
             <p className="text-sm font-bold">{formatearPrecio(ventaSeleccionada.venta.total)}</p>
           </div>
+          <div>
+            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Cliente</h4>
+            <p className="text-sm">
+              {ventaSeleccionada.cliente ? (
+                <span className="font-bold">
+                  {ventaSeleccionada.cliente.nombre || "Sin nombre"}
+                </span>
+              ) : (
+                <span className="text-gray-500 dark:text-gray-400">- - -</span>
+              )}
+            </p>
+          </div>
         </div>
 
         <h4 className="font-medium mb-2 text-gray-700 dark:text-gray-300">Productos Vendidos</h4>
         <div className="max-h-80 overflow-y-auto border dark:border-gray-700 rounded-md">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-100 dark:bg-gray-800">
+            <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0">
               <tr>
                 <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
                   Producto
@@ -165,19 +274,26 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {ventaSeleccionada?.productosVendidos?.length > 0 ? (
+              {ventaSeleccionada?.venta?.productosVendidos?.length > 0 ? (
                 ventaSeleccionada.venta.productosVendidos.map((productoVendido, index) => (
                   <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-4 py-2 whitespace-nowrap text-xs">
-                      <div className="font-medium">{ventaSeleccionada?.usuario.nombre || "Desconocido"}</div>
-                      {productoVendido.precioUnitario > 0 ? (
-                          <div className="text-xs text-green-600 dark:text-green-400">
-                            Descuento: {productoVendido.descuento ?? 0}%
-                          </div>
-                        ) : null}
+                      <div className="font-medium">
+                        {productoVendido.producto?.nombre || "Producto desconocido"}
+                      </div>
+                      {typeof productoVendido.descuento === "number" && productoVendido.descuento > 0 ? (
+                        <div className="text-xs text-green-600 dark:text-green-400">
+                          Descuento: {productoVendido.descuento}%
+                        </div>
+                      ) : null}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-xs text-center">
                       {productoVendido.cantidad}
+                      {productoVendido.producto?.tipo === "Líquido"
+                        ? " lt"
+                        : productoVendido.producto?.tipo === "Sólido"
+                          ? " kg"
+                          : " uds"}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-xs text-right">
                       {formatearPrecio(productoVendido.precioUnitario)}
@@ -271,7 +387,84 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
         </CardTittle>
       </CardHead>
 
-      <CardContent>
+      <CardContent className="flex flex-col space-y-4">
+        {/* Filtros */}
+        <div className="mb-4 grid md:grid-cols-3 sm:grid-cols-2 gap-4 items-center sm:items-end">
+          <div className="w-full">
+            <label
+              htmlFor="cliente-filter"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Filtrar por cliente
+            </label>
+            <div className="relative">
+              <select
+                id="cliente-filter"
+                value={filtroCliente}
+                onChange={handleFiltroClienteChange}
+                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">Todos los clientes</option>
+                {clientesUnicos.map(cliente => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="w-full">
+            <label
+              htmlFor="hora-inicio-filter"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Hora inicio
+            </label>
+            <input
+              id="hora-inicio-filter"
+              type="time"
+              value={filtroHoraInicio}
+              onChange={handleFiltroHoraInicioChange}
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+
+          <div className="w-full">
+            <label
+              htmlFor="hora-fin-filter"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+            >
+              Hora fin
+            </label>
+            <input
+              id="hora-fin-filter"
+              type="time"
+              value={filtroHoraFin}
+              onChange={handleFiltroHoraFinChange}
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white"
+            />
+          </div>
+
+          <div className="flex items-end">
+            <Button
+              onClick={() => {
+                setFiltroCliente("");
+                setFiltroHoraInicio("");
+                setFiltroHoraFin("");
+                setVentasFiltradas(ventasOriginales);
+              }}
+              className="h-full bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            >
+              Limpiar filtros
+            </Button>
+          </div>
+
+          <div className="ml-auto text-sm text-gray-500 dark:text-gray-400 sm:col-span-2 md:col-span-1">
+            Mostrando {ventasFiltradas.length} de {ventasOriginales.length} ventas
+          </div>
+        </div>
+
         {loading ? (
           <div className="flex justify-center items-center py-12">
             <div className="w-12 h-12 border-4 border-t-blue-500 border-b-blue-700 rounded-full animate-spin"></div>
@@ -290,6 +483,9 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Usuario
                   </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Cliente
+                  </th>
                   <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Total
                   </th>
@@ -304,8 +500,8 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {ventasFiltradas.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                      No se encontraron ventas en el período seleccionado
+                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                      No se encontraron ventas con los filtros seleccionados
                     </td>
                   </tr>
                 ) : (
@@ -318,10 +514,20 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                         #{ventaResponse.venta.ventaId}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {ventaResponse.venta.fecha}
+                        <div className="font-medium">
+                          {new Date(ventaResponse.venta.fecha).toLocaleDateString()}
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {ventaResponse.venta.hora}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         {ventaResponse?.usuario?.nombre || 'Desconocido'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        {ventaResponse?.cliente?.nombre ||
+                          <span className="text-gray-400 dark:text-gray-500">Sin cliente</span>
+                        }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
                         {ventaResponse.venta.anulada ? (

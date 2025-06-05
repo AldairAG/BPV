@@ -11,7 +11,7 @@ interface ModalProductoGranelProps {
         precioVenta: number;
         esGranel: boolean;
     };
-    onConfirm: (productoId: number, cantidad: number) => Promise<void>;
+    onConfirm: (cantidad: number) => Promise<void>;
 }
 
 const ModalProductoGranel: React.FC<ModalProductoGranelProps> = ({
@@ -56,8 +56,9 @@ const ModalProductoGranel: React.FC<ModalProductoGranelProps> = ({
         try {
             // Convertir a litros si es necesario para el cálculo
             const cantidadFinal = unidad === 'l' ? cantidad : cantidad / 1000;
+            console.log(`Confirmando ${cantidadFinal} litros del producto ${cantidad}`);
             
-            await onConfirm(producto.productoId, cantidadFinal);
+            await onConfirm(cantidadFinal);
             onClose();
         } catch (error) {
             console.error("Error al confirmar cantidad:", error);

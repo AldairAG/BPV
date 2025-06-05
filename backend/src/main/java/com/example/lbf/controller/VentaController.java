@@ -134,6 +134,7 @@ public class VentaController {
                         VentaMonitoreoResponse response = new VentaMonitoreoResponse();
                         response.setUsuario(venta.getUsuario());
                         response.setVenta(venta);
+                        response.setCliente(venta.getCliente());
 
                         List<ProductoVendido> productosVendidos = venta.getProductosVendidos();
 

@@ -229,6 +229,7 @@ export const useCarrito = () => {
 
       // Preparar request para crear venta
       const ventaRequest: VentaRequest = {
+        sucursal: user.sucursal || 'Sucursal Default', // Usar sucursal del usuario o una por defecto
         usuarioId: user.id,
         clienteId: cliente?.idCliente || null, // Puede ser null si no hay cliente seleccionado
         productos: carritoItems.map(item => ({

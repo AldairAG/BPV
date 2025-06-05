@@ -35,7 +35,11 @@ public class VentaServiceImpl implements VentaService {
         Venta venta = new Venta();
         venta.setUsuario(usuario);
         venta.setFecha(LocalDate.now());
+        java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("hh:mm a");
+        String horaFormateada = java.time.LocalTime.now().format(formatter);
+        venta.setHora(horaFormateada);
         venta.setConIva(ventaRequest.getConIva());
+        venta.setSucursal(ventaRequest.getSucursal());
 
         if (ventaRequest.getClienteId() != null) {
             clienteRepository.findById(ventaRequest.getClienteId())

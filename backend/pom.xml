@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.example</groupId>
 	<artifactId>lbf</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>lbf</name>
 	<description>Api de gestion de datos de la bobuja feliz</description>
 	<url/>

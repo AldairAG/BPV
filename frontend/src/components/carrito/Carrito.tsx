@@ -114,8 +114,6 @@ const Carrito: React.FC<CarritoProps> = ({
     const handleProcessPurchase = async () => {
         if (!isEmpty && !loading) {
             try {
-                console.log(clienteSeleccionado);
-                
                 await onProcessPurchase(includeIVA,clienteSeleccionado);
 
                 // Guardar detalles para mostrar en la confirmación

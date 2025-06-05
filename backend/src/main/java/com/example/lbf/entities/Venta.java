@@ -41,4 +41,8 @@ public class Venta {
 
     private Boolean conIva;
 
+    private String hora;
+
+    private String sucursal;
+
 }

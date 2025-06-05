@@ -12,15 +12,15 @@ interface ItemProductoCajeroProps {
     quantity?: number;
 }
 
-const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({ 
-    producto, 
-    onAddToCart, 
+const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
+    producto,
+    onAddToCart,
     inCart = false,
     quantity = 0
 }) => {
     // Estado para controlar el modal de productos a granel
     const [modalGranelOpen, setModalGranelOpen] = useState(false);
-    
+
     // Verificar si hay stock disponible
     const outOfStock = producto.stock <= 0;
     const lowStock = producto.stock <= producto.stockMinimo;
@@ -39,7 +39,7 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
     };
 
     // Confirmar cantidad seleccionada en el modal
-    const handleConfirmGranel = async ( cantidad: number) => {
+    const handleConfirmGranel = async (cantidad: number) => {
         console.log(`Cantidad seleccionada para ${producto.nombre}:`, cantidad);
         await onAddToCart(cantidad);
     };
@@ -56,7 +56,7 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
                         <Check className="w-4 h-4 text-white" />
                     </div>
                 )}
-                
+
                 <div className="p-4">
                     <div className="flex justify-between items-start mb-2">
                         <div className={`p-2 rounded-full ${outOfStock ? 'bg-red-100' : 'bg-white'}`}>
@@ -66,7 +66,7 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
                                 <Droplets className={`w-5 h-5 ${outOfStock ? 'text-red-700' : 'text-blue-700'}`} />
                             )}
                         </div>
-                        
+
                         {inCart && quantity > 0 && (
                             <div className="bg-green-100 text-green-800 rounded-full px-2 py-1 text-xs font-bold">
                                 {quantity}
@@ -79,7 +79,7 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
                     </h3>
 
                     <div className="flex justify-between items-center mb-2">
-                        <Badge 
+                        <Badge
                             className="bg-blue-100 text-blue-700"
                             style={{ backgroundColor: producto.categoria?.color, color: '#fff' }}
                         >
@@ -113,10 +113,10 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
                         )}
                     </div>
                 </div>
-                
+
                 <div className="flex items-center p-3 pt-0">
                     {inCart ? (
-                        <button 
+                        <button
                             onClick={handleAddToCart}
                             className="text-white inline-flex items-center 
                                 justify-center gap-2 whitespace-nowrap text-sm 
@@ -130,7 +130,7 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
                             Agregar más
                         </button>
                     ) : (
-                        <button 
+                        <button
                             onClick={handleAddToCart}
                             disabled={outOfStock}
                             className="text-white inline-flex items-center 

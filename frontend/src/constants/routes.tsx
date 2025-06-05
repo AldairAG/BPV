@@ -1,9 +1,8 @@
 export const USER_ROUTES={
-    HOME: "/c/inicio",
-    LOGIN: "/",
-    DASHBOARD: "/c/dashboard",
-    SETTINGS: "/c/settings",
-    NOT_FOUND: "*",
+    USER: "/c/",
+    HOME: "inicio",
+    CORTE_DE_CAJA: "corte_de_caja",
+    LOGIN: "/"
 }
 
 export const ADMIN_ROUTES={

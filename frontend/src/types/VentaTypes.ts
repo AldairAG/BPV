@@ -1,3 +1,4 @@
+import type { ClienteType } from "./ClienteType";
 import type { ProductoType } from "./ProductoType";
 import type { UsuarioType } from "./UsuarioType";
 
@@ -11,7 +12,9 @@ export interface VentaType {
   conIva: boolean;
   anulada: boolean;
   usuario: UsuarioType;
+  hora: string;
   productosVendidos: ProductoVendidoType[];
+  sucursal: string;
 }
 
 /**
@@ -30,6 +33,7 @@ export interface ProductoVendidoType {
  * Interfaz para la solicitud de creación de venta
  */
 export interface VentaRequest {
+  sucursal: string;
   usuarioId: number;
   clienteId?: number | null;  // Agregar campo para el ID del cliente
   productos: ProductoVendidoType[];
@@ -40,4 +44,5 @@ export interface VentaMonitoreoResponse {
   usuario: UsuarioType;
   venta: VentaType;
   productosVendidos: ProductoType[];
+  cliente:ClienteType;
 }

@@ -13,8 +13,6 @@ export const VentaService = {
    * @returns La venta creada con su ID asignado
    */
   crearVenta: async (ventaRequest: VentaRequest): Promise<VentaType> => {
-    console.log('Creando venta:', ventaRequest);
-    
     const response = await apiClient.post<VentaType>(BASE_URL, ventaRequest);
     return response.data;
   },

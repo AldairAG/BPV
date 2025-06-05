@@ -27,4 +27,6 @@ import lombok.Setter;
         private Float descuento;
 
         private Long clienteId;
+
+        private String sucursal;
     }

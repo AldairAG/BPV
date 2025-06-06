@@ -36,6 +36,7 @@ export const UserService = {
     await apiClient.delete(`${BASE_URL}/${id}`);
   },
 
+
   /**
    * Obtiene un usuario por su ID
    * @param id ID del usuario a buscar

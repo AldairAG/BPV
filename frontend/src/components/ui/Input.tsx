@@ -46,7 +46,7 @@ export const Input: React.FC<InputProps> = ({
                     type={isSearch ? 'search' : props.type}
                     {...props}
                     className={twMerge(
-                        "flex h-10 w-full rounded-md border border-input px-3 py-2 text-base bg-transparent focus-visible:outline-none focus-visible:ring focus-visible:ring-ring focus-visible:ring-offset md:text-sm",
+                        "flex h-10 w-full rounded-md border border-inpu px-3 py-2 text-base focus-visible:outline-none focus-visible:ring focus-visible:ring-ring focus-visible:ring-offset md:text-sm",
                         isSearch && "pl-10" // ← espacio para el ícono
                     , classNameInput)}
                 />

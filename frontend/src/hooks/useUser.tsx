@@ -155,6 +155,22 @@ export const useUser = () => {
     }
   };
 
+  const deleteUser = async (id: number): Promise<boolean> => {
+    try { 
+      await UserService.desactivarUsuario(id);
+      // Si se elimina el usuario actual, limpiar el estado
+      if (user && user.id === id) {
+        logout();
+      }
+      return true;
+    }
+    catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Error al eliminar usuario';
+      alert(errorMessage);
+      return false;
+    }
+  }
+
   return {
     // Estado
     user,
@@ -177,7 +193,8 @@ export const useUser = () => {
     // Operaciones CRUD
     getAllUsers,
     createUser,
-    updateUser
+    updateUser,
+    deleteUser
   };
 };
 

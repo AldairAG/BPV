@@ -73,6 +73,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
     setLoading(true);
     try {
       const response = await VentaService.getVentasByRangoDeFechasParaMonitoreo(fechaInicio, fechaFin);
+      console.log("Ventas cargadas:", response);
 
       // Ordenar por fecha más reciente por defecto
       const ventasOrdenadas = [...response].sort(
@@ -104,38 +105,38 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
   // Función para aplicar todos los filtros a la vez
   const aplicarFiltros = (clienteId: string, horaInicio: string, horaFin: string) => {
     let ventasFiltradas = [...ventasOriginales];
-    
+
     // Filtrar por cliente si hay uno seleccionado
     if (clienteId !== "") {
       ventasFiltradas = ventasFiltradas.filter(
         venta => venta.cliente?.idCliente === parseInt(clienteId)
       );
     }
-    
+
     // Filtrar por hora de inicio si está definida
     if (horaInicio) {
       ventasFiltradas = ventasFiltradas.filter(venta => {
         // Convertir hora de la venta a formato comparable
-        const horaVenta = venta.venta.hora ? 
-          venta.venta.hora.replace(/\s?[AP]M$/i, "").trim() : 
+        const horaVenta = venta.venta.hora ?
+          venta.venta.hora.replace(/\s?[AP]M$/i, "").trim() :
           "00:00";
-        
+
         return horaVenta >= horaInicio;
       });
     }
-    
+
     // Filtrar por hora de fin si está definida
     if (horaFin) {
       ventasFiltradas = ventasFiltradas.filter(venta => {
         // Convertir hora de la venta a formato comparable
-        const horaVenta = venta.venta.hora ? 
-          venta.venta.hora.replace(/\s?[AP]M$/i, "").trim() : 
+        const horaVenta = venta.venta.hora ?
+          venta.venta.hora.replace(/\s?[AP]M$/i, "").trim() :
           "00:00";
-        
+
         return horaVenta <= horaFin;
       });
     }
-    
+
     setVentasFiltradas(ventasFiltradas);
   };
 
@@ -161,6 +162,21 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
       setVentaSeleccionada(null);
     }, 300);
   };
+
+  const findNombreById = (id: number) => {
+    const productoEncontrado = ventaSeleccionada?.productosVendidos.find(producto =>
+      producto.productoVentas.some(venta => venta.productoVendidoId === id)
+    );
+
+    // Mostrar el resultado
+    if (productoEncontrado) {
+      console.log("Producto encontrado:", productoEncontrado.nombre);
+      return productoEncontrado.nombre || "Producto sin nombre";
+    } else {
+      console.log("Producto no encontrado");
+      return null
+    }
+  }
 
   // Imprimir ticket de venta
   const imprimirTicket = async (response: VentaMonitoreoResponse) => {
@@ -222,9 +238,9 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
           <div>
             <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha y Hora</h4>
             <p className="text-sm">
-              {new Date(ventaSeleccionada.venta.fecha).toLocaleDateString()} 
+              {new Date(ventaSeleccionada.venta.fecha).toLocaleDateString()}
               <span className="ml-2 text-gray-600 dark:text-gray-400">
-                {new Date(ventaSeleccionada.venta.hora).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                {ventaSeleccionada.venta.hora}
               </span>
             </p>
           </div>
@@ -279,7 +295,9 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                   <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-4 py-2 whitespace-nowrap text-xs">
                       <div className="font-medium">
-                        {productoVendido.producto?.nombre || "Producto desconocido"}
+                        {productoVendido.productoVendidoId != null
+                          ? findNombreById(productoVendido.productoVendidoId) || "Producto desconocido"
+                          : "Producto desconocido"}
                       </div>
                       {typeof productoVendido.descuento === "number" && productoVendido.descuento > 0 ? (
                         <div className="text-xs text-green-600 dark:text-green-400">

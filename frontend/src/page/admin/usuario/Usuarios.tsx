@@ -73,7 +73,7 @@ const Usuarios = () => {
     const [usuariosFiltrados, setUsuariosFiltrados] = useState<UsuarioType[]>([]);
 
     // Obtener los métodos del hook useUser
-    const { getAllUsers, createUser, updateUser } = useUser();
+    const { getAllUsers, createUser, updateUser,deleteUser } = useUser();
 
     // Cargar usuarios al montar el componente
     useEffect(() => {
@@ -132,7 +132,7 @@ const Usuarios = () => {
         setInitialValues({
             ...usuario,
             id: usuario.id ?? 0,
-            contrasena: "", // No incluir contraseña en edición
+            contrasena: usuario.contrasena ?? "", // No incluir contraseña en edición
             sucursal: usuario.sucursal || "" // Manejar caso donde sucursal no existe
         });
         openModal();
@@ -141,10 +141,9 @@ const Usuarios = () => {
     // Función para eliminar un usuario
     const handleDelete = async (id: number) => {
         if (window.confirm("¿Está seguro que desea eliminar este usuario?")) {
-            // Aquí implementarías la lógica de eliminación
-            // Como no veo un método deleteUser en useUser, tendrías que agregarlo
-            console.log("Eliminar usuario con ID:", id);
-            // Después de eliminar, recargar la lista
+
+            await deleteUser(id);
+
             await fetchUsuarios();
         }
     };
@@ -256,11 +255,10 @@ const Usuarios = () => {
                             <div>
                                 <Input
                                     id="contrasena"
-                                    label={editMode ? "Contraseña (dejar en blanco para mantener la actual)" : "Contraseña"}
+                                    label={"Contraseña"}
                                     name="contrasena"
-                                    type="password"
-                                    required={!editMode}
-                                    placeholder={editMode ? "••••••••" : "Ingrese contraseña"}
+                                    type="text"
+                                    placeholder={"Ingrese contraseña"}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     value={values.contrasena}
@@ -333,6 +331,7 @@ const Usuarios = () => {
                                     className="w-4 h-4"
                                     checked={values.activo}
                                     onChange={handleChange}
+                                    value={values.activo ? "true" : "false"}
                                 />
                                 <label htmlFor="activo" className="text-sm font-medium">
                                     Usuario activo

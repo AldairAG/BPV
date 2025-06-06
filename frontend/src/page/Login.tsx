@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Button } from "../components/ui/Button";
 import { Card, CardContent, CardDescription, CardHead, CardTittle } from "../components/ui/Card";
@@ -67,11 +67,10 @@ const Login = () => {
                             validationSchema={LoginSchema}
                             onSubmit={handleSubmit}
                         >
-                            {({ isSubmitting, touched, errors }) => (
+                            {({ isSubmitting, touched, errors, handleChange, handleBlur, values }) => (
                                 <Form className="space-y-4 w-full">
                                     <div>
-                                        <Field
-                                            as={Input}
+                                        <Input
                                             id="username"
                                             name="username"
                                             type="text"
@@ -79,7 +78,11 @@ const Login = () => {
                                             className={`w-full ${
                                                 touched.username && errors.username ? "border-red-500" : ""
                                             }`}
+                                            classNameInput="bg-white"
                                             disabled={loading}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            value={values.username}
                                         />
                                         <ErrorMessage
                                             name="username"
@@ -89,12 +92,15 @@ const Login = () => {
                                     </div>
 
                                     <div>
-                                        <Field
-                                            as={Input}
+                                        <Input
                                             id="contrasena"
                                             name="contrasena"
                                             type="password"
                                             placeholder="Contraseña"
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            classNameInput="bg-white"
+                                            value={values.contrasena}
                                             className={`w-full ${
                                                 touched.contrasena && errors.contrasena ? "border-red-500" : ""
                                             }`}

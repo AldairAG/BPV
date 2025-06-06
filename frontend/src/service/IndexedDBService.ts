@@ -23,13 +23,27 @@ interface BPVOfflineDB extends DBSchema {
       lastUpdated: number;
     };
   };
+  offlineVentas: {
+    key: string;
+    value: {
+      id: string;
+      items: any[];
+      conIva: boolean;
+      cliente: any;
+      fechaCreacion: number;
+      total: number;
+      sincronizado: boolean;
+      fechaSincronizacion?: number;
+    };
+    indexes: { 'by-sincronizado': 'sincronizado'; 'by-fecha': 'fechaCreacion' };
+  };
 }
 
 class IndexedDBService {
   private static instance: IndexedDBService;
   private db: IDBPDatabase<BPVOfflineDB> | null = null;
   private dbName = 'bpv-offline-db';
-  private dbVersion = 1;
+  private dbVersion = 2; // Incrementamos la versión para actualizar el esquema
 
   private constructor() {
     this.initDB();
@@ -45,7 +59,7 @@ class IndexedDBService {
   private async initDB(): Promise<void> {
     try {
       this.db = await openDB<BPVOfflineDB>(this.dbName, this.dbVersion, {
-        upgrade(db) {
+        upgrade(db, oldVersion, newVersion) {
           // Create stores if they don't exist
           if (!db.objectStoreNames.contains('pendingRequests')) {
             const pendingRequestsStore = db.createObjectStore('pendingRequests', { keyPath: 'id' });
@@ -55,6 +69,15 @@ class IndexedDBService {
           if (!db.objectStoreNames.contains('offlineData')) {
             db.createObjectStore('offlineData', { keyPath: 'type' });
           }
+
+          // Añadir store para ventas offline
+          if (!db.objectStoreNames.contains('offlineVentas')) {
+            const ventasStore = db.createObjectStore('offlineVentas', { keyPath: 'id' });
+            ventasStore.createIndex('by-sincronizado', 'sincronizado');
+            ventasStore.createIndex('by-fecha', 'fechaCreacion');
+          }
+
+          console.log(`DB upgraded from version ${oldVersion} to ${newVersion}`);
         },
       });
       console.log('IndexedDB initialized successfully');
@@ -117,6 +140,51 @@ class IndexedDBService {
     }
   }
 
+  // Añadir una venta para procesamiento offline
+  public async storeOfflineVenta(venta: {
+    items: any[];
+    conIva: boolean;
+    cliente: any | null;
+    total: number;
+  }): Promise<string> {
+    await this.ensureDBInitialized();
+    
+    const id = `venta-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const ventaData = {
+      id,
+      ...venta,
+      fechaCreacion: Date.now(),
+      sincronizado: false
+    };
+
+    await this.db!.add('offlineVentas', ventaData);
+    return id;
+  }
+
+  // Obtener todas las ventas pendientes de sincronizar
+  public async getUnsyncedVentas(): Promise<any[]> {
+    await this.ensureDBInitialized();
+    return this.db!.getAllFromIndex('offlineVentas', 'by-sincronizado', IDBKeyRange.only(false));
+  }
+
+  // Marcar una venta como sincronizada
+  public async markVentaAsSynced(id: string): Promise<void> {
+    await this.ensureDBInitialized();
+    
+    const venta = await this.db!.get('offlineVentas', id);
+    if (venta) {
+      venta.sincronizado = true;
+      venta.fechaSincronizacion = Date.now();
+      await this.db!.put('offlineVentas', venta);
+    }
+  }
+
+  // Obtener todas las ventas (sincronizadas y no sincronizadas)
+  public async getAllVentas(): Promise<any[]> {
+    await this.ensureDBInitialized();
+    return this.db!.getAllFromIndex('offlineVentas', 'by-fecha');
+  }
+
   // Ensure database is initialized before any operation
   private async ensureDBInitialized(): Promise<void> {
     if (!this.db) {
@@ -129,6 +197,7 @@ class IndexedDBService {
     await this.ensureDBInitialized();
     await this.db!.clear('pendingRequests');
     await this.db!.clear('offlineData');
+    await this.db!.clear('offlineVentas');
   }
 }
 

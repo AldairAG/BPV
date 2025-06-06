@@ -14,8 +14,28 @@ import OfflineStatusIndicatorEnhanced from './components/OfflineStatusIndicatorE
 import ProtectedRoute from './components/navigation/ProtectedRoute';
 import RoleProtectedRoute from './components/navigation/RoleProtectedRoute';
 import { ROLES } from './constants/roles';
+import { useEffect } from 'react';
+import { toast } from 'react-hot-toast';
 
 function App() {
+  // Registrar el Service Worker para funcionalidad offline
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/serviceWorker.js')
+          .then(registration => {
+            console.log('Service Worker registrado correctamente:', registration);
+            toast.success('La aplicación está lista para trabajar sin conexión', { 
+              duration: 5000,
+              id: 'sw-registered'
+            });
+          })
+          .catch(error => {
+            console.error('Error al registrar el Service Worker:', error);
+          });
+      });
+    }
+  }, []);
 
   return (
     <Provider store={store}>

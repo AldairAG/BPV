@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Trash2, MinusCircle, PlusCircle, ShoppingCart, Percent, CheckCircle, Printer, UserPlus, User, X } from "lucide-react";
+import { Trash2, MinusCircle, PlusCircle, ShoppingCart, Percent, CheckCircle, Printer, UserPlus, User, X, WifiOff } from "lucide-react";
 import { useCarrito, type CarritoItem } from "../../hooks/useCarrito";
 import { Card, CardContent, CardHead, CardTittle } from "../ui/Card";
 import { Button } from "../ui/Button";
@@ -9,6 +9,7 @@ import ModalTemplate, { useModal } from "../modal/ModalTemplate";
 import ModalCliente from "../modal/ModalCliente";
 import useCliente from "../../hooks/useCliente";
 import type { ClienteType } from "../../types/ClienteType";
+import { useConnectionStatus } from "../../service/ConnectionService";
 
 interface CarritoProps {
     items: CarritoItem[];
@@ -34,6 +35,7 @@ const Carrito: React.FC<CarritoProps> = ({
     const [ventaCompletada, setVentaCompletada] = useState(false);
     const [imprimiendo, setImprimiendo] = useState(false);
     const [errorImpresion, setErrorImpresion] = useState<string | null>(null);
+    const isOnline = useConnectionStatus();
     
     // Usar el hook useModal para controlar el modal de cliente
     const { isOpen, openModal, closeModal } = useModal();
@@ -207,6 +209,16 @@ const Carrito: React.FC<CarritoProps> = ({
                 </CardHead>
 
                 <CardContent className="flex flex-col gap-4 p-4">
+                    {/* Mostrar mensaje de modo offline */}
+                    {!isOnline && !ventaCompletada && (
+                        <div className="bg-yellow-900/30 border border-yellow-700 rounded-md p-3 flex items-center gap-3 mb-2">
+                            <WifiOff className="h-5 w-5 text-yellow-500" />
+                            <div className="text-sm text-yellow-200">
+                                Modo sin conexión. Las ventas se guardarán localmente y se sincronizarán cuando vuelva la conexión a internet.
+                            </div>
+                        </div>
+                    )}
+
                     {/* Sección para mostrar cliente seleccionado */}
                     {!ventaCompletada && !isEmpty && (
                         <div className="bg-gray-700/50 rounded-md p-3 border border-gray-700">

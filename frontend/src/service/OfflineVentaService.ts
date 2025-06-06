@@ -107,10 +107,12 @@ class OfflineVentaService {
     const ventasPendientes = await this.getVentasPendientes();
     return ventasPendientes.length > 0;
   }
-
   /**
+   * Obtiene un resumen de las ventas pendientes
+   */
   public async getResumenVentasPendientes(): Promise<any> {
-    const ventasPendientes = await this.getVentasPendientes() as VentaOfflineType[];
+    // Extendemos el tipo para incluir _timestamp
+    const ventasPendientes = (await this.getVentasPendientes()) as (VentaType & { _timestamp?: number })[];
     
     // Calculamos algunos totales para mostrar al usuario
     const total = ventasPendientes.reduce((sum, venta) => sum + (venta.total || 0), 0);
@@ -123,9 +125,7 @@ class OfflineVentaService {
         : null
     };
   }
-    };
-  }
-
+  
   /**
    * Elimina una venta pendiente específica (por ejemplo, si el usuario decide descartarla)
    */
@@ -134,6 +134,40 @@ class OfflineVentaService {
     const ventasActualizadas = ventasPendientes.filter(v => String(v.ventaId) !== idTemporal);
     
     await this.indexedDBService.storeOfflineData(this.VENTAS_OFFLINE_KEY, ventasActualizadas);
+  }
+
+  /**
+   * Sincroniza todas las ventas pendientes
+   */
+  public async sincronizarVentasPendientes(): Promise<{ exitosas: number, fallidas: number }> {
+    if (!ConnectionService.getStatus()) {
+      throw new Error('No hay conexión a internet para sincronizar');
+    }
+    
+    const ventasPendientes = await this.getVentasPendientes();
+    let exitosas = 0;
+    let fallidas = 0;
+    
+    for (const venta of ventasPendientes) {
+      try {
+        // Eliminamos propiedades temporales
+        const ventaLimpia = { ...(venta as VentaType & { _offline?: boolean; _timestamp?: number }) };
+        delete (ventaLimpia as any)._timestamp;
+        delete (ventaLimpia as any)._offline;
+        
+        // Enviamos al servidor
+        await ApiService.post('/ventas', ventaLimpia);
+        exitosas++;
+        
+        // Eliminamos de la lista de pendientes
+        await this.eliminarVentaPendiente(String(venta.ventaId));
+      } catch (error) {
+        console.error(`Error al sincronizar venta ${venta.ventaId}:`, error);
+        fallidas++;
+      }
+    }
+    
+    return { exitosas, fallidas };
   }
 }
 

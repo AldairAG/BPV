@@ -155,7 +155,8 @@ class OfflineProductoService {
             productos: []
           },
           activo: false,
-          tipo: ''
+          tipo: '',
+          productoVentas: []
         });
       }
     } catch (error) {
@@ -177,7 +178,8 @@ class OfflineProductoService {
           productos: []
         },
         activo: false,
-        tipo: ''
+        tipo: '',
+        productoVentas: []
       });
     }
   }

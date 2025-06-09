@@ -21,14 +21,16 @@ interface CarritoProps {
     onProcessPurchase: (conIva:boolean,cliente:ClienteType|null) => Promise<void>;
 }
 
-const Carrito: React.FC<CarritoProps> = ({
+const Carrito: React.FC<CarritoProps> = (props) => {
+    const {
     items,
     loading,
     onRemoveItem,
     onUpdateQuantity,
     onClearCart,
     onProcessPurchase,
-}) => {
+    } = props;
+
     const [includeIVA, setIncludeIVA] = useState(true);
     const [updatingId, setUpdatingId] = useState<number | null>(null);
     const [descuentos, setDescuentos] = useState<Record<number, number>>({});
@@ -37,14 +39,9 @@ const Carrito: React.FC<CarritoProps> = ({
     const [errorImpresion, setErrorImpresion] = useState<string | null>(null);
     const isOnline = useConnectionStatus();
     
-    // Usar el hook useModal para controlar el modal de cliente
     const { isOpen, openModal, closeModal } = useModal();
-    
-    // Usar el hook useCarrito para otras funcionalidades
     const { procesarVenta } = useCarrito();
     const { user } = useUser();
-    
-    // Obtener información del cliente
     const { 
         clienteSeleccionado, 
         seleccionarCliente,
@@ -56,13 +53,6 @@ const Carrito: React.FC<CarritoProps> = ({
         timestamp: ""
     });
     const isEmpty = items.length === 0;
-
-    // Mantener efectos básicos de UI
-    useEffect(() => {
-        if (items.length > 0) {
-            setVentaCompletada(false);
-        }
-    }, [items]);
 
     // Calcular el total con descuentos aplicados
     const calcularTotalConDescuentos = () => {
@@ -76,18 +66,14 @@ const Carrito: React.FC<CarritoProps> = ({
     };
 
     const totalFinal = calcularTotalConDescuentos();
-
-    // Calcular montos
     const subtotal = totalFinal;
     const iva = includeIVA ? totalFinal * 0.16 : 0;
 
-    // Manejar cambios en la cantidad
     const handleQuantityChange = async (productoId: number, newQuantity: number) => {
         if (newQuantity <= 0) {
             onRemoveItem(productoId);
             return;
         }
-
         setUpdatingId(productoId);
         try {
             await onUpdateQuantity(productoId, newQuantity);
@@ -96,23 +82,19 @@ const Carrito: React.FC<CarritoProps> = ({
         }
     };
 
-    // Manejar cambios en el descuento
     const handleDescuentoChange = (productoId: number, value: string) => {
         const descuento = parseInt(value, 10) || 0;
-        
         setDescuentos(prev => ({
             ...prev,
             [productoId]: descuento
         }));
     };
 
-
-    // Eliminar cliente seleccionado
     const handleRemoveCliente = () => {
         clearSeleccion();
     };
 
-    // Simplificar el proceso de compra para la UI
+    // PROCESAR VENTA
     const handleProcessPurchase = async () => {
         if (!isEmpty && !loading) {
             try {

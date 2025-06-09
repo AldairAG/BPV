@@ -250,7 +250,26 @@ const ReporteService = {
       responseType: 'blob'
     });
     return response.data;
-  }
+  },
+
+  /**
+   * Obtiene las ventas del día de hoy directamente
+   * @returns Lista de ventas del día actual
+   */
+  getVentasHoyDirecto: async (): Promise<any[]> => {
+    const response = await apiClient.get('/ventas/hoy');
+    return response.data; // Esto será un array de ventas del día
+  },
+
+  /**
+   * Método auxiliar para obtener el total de ventas de hoy
+   * @returns Total de ventas del día actual
+   */
+  getVentasHoyTotal: async (): Promise<number> => {
+    const response = await apiClient.get('/ventas/hoy');
+    // Suma los totales de cada venta
+    return response.data.reduce((acc: number, venta: any) => acc + (venta.total || 0), 0);
+  },
 };
 
 export default ReporteService;

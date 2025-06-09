@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Trash2, MinusCircle, PlusCircle, ShoppingCart, Percent, CheckCircle, Printer, UserPlus, User, X, WifiOff } from "lucide-react";
 import { useCarrito, type CarritoItem } from "../../hooks/useCarrito";
 import { Card, CardContent, CardHead, CardTittle } from "../ui/Card";
 import { Button } from "../ui/Button";
-import PrinterService from "../../service/PrinterService";
 import useUser from "../../hooks/useUser";
 import ModalTemplate, { useModal } from "../modal/ModalTemplate";
 import ModalCliente from "../modal/ModalCliente";
 import useCliente from "../../hooks/useCliente";
 import type { ClienteType } from "../../types/ClienteType";
 import { useConnectionStatus } from "../../service/ConnectionService";
+import TicketPrint from "../../service/TicketPrint";
 
 interface CarritoProps {
     items: CarritoItem[];
@@ -23,22 +23,25 @@ interface CarritoProps {
 
 const Carrito: React.FC<CarritoProps> = (props) => {
     const {
-    items,
-    loading,
-    onRemoveItem,
-    onUpdateQuantity,
-    onClearCart,
-    onProcessPurchase,
+        items,
+        loading,
+        onRemoveItem,
+        onUpdateQuantity,
+        onClearCart,
+        onProcessPurchase,
     } = props;
 
     const [includeIVA, setIncludeIVA] = useState(true);
     const [updatingId, setUpdatingId] = useState<number | null>(null);
     const [descuentos, setDescuentos] = useState<Record<number, number>>({});
+    const [ventaParaImprimir, setVentaParaImprimir] = useState<any>(null);
     const [ventaCompletada, setVentaCompletada] = useState(false);
-    const [imprimiendo, setImprimiendo] = useState(false);
+    const [detallesVenta, setDetallesVenta] = useState({ total: 0, timestamp: "" });
     const [errorImpresion, setErrorImpresion] = useState<string | null>(null);
+    const [mostrarTicket, setMostrarTicket] = useState(false);
+    const [readyToPrint, setReadyToPrint] = useState(false);
     const isOnline = useConnectionStatus();
-    
+
     const { isOpen, openModal, closeModal } = useModal();
     const { procesarVenta } = useCarrito();
     const { user } = useUser();
@@ -48,10 +51,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
         clearSeleccion, 
     } = useCliente();
 
-    const [detallesVenta, setDetallesVenta] = useState({
-        total: 0,
-        timestamp: ""
-    });
+    const printAreaRef = useRef<HTMLDivElement>(null);
     const isEmpty = items.length === 0;
 
     // Calcular el total con descuentos aplicados
@@ -98,7 +98,8 @@ const Carrito: React.FC<CarritoProps> = (props) => {
     const handleProcessPurchase = async () => {
         if (!isEmpty && !loading) {
             try {
-                await onProcessPurchase(includeIVA,clienteSeleccionado);
+
+               /* await onProcessPurchase(includeIVA,clienteSeleccionado);
 
                 // Guardar detalles para mostrar en la confirmación
                 setDetallesVenta({
@@ -107,62 +108,98 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                 });
                 
                 // Procesar la venta
-                await procesarVenta(includeIVA,clienteSeleccionado);
+                await procesarVenta(includeIVA,clienteSeleccionado);  */
 
-                // Mostrar mensaje de éxito
+
+                const fechaVenta = new Date().toLocaleString();
+                const totalVenta = Number((totalFinal + iva).toFixed(2));
+                const ventaData = {
+                    fecha: fechaVenta,
+                    ticketNumber: `${Date.now().toString().slice(-6)}`,
+                    vendedor: user?.nombre || 'Usuario Sistema',
+                    cliente: clienteSeleccionado ? { nombre: clienteSeleccionado.nombre } : undefined,
+                    items: items.map(item => ({
+                        producto: {
+                            nombre: item.producto.nombre,
+                            precioVenta: item.producto.precioVenta
+                        },
+                        cantidad: item.cantidad
+                    })),
+                    total: totalVenta
+                };
+
+                if (!ventaData.items || ventaData.items.length === 0) {
+                    setErrorImpresion("No hay productos en la venta.");
+                    return;
+                }
+
+                // Al completar la venta:
+                setVentaParaImprimir(ventaData);
+                localStorage.setItem("ventaParaImprimir", JSON.stringify(ventaData));
                 setVentaCompletada(true);
+                localStorage.setItem("ventaCompletada", "true");
+                setDetallesVenta({ total: totalVenta, timestamp: fechaVenta });
+                localStorage.setItem("detallesVenta", JSON.stringify({ total: totalVenta, timestamp: fechaVenta }));
             } catch (error) {
-                console.error("Error al procesar la venta:", error);
+                setErrorImpresion("Error al procesar la venta.");
             }
-        }
-    };
-
-    // Función para imprimir ticket
-    const handlePrintTicket = async () => {
-        if (!ventaCompletada) return;
-
-        setImprimiendo(true);
-        setErrorImpresion(null);
-
-        try {
-            // Generar número de ticket único
-            const ticketNumber = `${Date.now().toString().slice(-6)}`;
-
-            // Preparar datos para impresión
-            const ticketData = {
-                ticketNumber,
-                items,
-                subtotal,
-                iva,
-                total: totalFinal+iva,
-                fecha: new Date().toLocaleString(),
-                vendedor: user?.nombre || 'Usuario Sistema',
-                conIva: includeIVA,
-                descuentos,
-                cliente: clienteSeleccionado
-            };
-
-            // Imprimir ticket
-            const success = await PrinterService.printTicket(ticketData);
-
-            if (!success) {
-                setErrorImpresion("No se pudo imprimir el ticket. Verifique la conexión con la impresora.");
-            }
-        } catch (error) {
-            console.error("Error al imprimir ticket:", error);
-            setErrorImpresion("Error al imprimir ticket: " + (error instanceof Error ? error.message : "Error desconocido"));
-        } finally {
-            setImprimiendo(false);
         }
     };
 
     const handleSelectCliente = (cliente:ClienteType) => {
         seleccionarCliente(cliente);
-    }
-    // Mostrar en consola cuando cambia el cliente seleccionado
+    };
+
+    // SOLO muestra el ticket cuando el usuario da click en imprimir
+    const handlePrint = () => {
+        if (!ventaParaImprimir || !ventaParaImprimir.items || ventaParaImprimir.items.length === 0) {
+            setErrorImpresion("No hay datos para imprimir el ticket.");
+            return;
+        }
+        setMostrarTicket(true);
+    };
+
     useEffect(() => {
-        console.log("Cliente seleccionado en Carrito:", clienteSeleccionado);
-    }, [clienteSeleccionado]);
+        if (
+            mostrarTicket &&
+            printAreaRef.current &&
+            ventaParaImprimir &&
+            ventaParaImprimir.items &&
+            ventaParaImprimir.items.length > 0
+        ) {
+            setTimeout(() => {
+                window.print();
+                setMostrarTicket(false);
+            }, 200);
+        }
+    }, [mostrarTicket, ventaParaImprimir]);
+
+    // Limpia todo al iniciar nueva venta
+    const handleNuevaVenta = () => {
+        setVentaCompletada(false);
+        setVentaParaImprimir(null);
+        setDetallesVenta({ total: 0, timestamp: "" });
+        localStorage.removeItem("ventaParaImprimir");
+        localStorage.removeItem("ventaCompletada");
+        localStorage.removeItem("detallesVenta");
+        onClearCart();
+    };
+
+    // Restaura ventaParaImprimir y ventaCompletada al montar
+    useEffect(() => {
+        const ventaGuardada = localStorage.getItem("ventaParaImprimir");
+        const ventaCompletadaGuardada = localStorage.getItem("ventaCompletada");
+        const detallesVentaGuardados = localStorage.getItem("detallesVenta");
+        if (ventaGuardada) {
+            setVentaParaImprimir(JSON.parse(ventaGuardada));
+        }
+        if (ventaCompletadaGuardada === "true") {
+            setVentaCompletada(true);
+        }
+        if (detallesVentaGuardados) {
+            setDetallesVenta(JSON.parse(detallesVentaGuardados));
+        }
+    }, []);
 
     return (
         <>
@@ -175,16 +212,14 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                         </CardTittle>
                         <div className="flex items-center gap-2">
                             {!isEmpty && !ventaCompletada && (
-                                <>
-                                    <Button
-                                        onClick={onClearCart}
-                                        className="text-gray-400 hover:text-white flex items-center gap-1"
-                                        disabled={loading}
-                                    >
-                                        <Trash2 className="h-4 w-4 mr-1" />
-                                        Vaciar
-                                    </Button>
-                                </>
+                                <Button
+                                    onClick={onClearCart}
+                                    className="text-gray-400 hover:text-white flex items-center gap-1"
+                                    disabled={loading}
+                                >
+                                    <Trash2 className="h-4 w-4 mr-1" />
+                                    Vaciar
+                                </Button>
                             )}
                         </div>
                     </div>
@@ -218,8 +253,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                                     </Button>
                                 )}
                             </div>
-                            
-                            {clienteSeleccionado?.idCliente !=null? (
+                            {clienteSeleccionado?.idCliente != null ? (
                                 <div className="flex flex-col">
                                     <span className="text-white font-medium">{clienteSeleccionado.nombre}</span>
                                     <span className="text-xs text-gray-400">ID: {clienteSeleccionado.idCliente}</span>
@@ -240,7 +274,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                     )}
 
                     {/* Mensaje de venta completada con botón de impresión */}
-                    {ventaCompletada && (
+                    {ventaCompletada && ventaParaImprimir && (
                         <div className="flex flex-col items-center justify-center py-8 text-center border border-green-500 bg-green-900/20 rounded-lg mb-4">
                             <CheckCircle className="h-16 w-16 text-green-500 mb-4" />
                             <h3 className="text-xl font-bold text-green-400">¡Venta completada con éxito!</h3>
@@ -250,53 +284,23 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                             <p className="text-gray-400 text-sm mt-1">
                                 {detallesVenta.timestamp}
                             </p>
-                            
-                            {/* Mostrar el cliente si hay uno seleccionado */}
-                            {clienteSeleccionado && (
-                                <div className="mt-2 text-sm text-gray-300">
-                                    Cliente: <span className="font-medium">{clienteSeleccionado.nombre}</span>
-                                </div>
-                            )}
-
-                            {/* Botón para imprimir ticket */}
                             <div className="flex flex-col gap-2 w-full max-w-xs mt-6">
                                 <Button
-                                    onClick={handlePrintTicket}
+                                    onClick={handlePrint}
                                     className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2"
-                                    disabled={imprimiendo}
                                 >
-                                    {imprimiendo ? (
-                                        <>
-                                            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                            Imprimiendo...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Printer className="h-4 w-4" />
-                                            Imprimir ticket
-                                        </>
-                                    )}
+                                    <Printer className="h-4 w-4" />
+                                    Imprimir ticket
                                 </Button>
-
                                 <Button
                                     className="bg-green-600 hover:bg-green-700 text-white"
-                                    onClick={() => {
-                                        setVentaCompletada(false);
-                                        onClearCart();
-                                    }}
+                                    onClick={handleNuevaVenta}
                                 >
                                     Realizar nueva venta
                                 </Button>
                             </div>
-
-                            {/* Mensaje de error de impresión */}
                             {errorImpresion && (
-                                <div className="mt-4 p-3 bg-red-900/20 border border-red-500 rounded text-red-300 text-sm w-full max-w-xs">
-                                    {errorImpresion}
-                                </div>
+                                <div className="text-red-400 mt-2">{errorImpresion}</div>
                             )}
                         </div>
                     )}
@@ -475,8 +479,44 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                     onClose={closeModal} 
                 />
             </ModalTemplate>
+
+            {/* Área oculta para impresión */}
+            {mostrarTicket && ventaParaImprimir && (
+              <div className="print-area" id="ticket-print-area" ref={printAreaRef}>
+                <TicketPrint venta={ventaParaImprimir} />
+              </div>
+            )}
         </>
     );
 }
 
 export default Carrito;
+
+/* Debugging information
+Remove or comment out these console logs in production
+*/
+/* Debug hooks should be placed inside the Carrito component if needed.
+The following code was causing errors because it was outside the component scope.
+useEffect(() => {
+  console.log("items:", items);
+  console.log("user:", user);
+  console.log("clienteSeleccionado:", clienteSeleccionado);
+  console.log("totalFinal:", totalFinal, "iva:", iva);
+}, [items, user, clienteSeleccionado, totalFinal, iva]);
+
+console.log("items:", items);
+console.log("user:", user);
+console.log("clienteSeleccionado:", clienteSeleccionado);
+console.log("totalFinal:", totalFinal, "iva:", iva);
+useEffect(() => {
+  console.log("DEBUG ventaParaImprimir:", ventaParaImprimir);
+}, [ventaParaImprimir]);
+*/
+
+/*
+  Mueve este bloque CSS a un archivo .css o agrégalo a tu hoja de estilos global.
+  Ejemplo: crea 'CarritoPrint.css' y colócalo ahí, luego impórtalo en este archivo con:
+  import './CarritoPrint.css';
+*/
+
+

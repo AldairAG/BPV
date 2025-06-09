@@ -3,3 +3,77 @@
   padding: 0;
 }
 
+/* Burbujas del login */
+.bubbles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0; left: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bubble {
+  position: absolute;
+  bottom: -100px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: bubbleUp 8s linear infinite;
+  opacity: 0.7;
+  filter: blur(1px);
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow: 0 0 10px 2px rgba(255,255,255,0.2);
+}
+.bubble-1 { left: 10%; width: 30px; height: 30px; animation-delay: 0s; }
+.bubble-2 { left: 20%; width: 50px; height: 50px; animation-delay: 1s; }
+.bubble-3 { left: 30%; width: 20px; height: 20px; animation-delay: 2s; }
+.bubble-4 { left: 40%; width: 60px; height: 60px; animation-delay: 3s; }
+.bubble-5 { left: 50%; width: 35px; height: 35px; animation-delay: 4s; }
+.bubble-6 { left: 60%; width: 25px; height: 25px; animation-delay: 5s; }
+.bubble-7 { left: 70%; width: 45px; height: 45px; animation-delay: 6s; }
+.bubble-8 { left: 80%; width: 55px; height: 55px; animation-delay: 7s; }
+.bubble-9 { left: 90%; width: 40px; height: 40px; animation-delay: 3.5s; }
+.bubble-10 { left: 95%; width: 30px; height: 30px; animation-delay: 2.5s; }
+
+@keyframes bubbleUp {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.7;
+  }
+  80% {
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-110vh) scale(1.2);
+    opacity: 0;
+  }
+}
+
+@media print {
+  html, body {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  #ticket-content {
+    width: 300px !important;      /* O prueba 310px si tu impresora lo permite */
+    min-width: 300px !important;
+    max-width: 300px !important;
+    margin: 0 auto !important;    /* Centrado horizontal */
+    padding: 0 !important;        /* Sin padding */
+    background: #fff !important;
+    color: #000 !important;
+    box-sizing: border-box !important;
+  }
+  #ticket-content .ticket-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+  }
+  @page {
+    margin: 0;
+  }
+}
+

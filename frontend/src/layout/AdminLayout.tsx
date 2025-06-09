@@ -74,7 +74,7 @@ const AdminLayout = () => {
     return (
         <section className="flex flex-col h-screen w-full text-white">
             <header className="flex border-b items-center border-b-gray-300 h-15 p-3">
-                <span className="text-xl md:text-2xl text-sky-500 font-semibold">LBF Admin</span>
+                <span className="text-xl md:text-2xl text-sky-500 font-semibold">La Burbuja Felíz -Administrador-</span>
 
                 {/* Menú hamburguesa solo visible en móvil */}
                 <button 

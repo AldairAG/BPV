@@ -37,9 +37,22 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    const bubbles = document.querySelector('.bubbles');
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 30; // rango -15 a 15
+      const y = (e.clientY / window.innerHeight - 0.5) * 30; // rango -15 a 15
+      if (bubbles) {
+        (bubbles as HTMLElement).style.transform = `translate(${x}px, ${y}px)`;
+      }
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
     <Provider store={store}>
-      <div className='h-screen w-full p-0 m-0 bg-gray-900'>
+      <div className="min-h-screen w-full p-0 m-0 bg-blue-900">
         <OfflineStatusIndicatorEnhanced position="top" />
         <Routes>
           <Route path={USER_ROUTES.LOGIN} element={<Login />} />

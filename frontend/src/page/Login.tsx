@@ -26,42 +26,55 @@ const Login = () => {
     const handleSubmit = async (values: { username: string; contrasena: string }) => {
         setLoading(true);
         setError(null);
-        
+
         try {
             const success = await login(values.username, values.contrasena);
-            
+
             if (!success) {
-                // Si el login falló pero no lanzó un error
                 setError("Credenciales inválidas");
             }
         } catch (err: any) {
-            // Capturamos cualquier error no manejado
-            setError(err.message || "Error al iniciar sesión");
+            // Mejor manejo de errores HTTP
+            if (err.response && err.response.status === 401) {
+                setError("Credenciales inválidas");
+            } else if (err.response && err.response.status === 400) {
+                setError("Solicitud incorrecta. Verifica los datos.");
+            } else if (err.message && err.message.includes("Network Error")) {
+                setError("No se pudo conectar con el servidor. Verifica tu conexión.");
+            } else {
+                setError("Error al iniciar sesión");
+            }
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center px-4 bg-gray-900">
-            <div className="w-full max-w-md">
+        <div className="min-h-screen flex items-center justify-center px-4 bg-blue-300 relative overflow-hidden">
+            {/* Burbujas animadas */}
+            <div className="bubbles">
+                {[...Array(10)].map((_, i) => (
+                    <div key={i} className={`bubble bubble-${i + 1}`}></div>
+                ))}
+            </div>
+            <div className="w-full max-w-md relative z-10">
                 <div className="text-center mb-8 flex flex-col items-center">
                     <img src={logo} alt="logo" className="w-30 h-30 md:w-50 md:h-50"/>
-                    <h1 className="text-3xl font-bold text-sky-600">La Burbuja Feliz</h1>
-                    <p className="text-gray-400">Sistema de Punto de Venta para Artículos de Limpieza</p>
+                    <h1 className="text-3xl font-bold text-sky-900">La Burbuja Feliz</h1>
+                    <p className="text-gray-900">Sistema de Punto de Venta para Artículos de Limpieza</p>
                 </div>
 
-                <Card className="rounded-lg border bg-card text-card-foreground shadow-sm">
-                    <CardHead className="flex flex-col space-y-1.5 p-6">
-                        <CardTittle className="text-2xl font-semibold leading-none tracking-tight">
+                <Card className="rounded-lg border bg-card text-card-foreground shadow-2x1 bg-blue-400">
+                    <CardHead className="flex flex-col space-y-1.5 p-6 ">
+                        <CardTittle className="text-2xl font-semibold leading-none tracking-tight text-gray-900">
                             Iniciar Sesión
                         </CardTittle>
-                        <CardDescription>
+                        <CardDescription className="text-gray-800">
                             Ingrese sus credenciales para acceder al sistema
                         </CardDescription>
                     </CardHead>
                     
-                    <CardContent className="p-6 pt-0">
+                    <CardContent className="p-2 pt-5">
                         <Formik
                             initialValues={{ username: "", contrasena: "" }}
                             validationSchema={LoginSchema}

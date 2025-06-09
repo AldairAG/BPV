@@ -9,3 +9,26 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.print-area {
+  display: none;
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #ticket-print-area, #ticket-print-area * {
+    visibility: visible !important;
+  }
+  #ticket-print-area {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #fff !important;
+    color: #000 !important;
+    z-index: 9999;
+  }
+}

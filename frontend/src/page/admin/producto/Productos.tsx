@@ -58,28 +58,28 @@ const Productos = () => {
     const [editMode, setEditMode] = useState(false);
     const [initialValues, setInitialValues] = useState<{
         nombre: string;
-        precioVenta: number | string;
-        precioCompra: number | string;
-        stock: number | string;
-        stockMinimo: number | string;
+        precioVenta: string | number;
+        precioCosto: string | number;
+        stock: string | number;
+        stockMinimo: string | number;
         codigoBarras: string;
         categoria: CategoriaType | null;
         activo: boolean;
-        tipo: string;
         productoId: number;
-        descuentos: (number | string)[]; // Agregar descuentos
+        tipo: string;
+        descuentos: (string | number)[];
     }>({
         nombre: "",
         precioVenta: "",
-        precioCompra: "",
+        precioCosto: "", // <--- aquí
         stock: "",
         stockMinimo: "",
         codigoBarras: "",
         categoria: null,
         activo: true,
         productoId: 0,
-        tipo: TIPOS_PRODUCTO.PIEZA, // Valor por defecto
-        descuentos: ["", "", "", ""] // Inicializar con 4 descuentos vacíos
+        tipo: TIPOS_PRODUCTO.PIEZA,
+        descuentos: ["", "", "", ""]
     });
 
     const [searchTerm, setSearchTerm] = useState("");
@@ -117,7 +117,7 @@ const Productos = () => {
         setInitialValues({
             nombre: "",
             precioVenta: "",
-            precioCompra: "",
+            precioCosto: "",
             stock: "",
             stockMinimo: "",
             codigoBarras: "",
@@ -136,15 +136,22 @@ const Productos = () => {
         
         setEditMode(true);
         setInitialValues({
-            ...producto,
-            codigoBarras: producto.codigoBarras ?? "",
-            // Si el tipo no está definido, usar 'Unidad' como valor predeterminado
-            tipo: producto.tipo || TIPOS_PRODUCTO.PIEZA,
-            // Si hay descuentos, usarlos; si no, inicializar con array vacío
-            descuentos: producto.descuentos?.length
-                ? [...producto.descuentos, ...Array(4 - producto.descuentos.length).fill("")]
-                : ["", "", "", ""]
-        });
+                    nombre: producto.nombre || "",
+                    precioVenta: producto.precioVenta !== undefined ? String(producto.precioVenta) : "",
+                    precioCosto: producto.precioCompra !== undefined
+                        ? String(producto.precioCompra)
+                        : "",
+                    stock: producto.stock !== undefined ? String(producto.stock) : "",
+                    stockMinimo: producto.stockMinimo !== undefined ? String(producto.stockMinimo) : "",
+                    codigoBarras: producto.codigoBarras ?? "",
+                    categoria: producto.categoria || null,
+                    activo: producto.activo ?? true,
+                    productoId: producto.productoId ?? producto.id ?? 0,
+                    tipo: producto.tipo || TIPOS_PRODUCTO.PIEZA,
+                    descuentos: producto.descuentos?.length
+                        ? [...producto.descuentos.map(d => d === null || d === undefined ? "" : String(d)), ...Array(4 - producto.descuentos.length).fill("")]
+                        : ["", "", "", ""]
+                });
         seleccionarProducto(producto);
         openModal();
     };
@@ -158,6 +165,7 @@ const Productos = () => {
 
     // Función para manejar el envío del formulario
     const handleSubmit = async (values: any) => {
+        console.log("Submit ejecutado", values); // <-- Agrega esto
         try {
             // Limpiar descuentos, eliminar valores vacíos y convertir a números
             const descuentos = values.descuentos
@@ -275,18 +283,18 @@ const Productos = () => {
                                 </div>
                                 <div>
                                     <Input
-                                        id="precioCompra"
+                                        id="precioCosto"
                                         label="Precio de costo"
-                                        name="precioCompra"
+                                        name="precioCosto" // <--- aquí
                                         type="number"
                                         required
                                         placeholder="0.00"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.precioCompra}
+                                        value={values.precioCosto}
                                     />
                                     <ErrorMessage
-                                        name="precioCompra"
+                                        name="precioCosto"
                                         component="div"
                                         className="text-red-500 text-sm mt-1"
                                     />

@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { type ClienteType } from "../types/ClienteType";
-import { type CarritoItem } from "../hooks/useCarrito";
 
 // TypeScript declaration for Web Serial API
 interface SerialPort {
@@ -23,18 +21,18 @@ interface NavigatorWithSerial extends Navigator {
 }
 declare const navigator: NavigatorWithSerial;
 
-interface TicketData {
-  ticketNumber: string;
-  items: CarritoItem[];
+export type TicketData = {
+  ticketNumber: string | number;
+  items: { producto: { nombre: string; precioVenta: number }, cantidad: number }[];
   total: number;
   subtotal: number;
   iva: number;
-  cliente?: ClienteType | null;
+  cliente?: { nombre: string } | null;
   fecha: string;
   vendedor: string;
   conIva: boolean;
   descuentos?: Record<number, number>;
-}
+};
 
 // Servicio para manejar la impresión de tickets
 export const PrinterService = {
@@ -44,160 +42,88 @@ export const PrinterService = {
    * @returns Promise que resuelve cuando la impresión se completa
    */
   printTicket: async (data: TicketData): Promise<boolean> => {
+    console.log("PrinterService.printTicket recibe:", data);
     try {
-      // Formato ESC/POS para impresora térmica
-      const commands = [];
-      
+      const commands: (string | Uint8Array)[] = [];
+      const config = JSON.parse(localStorage.getItem("ticketConfig") || "{}");
+
       // Inicializar impresora
-      commands.push('\x1B\x40');  // ESC @ - Inicializar impresora
-      
-      // Centrar texto
-      commands.push('\x1B\x61\x01');  // ESC a 1 - Alineación centrada
-      
-      // Encabezado con negrita
-      commands.push('\x1B\x21\x08');  // ESC ! - Modo enfatizado (negrita)
-      commands.push('BPV - SISTEMA DE VENTAS');
-      commands.push('\x0A');  // Salto de línea
-      commands.push('\x1B\x21\x00');  // Volver a modo normal
-      
-      // Fecha y número de ticket
-      commands.push(`Fecha: ${data.fecha}`);
-      commands.push('\x0A');
-      commands.push(`Ticket #: ${data.ticketNumber}`);
-      commands.push('\x0A\x0A');
-      
-      // Información del vendedor
-      commands.push(`Vendedor: ${data.vendedor}`);
-      commands.push('\x0A');
-      
-      // Información del cliente si existe
-      if (data.cliente) {
-        commands.push(`Cliente: ${data.cliente.nombre}`);
-        commands.push('\x0A');
-      }
-      
-      // Separador
-      commands.push('--------------------------------');
-      commands.push('\x0A');
-      
-      // Alineación a la izquierda para los productos
-      commands.push('\x1B\x61\x00');  // ESC a 0 - Alineación izquierda
-      
-      // Encabezados de columnas
-      commands.push('PRODUCTO          CANT  PRECIO  TOTAL');
-      commands.push('\x0A');
-      commands.push('--------------------------------');
-      commands.push('\x0A');
-      
+      commands.push('\x1B\x40'); // ESC @
+
+      // Centrar texto y negrita
+      commands.push('\x1B\x61\x01');
+      commands.push('\x1B\x21\x08');
+      commands.push((config.nombreTienda || 'BPV - SISTEMA DE VENTAS') + '\n');
+      if (config.rfc) commands.push(`RFC: ${config.rfc}\n`);
+      if (config.direccion) commands.push(config.direccion + '\n');
+      if (config.telefono) commands.push('Tel: ' + config.telefono + '\n');
+      commands.push('\x1B\x21\x00');
+
+      // Fecha y ticket
+      commands.push(`Fecha: ${data.fecha || "-"}\n`);
+      commands.push(`Ticket #: ${data.ticketNumber || "-"}\n`);
+      commands.push(`Vendedor: ${data.vendedor || "-"}\n`);
+      if (data.cliente && data.cliente.nombre) commands.push(`Cliente: ${data.cliente.nombre}\n`);
+      commands.push('-----------------------------\n');
+
       // Productos
-      data.items.forEach(item => {
-        const descuento = data.descuentos?.[item.producto.productoId] || 0;
-        const precioConDescuento = item.producto.precioVenta * (1 - descuento / 100);
-        const subtotalItem = precioConDescuento * item.cantidad;
-        
-        // Nombre del producto (max 16 caracteres)
-        let nombre = item.producto.nombre.substring(0, 16);
-        nombre = nombre.padEnd(16, ' ');
-        
-        // Cantidad (3 caracteres alineados a la derecha)
-        const cantidad = item.cantidad.toString().padStart(3, ' ');
-        
-        // Precio unitario (6 caracteres alineados a la derecha)
-        const precio = precioConDescuento.toFixed(2).padStart(6, ' ');
-        
-        // Subtotal (7 caracteres alineados a la derecha)
-        const total = subtotalItem.toFixed(2).padStart(7, ' ');
-        
-        commands.push(`${nombre} ${cantidad} ${precio} ${total}`);
-        commands.push('\x0A');
-        
-        // Si hay descuento, mostrarlo
-        if (descuento > 0) {
-          commands.push(`   Descuento: ${descuento}%`);
-          commands.push('\x0A');
-        }
-      });
-      
-      // Separador
-      commands.push('--------------------------------');
-      commands.push('\x0A');
-      
-      // Totales a la derecha
-      commands.push('\x1B\x61\x02');  // ESC a 2 - Alineación derecha
-      
-      // Subtotal, IVA y Total
-      commands.push(`SUBTOTAL: $${data.subtotal.toFixed(2)}`);
-      commands.push('\x0A');
-      
-      if (data.conIva) {
-        commands.push(`IVA (16%): $${data.iva.toFixed(2)}`);
-        commands.push('\x0A');
+      if (data.items && data.items.length > 0) {
+        data.items.forEach(item => {
+          const nombre = item.producto?.nombre || "Producto";
+          const cantidad = item.cantidad || 0;
+          const precio = typeof item.producto?.precioVenta === "number" ? item.producto.precioVenta : 0;
+          const total = (precio * cantidad).toFixed(2);
+          commands.push(`${nombre} x${cantidad} $${total}\n`);
+        });
+      } else {
+        commands.push("Sin productos\n");
       }
-      
-      // Total en negrita
-      commands.push('\x1B\x21\x08');  // Modo enfatizado (negrita)
-      commands.push(`TOTAL: $${data.total.toFixed(2)}`);
-      commands.push('\x1B\x21\x00');  // Volver a modo normal
-      commands.push('\x0A\x0A');
-      
-      // Mensaje de agradecimiento centrado
-      commands.push('\x1B\x61\x01');  // Alineación centrada
-      commands.push('¡GRACIAS POR SU COMPRA!');
-      commands.push('\x0A\x0A');
-      
+      commands.push('-----------------------------\n');
+
+      // Totales
+      commands.push(`TOTAL: $${typeof data.total === "number" ? data.total.toFixed(2) : "0.00"}\n`);
+
+      // Leyenda final
+      commands.push('\n');
+      commands.push((config.leyenda || "¡Gracias por su compra!") + '\n');
+
       // Cortar papel
-      commands.push('\x1D\x56\x41');  // GS V A - Corte de papel
-      
-      // Unir todos los comandos en un solo string
+      commands.push('\x1D\x56\x00');
+
+      // Unir y codificar comandos
+      const encoder = new TextEncoder();
       const commandString = commands.join('');
-      
-      // Enviar a la impresora por USB
+      const dataToSend = encoder.encode(commandString);
+
+      // Web Serial API
       if ('serial' in navigator) {
+        let port: SerialPort | null = null;
         try {
-          // Solicitar acceso a la impresora a través del puerto serie USB
-          const port = await navigator.serial.requestPort();
-          
-          // Ajusta estos parámetros según la configuración de tu impresora
-          // Común para impresoras térmicas: 9600, pero puede variar (19200, 38400, etc.)
-          await port.open({ 
+          port = await navigator.serial.requestPort();
+          await port.open({
             baudRate: 9600,
             dataBits: 8,
             stopBits: 1,
             parity: 'none',
             flowControl: 'none'
           });
-          
-          // Convertir comandos a Uint8Array
-          const encoder = new TextEncoder();
-          const data = encoder.encode(commandString);
-          
-          // Enviar datos a la impresora
           const writer = port.writable.getWriter();
-          await writer.write(data);
+          await writer.write(dataToSend);
           writer.releaseLock();
-          
-          // Cerrar puerto
           await port.close();
-          
           return true;
         } catch (err) {
+          if (port) await port.close().catch(() => {});
           console.error('Error específico al conectar con impresora USB:', err);
-          let errorMessage = '';
-          if (err instanceof Error) {
-            errorMessage = err.message;
-          } else if (typeof err === 'string') {
-            errorMessage = err;
-          } else {
-            errorMessage = JSON.stringify(err);
-          }
-          throw new Error(`No se pudo conectar con la impresora USB: ${errorMessage}`);
+          throw new Error('No se pudo conectar con la impresora USB: ' + (err instanceof Error ? err.message : String(err)));
         }
       } else {
-        // Mensaje más claro sobre compatibilidad
-        throw new Error('La impresión USB directa solo está disponible en Chrome/Edge y en conexiones seguras (HTTPS o localhost)');
+        alert('La impresión directa solo está disponible en Chrome/Edge y en conexiones seguras (HTTPS o localhost).');
+        return false;
       }
     } catch (error) {
       console.error('Error al imprimir ticket:', error);
+      alert('Error al imprimir ticket: ' + (error instanceof Error ? error.message : String(error)));
       return false;
     }
   }

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHead, CardTittle } from "../../../components/ui/
 import { Button } from "../../../components/ui/Button";
 import VentaService from "../../../service/VentaService";
 import PrinterService from "../../../service/PrinterService";
+import TicketPrint from "../../../service/TicketPrint";
 import { toast } from "react-hot-toast";
 import type { VentaMonitoreoResponse } from "../../../types/VentaTypes";
 import ModalTemplate, { useModal } from "../../../components/modal/ModalTemplate";
@@ -373,27 +374,48 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
           </table>
         </div>
 
+        {/* Área del ticket a imprimir */}
+        <div id="ticket-area" style={{ marginTop: 24 }}>
+          {ventaSeleccionada && (
+            <TicketPrint venta={getVentaParaTicket(ventaSeleccionada)} />
+          )}
+        </div>
+
         <div className="mt-4 text-right">
           <Button
             className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
-            onClick={() => imprimirTicket(ventaSeleccionada)}
-            disabled={imprimiendo || ventaSeleccionada.venta.anulada}
+            onClick={() => window.print()}
+            disabled={ventaSeleccionada.venta.anulada}
           >
-            {imprimiendo ? (
-              <>
-                <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Imprimiendo...
-              </>
-            ) : (
-              <>
-                <Printer className="h-4 w-4" />
-                Imprimir Ticket
-              </>
-            )}
+            <Printer className="h-4 w-4" />
+            Imprimir Ticket
           </Button>
         </div>
       </>
     );
+  };
+
+  const getVentaParaTicket = (ventaSeleccionada: VentaMonitoreoResponse | null) => {
+    if (!ventaSeleccionada) return null;
+    return {
+      ticketNumber: `${ventaSeleccionada.venta.ventaId}`,
+      items: ventaSeleccionada.venta.productosVendidos.map(pv => ({
+        producto: {
+          ...pv.producto,
+          nombre: (pv.productoVendidoId != null
+            ? findNombreById(pv.productoVendidoId)
+            : null) || pv.producto.nombre || "Producto desconocido"
+        },
+        cantidad: pv.cantidad,
+        precioUnitario: pv.precioUnitario, // <-- AGREGA ESTO
+        subtotal: pv.subtotal              // <-- Y ESTO
+      })),
+      total: ventaSeleccionada.venta.total,
+      fecha: ventaSeleccionada.venta.fecha,
+      vendedor: ventaSeleccionada.usuario?.nombre || "Desconocido",
+      cliente: ventaSeleccionada.cliente || null,
+      // Agrega aquí otros campos requeridos por TicketPrint si los necesitas
+    };
   };
 
   return (
@@ -590,6 +612,26 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
       >
         {renderDetalleVenta()}
       </ModalTemplate>
+
+      {/* Estilos para la impresión del ticket */}
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden !important;
+          }
+          #ticket-area, #ticket-area * {
+            visibility: visible !important;
+          }
+          #ticket-area {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100vw;
+            background: #fff;
+            z-index: 9999;
+          }
+        }
+      `}</style>
     </Card>
   );
 };

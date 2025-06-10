@@ -3,7 +3,6 @@ import { FileTextIcon, EyeIcon, Printer } from "lucide-react";
 import { Card, CardContent, CardHead, CardTittle } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
 import VentaService from "../../../service/VentaService";
-import PrinterService from "../../../service/PrinterService";
 import TicketPrint from "../../../service/TicketPrint";
 import { toast } from "react-hot-toast";
 import type { VentaMonitoreoResponse } from "../../../types/VentaTypes";
@@ -26,7 +25,6 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
   const [ventasFiltradas, setVentasFiltradas] = useState<VentaMonitoreoResponse[]>([]);
   const [ventasOriginales, setVentasOriginales] = useState<VentaMonitoreoResponse[]>([]);
   const [ventaSeleccionada, setVentaSeleccionada] = useState<VentaMonitoreoResponse | null>(null);
-  const [imprimiendo, setImprimiendo] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [filtroCliente, setFiltroCliente] = useState<string>("");
   const [clientesUnicos, setClientesUnicos] = useState<{ id: number, nombre: string }[]>([]);
@@ -178,50 +176,6 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
       return null
     }
   }
-
-  // Imprimir ticket de venta
-  const imprimirTicket = async (response: VentaMonitoreoResponse) => {
-    if (!response) return;
-
-    setImprimiendo(true);
-
-    try {
-      // Preparar datos para impresión
-      const ticketData = {
-        ticketNumber: `${response.venta.ventaId}`,
-        items: response.venta.productosVendidos.map(pv => ({
-          producto: pv.producto,
-          cantidad: pv.cantidad
-        })),
-        subtotal: response.venta.productosVendidos.reduce((total, pv) => total + pv.subtotal, 0),
-        iva: response.venta.conIva ? (response.venta.total - response.venta.productosVendidos.reduce((total, pv) => total + pv.subtotal, 0)) : 0,
-        total: response.venta.total,
-        fecha: new Date(response.venta.fecha).toLocaleString(),
-        vendedor: response.usuario?.nombre || "Desconocido",
-        cliente: response.cliente || null,
-        conIva: response.venta.conIva,
-        descuentos: response.venta.productosVendidos.reduce((acc, pv) => {
-          if (pv.descuento) {
-            acc[pv.producto.productoId] = pv.descuento;
-          }
-          return acc;
-        }, {} as Record<number, number>)
-      };
-
-      const success = await PrinterService.printTicket(ticketData);
-
-      if (success) {
-        toast.success("Ticket impreso correctamente");
-      } else {
-        toast.error("Error al imprimir ticket");
-      }
-    } catch (error) {
-      console.error("Error al imprimir ticket:", error);
-      toast.error("Error al imprimir ticket");
-    } finally {
-      setImprimiendo(false);
-    }
-  };
 
   // Renderizar el contenido del modal de detalle de venta
   const renderDetalleVenta = () => {
@@ -396,25 +350,25 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
   };
 
   const getVentaParaTicket = (ventaSeleccionada: VentaMonitoreoResponse | null) => {
-    if (!ventaSeleccionada) return null;
+    if (!ventaSeleccionada) return undefined;
     return {
+      fecha: ventaSeleccionada.venta.fecha,
       ticketNumber: `${ventaSeleccionada.venta.ventaId}`,
+      vendedor: ventaSeleccionada.usuario?.nombre || "Desconocido",
+      cliente: ventaSeleccionada.cliente
+        ? { nombre: ventaSeleccionada.cliente.nombre || "Sin nombre" }
+        : undefined,
       items: ventaSeleccionada.venta.productosVendidos.map(pv => ({
         producto: {
-          ...pv.producto,
-          nombre: (pv.productoVendidoId != null
-            ? findNombreById(pv.productoVendidoId)
-            : null) || pv.producto.nombre || "Producto desconocido"
+          nombre:
+            (pv.productoVendidoId != null
+              ? findNombreById(pv.productoVendidoId)
+              : null) || pv.producto.nombre || "Producto desconocido",
+          precioVenta: pv.precioUnitario
         },
-        cantidad: pv.cantidad,
-        precioUnitario: pv.precioUnitario, // <-- AGREGA ESTO
-        subtotal: pv.subtotal              // <-- Y ESTO
+        cantidad: pv.cantidad
       })),
-      total: ventaSeleccionada.venta.total,
-      fecha: ventaSeleccionada.venta.fecha,
-      vendedor: ventaSeleccionada.usuario?.nombre || "Desconocido",
-      cliente: ventaSeleccionada.cliente || null,
-      // Agrega aquí otros campos requeridos por TicketPrint si los necesitas
+      total: ventaSeleccionada.venta.total
     };
   };
 

@@ -444,7 +444,7 @@ const Reportes = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                          {formatearPrecio(item.producto.precioVenta)}
+                          {formatearPrecio(item.producto.precio)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-semibold">
                           {item.cantidad} {item.producto.tipo === "Líquido" ? "lt" : item.producto.tipo === "Sólido" ? "kg" : "uds"}

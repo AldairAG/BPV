@@ -1,4 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from "react";
 import useReportes from "../../../hooks/useReportes";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -30,11 +31,6 @@ const Dashboard = () => {
   } = useReportes();
 
   const [ventasDiariasGrafica, setVentasDiariasGrafica] = useState<VentaDiariaGrafica[]>([]);
-
-  // Permite refrescar el dashboard desde fuera (si lo necesitas en el futuro)
-  const refrescarDashboard = useCallback(() => {
-    cargarDashboard();
-  }, [cargarDashboard]);
 
   useEffect(() => {
     cargarDashboard();

@@ -10,7 +10,7 @@ const AdminLayout = () => {
     const navigate = useNavigate();
     const { logout } = useUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
     // Manejar la navegación
     const handleNavigation = (path: string) => {
@@ -31,9 +31,9 @@ const AdminLayout = () => {
     // Controlar cambios de tamaño de ventana
     useEffect(() => {
         const handleResize = () => {
-            setIsMobile(window.innerWidth < 768);
+            setIsMobile(window.innerWidth < 1024);
             // Si la pantalla se vuelve grande, cerrar el menú móvil
-            if (window.innerWidth >= 768) {
+            if (window.innerWidth >= 1024) {
                 setIsMenuOpen(false);
             }
         };
@@ -78,7 +78,7 @@ const AdminLayout = () => {
 
                 {/* Menú hamburguesa solo visible en móvil */}
                 <button 
-                    className="ml-auto md:hidden p-1 hover:bg-gray-700 rounded-md"
+                    className="ml-auto lg:hidden p-1 hover:bg-gray-700 rounded-md"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
                 >
@@ -89,7 +89,7 @@ const AdminLayout = () => {
                 </button>
 
                 {/* Menú horizontal para escritorio */}
-                <div className="hidden md:flex flex-row items-center gap-2 ml-auto">
+                <div className="hidden lg:flex flex-row items-center gap-2 ml-auto">
                     {navItems.map((item, index) => (
                         <button 
                             key={index}
@@ -107,7 +107,7 @@ const AdminLayout = () => {
                         className=""
                     >
                         <LogOut className="h-4 w-4" />
-                        <span className="max-[880px]:hidden">
+                        <span className="max-[900px]:hidden">
                             Cerrar sesión
                         </span>
                     </Button>
@@ -116,7 +116,7 @@ const AdminLayout = () => {
 
             {/* Menú vertical para móvil */}
             {isMobile && isMenuOpen && (
-                <div className="md:hidden bg-gray-800 border-b border-gray-700 overflow-y-auto">
+                <div className="lg:hidden bg-gray-800 border-b border-gray-700 overflow-y-auto">
                     <nav className="flex flex-col p-2">
                         {navItems.map((item, index) => (
                             <button 

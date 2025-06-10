@@ -60,7 +60,7 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
                 <div className="p-4">
                     <div className="flex justify-between items-start mb-2">
                         <div className={`p-2 rounded-full ${outOfStock ? 'bg-red-100' : 'bg-white'}`}>
-                            {producto.tipo === "Unidad" ? (
+                            {producto.tipo === TIPOS_PRODUCTO.PIEZA ? (
                                 <Package className={`w-5 h-5 ${outOfStock ? 'text-red-700' : 'text-blue-700'}`} />
                             ) : (
                                 <Droplets className={`w-5 h-5 ${outOfStock ? 'text-red-700' : 'text-blue-700'}`} />
@@ -100,7 +100,7 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
                     </div>
 
                     <div className={`text-xs mb-3 ${lowStock ? 'text-red-400' : 'text-gray-300'}`}>
-                        Stock: {producto.stock || "0"} {producto.tipo === "Unidad" ? "unidades" : "lt"}
+                        Stock: {producto.stock || "0"} {producto.tipo === TIPOS_PRODUCTO.PIEZA ? "pz" : "lt"}
                         {lowStock && producto.stock > 0 && (
                             <span className="ml-2 px-2 py-1 text-xs bg-red-900/30 text-red-400 rounded-full">
                                 Stock bajo

@@ -48,7 +48,7 @@ const PanelVentas = () => {
   const [selectedCategoria, setSelectedCategoria] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<"cards" | "list">("cards");
   const [processingVenta, setProcessingVenta] = useState(false);
-  const [showCarrito, setShowCarrito] = useState(false);
+  const [showCarrito, setShowCarrito] = useState(true);
 
   // Añadir estado para el menú contraído
   const [menuCollapsed, setMenuCollapsed] = useState(false);

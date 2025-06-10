@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
 import { Trash2, MinusCircle, PlusCircle, ShoppingCart, Percent, CheckCircle, Printer, UserPlus, User, X, WifiOff } from "lucide-react";
-import { useCarrito, type CarritoItem } from "../../hooks/useCarrito";
+import { type CarritoItem } from "../../hooks/useCarrito";
 import { Card, CardContent, CardHead, CardTittle } from "../ui/Card";
 import { Button } from "../ui/Button";
 import useUser from "../../hooks/useUser";
@@ -28,7 +29,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
         onRemoveItem,
         onUpdateQuantity,
         onClearCart,
-        onProcessPurchase,
+        onProcessPurchase
     } = props;
 
     const [includeIVA, setIncludeIVA] = useState(true);
@@ -38,12 +39,10 @@ const Carrito: React.FC<CarritoProps> = (props) => {
     const [ventaCompletada, setVentaCompletada] = useState(false);
     const [detallesVenta, setDetallesVenta] = useState({ total: 0, timestamp: "" });
     const [errorImpresion, setErrorImpresion] = useState<string | null>(null);
-    const [mostrarTicket, setMostrarTicket] = useState(false);
-    const [readyToPrint, setReadyToPrint] = useState(false);
+    const [mostrarTicket, setMostrarTicket] = useState(true);
     const isOnline = useConnectionStatus();
 
     const { isOpen, openModal, closeModal } = useModal();
-    const { procesarVenta } = useCarrito();
     const { user } = useUser();
     const { 
         clienteSeleccionado, 
@@ -99,9 +98,9 @@ const Carrito: React.FC<CarritoProps> = (props) => {
         if (!isEmpty && !loading) {
             try {
 
-               /* await onProcessPurchase(includeIVA,clienteSeleccionado);
+               await onProcessPurchase(includeIVA,clienteSeleccionado);
 
-                // Guardar detalles para mostrar en la confirmación
+                /*Guardar detalles para mostrar en la confirmación
                 setDetallesVenta({
                     total: totalFinal+iva,
                     timestamp: new Date().toLocaleString()
@@ -140,6 +139,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                 localStorage.setItem("ventaCompletada", "true");
                 setDetallesVenta({ total: totalVenta, timestamp: fechaVenta });
                 localStorage.setItem("detallesVenta", JSON.stringify({ total: totalVenta, timestamp: fechaVenta }));
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (error) {
                 setErrorImpresion("Error al procesar la venta.");
             }
@@ -156,10 +156,15 @@ const Carrito: React.FC<CarritoProps> = (props) => {
             setErrorImpresion("No hay datos para imprimir el ticket.");
             return;
         }
+        console.log(ventaParaImprimir);
+        
         setMostrarTicket(true);
+        window.print()
+        setMostrarTicket(true);
+
     };
 
-    useEffect(() => {
+/*     useEffect(() => {
         if (
             mostrarTicket &&
             printAreaRef.current &&
@@ -168,11 +173,13 @@ const Carrito: React.FC<CarritoProps> = (props) => {
             ventaParaImprimir.items.length > 0
         ) {
             setTimeout(() => {
+                console.log(ventaParaImprimir);
+                
                 window.print();
                 setMostrarTicket(false);
             }, 200);
         }
-    }, [mostrarTicket, ventaParaImprimir]);
+    }, [mostrarTicket, ventaParaImprimir]); */
 
     // Limpia todo al iniciar nueva venta
     const handleNuevaVenta = () => {
@@ -492,31 +499,5 @@ const Carrito: React.FC<CarritoProps> = (props) => {
 
 export default Carrito;
 
-/* Debugging information
-Remove or comment out these console logs in production
-*/
-/* Debug hooks should be placed inside the Carrito component if needed.
-The following code was causing errors because it was outside the component scope.
-useEffect(() => {
-  console.log("items:", items);
-  console.log("user:", user);
-  console.log("clienteSeleccionado:", clienteSeleccionado);
-  console.log("totalFinal:", totalFinal, "iva:", iva);
-}, [items, user, clienteSeleccionado, totalFinal, iva]);
-
-console.log("items:", items);
-console.log("user:", user);
-console.log("clienteSeleccionado:", clienteSeleccionado);
-console.log("totalFinal:", totalFinal, "iva:", iva);
-useEffect(() => {
-  console.log("DEBUG ventaParaImprimir:", ventaParaImprimir);
-}, [ventaParaImprimir]);
-*/
-
-/*
-  Mueve este bloque CSS a un archivo .css o agrégalo a tu hoja de estilos global.
-  Ejemplo: crea 'CarritoPrint.css' y colócalo ahí, luego impórtalo en este archivo con:
-  import './CarritoPrint.css';
-*/
 
 

@@ -13,6 +13,8 @@ const defaultConfig: TicketConfig = {
 };
 
 const TicketPrint: React.FC<TicketPrintProps> = ({ venta, config }) => {
+
+
   if (!venta || !venta.items || venta.items.length === 0) {
     return <div style={{ color: "red" }}>No hay datos para imprimir el ticket.</div>;
   }
@@ -98,10 +100,10 @@ const TicketPrint: React.FC<TicketPrintProps> = ({ venta, config }) => {
               {Number(item.producto?.precioVenta) > 0 && Number(item.cantidad) > 0
                 ? `$${(Number(item.producto?.precioVenta) * Number(item.cantidad)).toFixed(2)}`
                 : (
-                    Number(item.producto?.precioVenta) === 0 && Number(item.cantidad) > 0
-                      ? "$0.00"
-                      : "0.00"
-                  )
+                  Number(item.producto?.precioVenta) === 0 && Number(item.cantidad) > 0
+                    ? "$0.00"
+                    : "0.00"
+                )
               }
             </span>
           </div>

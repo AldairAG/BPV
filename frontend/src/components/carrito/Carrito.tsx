@@ -58,7 +58,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
         let totalConDescuentos = 0;
         items.forEach(item => {
             const descuento = descuentos[item.producto.productoId] || 0;
-            const precioConDescuento = item.producto.precioVenta * (1 - descuento / 100);
+            const precioConDescuento = item.producto.precio * (1 - descuento / 100);
             totalConDescuentos += precioConDescuento * item.cantidad;
         });
         return totalConDescuentos;
@@ -120,7 +120,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                     items: items.map(item => ({
                         producto: {
                             nombre: item.producto.nombre,
-                            precioVenta: item.producto.precioVenta
+                            precio: item.producto.precio
                         },
                         cantidad: item.cantidad
                     })),
@@ -156,30 +156,11 @@ const Carrito: React.FC<CarritoProps> = (props) => {
             setErrorImpresion("No hay datos para imprimir el ticket.");
             return;
         }
-        console.log(ventaParaImprimir);
-        
         setMostrarTicket(true);
         window.print()
         setMostrarTicket(true);
 
     };
-
-/*     useEffect(() => {
-        if (
-            mostrarTicket &&
-            printAreaRef.current &&
-            ventaParaImprimir &&
-            ventaParaImprimir.items &&
-            ventaParaImprimir.items.length > 0
-        ) {
-            setTimeout(() => {
-                console.log(ventaParaImprimir);
-                
-                window.print();
-                setMostrarTicket(false);
-            }, 200);
-        }
-    }, [mostrarTicket, ventaParaImprimir]); */
 
     // Limpia todo al iniciar nueva venta
     const handleNuevaVenta = () => {
@@ -326,7 +307,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                         <div className="max-h-[400px] overflow-y-auto border-b border-b-gray-700 pb-4">
                             {items.map((item) => {
                                 const descuento = descuentos[item.producto.productoId] || 0;
-                                const precioConDescuento = item.producto.precioVenta * (1 - descuento / 100);
+                                const precioConDescuento = item.producto.precio * (1 - descuento / 100);
                                 const subtotalItem = precioConDescuento * item.cantidad;
 
                                 return (
@@ -336,7 +317,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                                                 <h4 className="text-sm font-medium">{item.producto.nombre}</h4>
                                                 <div className="flex items-center text-sm text-gray-400 mt-1">
                                                     <span className={descuento > 0 ? "line-through text-gray-500" : ""}>
-                                                        ${item.producto.precioVenta.toFixed(2)} c/u
+                                                        ${item.producto.precio.toFixed(2)} c/u
                                                     </span>
                                                     {descuento > 0 && (
                                                         <span className="ml-2 text-green-400">

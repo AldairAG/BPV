@@ -176,7 +176,7 @@ export const useCarrito = () => {
    */
   const calcularTotal = useCallback((): number => {
     return carritoItems.reduce(
-      (total, item) => total + item.producto.precioVenta * item.cantidad,
+      (total, item) => total + item.producto.precio * item.cantidad,
       0
     );
   }, [carritoItems]);
@@ -234,8 +234,8 @@ export const useCarrito = () => {
         clienteId: cliente?.idCliente || null, // Puede ser null si no hay cliente seleccionado
         productos: carritoItems.map(item => ({
           productoVendidoId: null, // Placeholder, will be set by backend
-          precioUnitario: item.producto.precioVenta,
-          subtotal: item.producto.precioVenta * item.cantidad,
+          precioUnitario: item.producto.precio,
+          subtotal: item.producto.precio * item.cantidad,
           producto: item.producto,
           cantidad: item.cantidad,
           descuento: 0

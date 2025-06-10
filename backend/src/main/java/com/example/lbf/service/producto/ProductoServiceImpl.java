@@ -37,7 +37,6 @@ public class ProductoServiceImpl implements ProductoService {
         nuevoProducto.setPrecio(producto.getPrecioVenta());
         nuevoProducto.setStock(producto.getStock());
         nuevoProducto.setCodigoBarras(producto.getCodigoBarras());
-        nuevoProducto.setPrecioVenta(producto.getPrecioVenta());
         nuevoProducto.setPrecioCompra(producto.getPrecioCosto());
         nuevoProducto.setStockMinimo(producto.getStockMinimo());
         nuevoProducto.setActivo(producto.getActivo());

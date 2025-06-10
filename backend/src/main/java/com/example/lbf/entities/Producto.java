@@ -30,7 +30,6 @@ public class Producto {
     private Float precio;
     private Float stock;
     private String codigoBarras;
-    private Float precioVenta;
     private Float precioCompra;
     private Float stockMinimo;
     private String tipo;

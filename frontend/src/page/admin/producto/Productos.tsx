@@ -23,10 +23,10 @@ const ProductoSchema = Yup.object().shape({
     nombre: Yup.string()
         .required("El nombre es obligatorio")
         .min(2, "El nombre debe tener al menos 2 caracteres"),
-    precioVenta: Yup.number()
+    precio: Yup.number()
         .required("El precio de venta es obligatorio")
         .positive("El precio debe ser positivo"),
-    precioCosto: Yup.number()
+    precioCompra: Yup.number()
         .required("El precio de costo es obligatorio")
         .positive("El precio debe ser positivo"),
     stock: Yup.number()
@@ -58,8 +58,8 @@ const Productos = () => {
     const [editMode, setEditMode] = useState(false);
     const [initialValues, setInitialValues] = useState<{
         nombre: string;
-        precioVenta: string | number;
-        precioCosto: string | number;
+        precio: string | number;
+        precioCompra: string | number;
         stock: string | number;
         stockMinimo: string | number;
         codigoBarras: string;
@@ -70,8 +70,8 @@ const Productos = () => {
         descuentos: (string | number)[];
     }>({
         nombre: "",
-        precioVenta: "",
-        precioCosto: "", // <--- aquí
+        precio: "",
+        precioCompra: "", // <--- aquí
         stock: "",
         stockMinimo: "",
         codigoBarras: "",
@@ -116,8 +116,8 @@ const Productos = () => {
         setEditMode(false);
         setInitialValues({
             nombre: "",
-            precioVenta: "",
-            precioCosto: "",
+            precio: "",
+            precioCompra: "",
             stock: "",
             stockMinimo: "",
             codigoBarras: "",
@@ -137,12 +137,12 @@ const Productos = () => {
         setEditMode(true);
         setInitialValues({
                     nombre: producto.nombre || "",
-                    precioVenta: producto.precioVenta !== undefined ? String(producto.precioVenta) : "",
-                    precioCosto: producto.precioCompra !== undefined
-                        ? String(producto.precioCompra)
+                    precio: producto.precio !== undefined ? producto.precio : "",
+                    precioCompra: producto.precioCompra !== undefined
+                        ? producto.precioCompra
                         : "",
-                    stock: producto.stock !== undefined ? String(producto.stock) : "",
-                    stockMinimo: producto.stockMinimo !== undefined ? String(producto.stockMinimo) : "",
+                    stock: producto.stock !== undefined ?producto.stock : "",
+                    stockMinimo: producto.stockMinimo !== undefined ? producto.stockMinimo : "",
                     codigoBarras: producto.codigoBarras ?? "",
                     categoria: producto.categoria || null,
                     activo: producto.activo ?? true,
@@ -265,36 +265,36 @@ const Productos = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <Input
-                                        id="precioVenta"
+                                        id="precio"
                                         label="Precio de venta"
-                                        name="precioVenta"
+                                        name="precio"
                                         type="number"
                                         required
                                         placeholder="0.00"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.precioVenta}
+                                        value={values.precio}
                                     />
                                     <ErrorMessage
-                                        name="precioVenta"
+                                        name="precio"
                                         component="div"
                                         className="text-red-500 text-sm mt-1"
                                     />
                                 </div>
                                 <div>
                                     <Input
-                                        id="precioCosto"
+                                        id="precioCompra"
                                         label="Precio de costo"
-                                        name="precioCosto" // <--- aquí
+                                        name="precioCompra" // <--- aquí
                                         type="number"
                                         required
                                         placeholder="0.00"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        value={values.precioCosto}
+                                        value={values.precioCompra}
                                     />
                                     <ErrorMessage
-                                        name="precioCosto"
+                                        name="precioCompra"
                                         component="div"
                                         className="text-red-500 text-sm mt-1"
                                     />
@@ -519,7 +519,7 @@ const Productos = () => {
                                         <td className="p-4 align-middle">
                                             {producto.tipo || "Unidad"}
                                         </td>
-                                        <td className="p-4 align-middle text-right">{formatPrice(producto.precioVenta)}</td>
+                                        <td className="p-4 align-middle text-right">{formatPrice(producto.precio||0)}</td>
                                         <td className="p-4 align-middle text-right">
                                             <span className={`${producto.stock <= producto.stockMinimo ? 'text-red-500 font-bold' : ''}`}>
                                                 {producto.tipo === 'Unidad'

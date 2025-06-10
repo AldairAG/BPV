@@ -86,7 +86,7 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
                             {producto.categoria?.nombre || "Sin Categoría"}
                         </Badge>
                         <p className="font-bold text-blue-300">
-                            ${producto.precioVenta.toFixed(2) || "0.00"}
+                            ${producto.precio.toFixed(2) || "0.00"}
                         </p>
                     </div>
 
@@ -156,7 +156,7 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
                     producto={{
                         productoId: producto.productoId,
                         nombre: producto.nombre,
-                        precioVenta: producto.precioVenta,
+                        precioVenta: producto.precio,
                         esGranel: true
                     }}
                     onConfirm={handleConfirmGranel}

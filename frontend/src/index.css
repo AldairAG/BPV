@@ -11,7 +11,7 @@ body {
 }
 
 .print-area {
-  display: ;
+  display: none;
 }
 
 @media print {

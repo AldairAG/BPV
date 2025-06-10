@@ -133,6 +133,8 @@ const PanelVentas = () => {
   const handleProcessVenta = async (conIva: boolean, cliente: ClienteType | null) => {
     setProcessingVenta(true);
     try {
+      console.log(carritoItems);
+      
       const ventaRealizada = await procesarVenta(conIva, cliente);
       if (ventaRealizada) {
         toast.success(`Venta realizada con éxito. Total: $${ventaRealizada.total.toFixed(2)}`);
@@ -407,7 +409,7 @@ const PanelVentas = () => {
                                 </span>
                               </td>
                               <td className="px-2 md:px-4 py-2 md:py-3 text-right">
-                                ${producto.precioVenta.toFixed(2)}
+                                ${producto.precio.toFixed(2)}
                               </td>
                               <td className="px-2 md:px-4 py-2 md:py-3 text-right hidden sm:table-cell">
                                 <span className={producto.stock <= producto.stockMinimo ? 'text-red-400' : ''}>

@@ -6,7 +6,7 @@ export type ProductoType = {
   id: number;
   productoId: number;
   nombre: string;
-  precioVenta: number;
+  precio: number;
   precioCompra: number;
   stock: number;
   stockMinimo: number;

@@ -197,7 +197,7 @@ export const useCarrito = () => {
    * @param conIva Indica si la venta incluye IVA
    * @returns La venta creada si tuvo éxito
    */
-  const procesarVenta = useCallback(async (conIva: boolean,cliente:ClienteType|null): Promise<VentaType | null> => {
+  const procesarVenta = useCallback(async (conIva: boolean,cliente:ClienteType|null,descuenos:Record<number, number>): Promise<VentaType | null> => {
     try {
       setLoading(true);
       setError(null);
@@ -238,10 +238,11 @@ export const useCarrito = () => {
           subtotal: item.producto.precio * item.cantidad,
           producto: item.producto,
           cantidad: item.cantidad,
-          descuento: 0
+          descuento: descuenos[item.producto.productoId] || 0 // Aplicar descuento si existe
         })),
         conIva
       };
+      
 
       // Enviar solicitud al servidor
       const ventaCreada = await VentaService.crearVenta(ventaRequest);

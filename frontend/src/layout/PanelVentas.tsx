@@ -130,12 +130,12 @@ const PanelVentas = () => {
   };
 
   // Función para procesar la venta
-  const handleProcessVenta = async (conIva: boolean, cliente: ClienteType | null) => {
+  const handleProcessVenta = async (conIva: boolean, cliente: ClienteType | null,descuenos:Record<number, number>) => {
     setProcessingVenta(true);
     try {
       console.log(carritoItems);
       
-      const ventaRealizada = await procesarVenta(conIva, cliente);
+      const ventaRealizada = await procesarVenta(conIva, cliente,descuenos);
       if (ventaRealizada) {
         toast.success(`Venta realizada con éxito. Total: $${ventaRealizada.total.toFixed(2)}`);
         fetchProductos();

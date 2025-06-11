@@ -19,7 +19,7 @@ interface CarritoProps {
     onRemoveItem: (productoId: number) => void;
     onUpdateQuantity: (productoId: number, cantidad: number) => Promise<boolean>;
     onClearCart: () => void;
-    onProcessPurchase: (conIva:boolean,cliente:ClienteType|null) => Promise<void>;
+    onProcessPurchase: (conIva:boolean,cliente:ClienteType|null,descuenos:Record<number, number>) => Promise<void>;
 }
 
 const Carrito: React.FC<CarritoProps> = (props) => {
@@ -98,7 +98,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
         if (!isEmpty && !loading) {
             try {
 
-               await onProcessPurchase(includeIVA,clienteSeleccionado);
+               await onProcessPurchase(includeIVA,clienteSeleccionado,descuentos);
 
                 /*Guardar detalles para mostrar en la confirmación
                 setDetallesVenta({
@@ -108,7 +108,6 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                 
                 // Procesar la venta
                 await procesarVenta(includeIVA,clienteSeleccionado);  */
-
 
                 const fechaVenta = new Date().toLocaleString();
                 const totalVenta = Number((totalFinal + iva).toFixed(2));
@@ -130,6 +129,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                     total: Number((totalFinal + iva).toFixed(2)),
                     conIva: includeIVA
                 };
+                // Validar que haya productos en la venta  
 
                 if (!ventaData.items || ventaData.items.length === 0) {
                     setErrorImpresion("No hay productos en la venta.");

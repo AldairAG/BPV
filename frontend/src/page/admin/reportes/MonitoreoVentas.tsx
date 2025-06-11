@@ -72,12 +72,12 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
     setLoading(true);
     try {
       const response = await VentaService.getVentasByRangoDeFechasParaMonitoreo(fechaInicio, fechaFin);
-      console.log("Ventas cargadas:", response);
-
       // Ordenar por fecha más reciente por defecto
-      const ventasOrdenadas = [...response].sort(
-        (a, b) => new Date(b.venta.fecha).getTime() - new Date(a.venta.fecha).getTime()
-      );
+      const ventasOrdenadas = [...response].sort((a, b) => {
+        const fechaA = new Date(a.venta.fecha + 'T00:00:00');
+        const fechaB = new Date(b.venta.fecha + 'T00:00:00');
+        return fechaB.getTime() - fechaA.getTime();
+      });
 
       setVentasOriginales(ventasOrdenadas);
       setVentasFiltradas(ventasOrdenadas);
@@ -88,7 +88,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
       setLoading(false);
     }
   };
-
+ 
   // Función para manejar el cambio de hora de inicio
   const handleFiltroHoraInicioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFiltroHoraInicio(e.target.value);
@@ -509,7 +509,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <div className="font-medium">
-                          {new Date(ventaResponse.venta.fecha).toLocaleDateString()}
+                          {ventaResponse.venta.fecha}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400">
                           {ventaResponse.venta.hora}

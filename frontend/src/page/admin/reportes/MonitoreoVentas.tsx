@@ -178,7 +178,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
   }
 
   // Renderizar el contenido del modal de detalle de venta
-  const renderDetalleVenta = () => {
+   const renderDetalleVenta = () => {
     if (!ventaSeleccionada) return null;
 
     return (

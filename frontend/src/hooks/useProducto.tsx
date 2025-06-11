@@ -99,6 +99,7 @@ export const useProducto = () => {
       if (producto.tipo==null) {
         producto.tipo = TIPOS_PRODUCTO.PIEZA;
       }
+      
       const nuevoProducto = await ProductoService.crearProducto(producto);
       console.log('Producto creado:', nuevoProducto);
       dispatch(addProducto(nuevoProducto));

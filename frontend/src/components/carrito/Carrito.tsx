@@ -120,11 +120,15 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                     items: items.map(item => ({
                         producto: {
                             nombre: item.producto.nombre,
-                            precio: item.producto.precio
+                            precioVenta: Number(item.producto.precio)
                         },
-                        cantidad: item.cantidad
+                        cantidad: Number(item.cantidad),
+                        descuento: descuentos[item.producto.productoId] || 0 // <--- descuento aplicado
                     })),
-                    total: totalVenta
+                    subtotal: Number(totalFinal.toFixed(2)),
+                    iva: Number(iva.toFixed(2)),
+                    total: Number((totalFinal + iva).toFixed(2)),
+                    conIva: includeIVA
                 };
 
                 if (!ventaData.items || ventaData.items.length === 0) {
@@ -162,11 +166,13 @@ const Carrito: React.FC<CarritoProps> = (props) => {
 
     };
 
-    // Limpia todo al iniciar nueva venta
+    // LIMPIAR CARRITO 
     const handleNuevaVenta = () => {
         setVentaCompletada(false);
         setVentaParaImprimir(null);
         setDetallesVenta({ total: 0, timestamp: "" });
+        setDescuentos({}); // ELIMINA DESCUENTOS
+        clearSeleccion();   // ELIMINA AL CLIENTE
         localStorage.removeItem("ventaParaImprimir");
         localStorage.removeItem("ventaCompletada");
         localStorage.removeItem("detallesVenta");

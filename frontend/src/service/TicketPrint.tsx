@@ -13,7 +13,7 @@ const defaultConfig: TicketConfig = {
 };
 
 const TicketPrint: React.FC<TicketPrintProps> = ({ venta, config }) => {
-
+  console.log("Venta para imprimir:", venta);
 
   if (!venta || !venta.items || venta.items.length === 0) {
     return <div style={{ color: "red" }}>No hay datos para imprimir el ticket.</div>;
@@ -36,6 +36,24 @@ const TicketPrint: React.FC<TicketPrintProps> = ({ venta, config }) => {
   const fontFamily = ticketConfig.fuente === "B" ? "monospace" : "inherit";
   const nombreTienda = ticketConfig.nombreTienda || "La Burbuja Felíz";
   const leyenda = ticketConfig.leyenda || "¡Gracias por su compra!";
+
+  // Calcular subtotal, iva y si la venta tiene IVA
+  const subtotalSinDescuento = venta.items.reduce((acc, item) => {
+    const precioUnit = Number(item.producto.precioVenta);
+    return acc + precioUnit * Number(item.cantidad);
+  }, 0);
+
+  const subtotal = venta.items.reduce((acc, item) => {
+    const precioUnit = Number(item.producto.precioVenta);
+    const desc = Number((item as any).descuento) || 0;
+    const precioConDesc = precioUnit * (1 - desc / 100);
+    return acc + precioConDesc * Number(item.cantidad);
+  }, 0);
+
+  const descuentoTotal = subtotalSinDescuento - subtotal;
+
+  const conIva = venta.total > subtotal;
+  const iva = conIva ? venta.total - subtotal : 0;
 
   return (
     <div
@@ -83,40 +101,73 @@ const TicketPrint: React.FC<TicketPrintProps> = ({ venta, config }) => {
       {venta.cliente && <div>Cliente: {venta.cliente.nombre}</div>}
       <hr />
       <div>
-        {venta.items.map((item, idx) => (
-          <div key={idx} className="ticket-row" style={{ display: "flex", justifyContent: "space-between" }}>
-            <span style={{ maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis", display: "inline-block" }}>
-              {item.producto?.nombre || "Producto"}
-            </span>
-            <span style={{ minWidth: 30, textAlign: "right" }}>
-              x{item.cantidad}
-            </span>
-            <span style={{ minWidth: 40, textAlign: "right" }}>
-              ${typeof item.producto?.precioVenta === "number"
-                ? item.producto.precioVenta.toFixed(2)
-                : "0.00"}
-            </span>
-            <span style={{ minWidth: 50, textAlign: "right" }}>
-              {Number(item.producto?.precioVenta) > 0 && Number(item.cantidad) > 0
-                ? `$${(Number(item.producto?.precioVenta) * Number(item.cantidad)).toFixed(2)}`
-                : (
-                  Number(item.producto?.precioVenta) === 0 && Number(item.cantidad) > 0
-                    ? "$0.00"
-                    : "0.00"
-                )
-              }
-            </span>
-          </div>
-        ))}
+        <table style={{ width: "100%", fontSize: 11, marginBottom: 8 }}>
+          <thead>
+            <tr>
+              <th style={{ textAlign: "left" }}>Producto</th>
+              <th>Cant</th>
+              <th>Precio</th>
+              <th>Desc</th>
+              <th>Importe</th>
+            </tr>
+          </thead>
+          <tbody>
+            {venta.items.map((item, idx) => {
+              const precioUnit = Number(item.producto.precioVenta);
+              const desc = Number((item as any).descuento) || 0;
+              const precioConDesc = precioUnit * (1 - desc / 100);
+              const importe = precioConDesc * Number(item.cantidad);
+              return (
+                <tr key={idx}>
+                  <td>{item.producto.nombre}</td>
+                  <td style={{ textAlign: "center" }}>{item.cantidad}</td>
+                  <td style={{ textAlign: "right" }}>${precioUnit.toFixed(2)}</td>
+                  <td style={{ textAlign: "right" }}>{desc}%</td>
+                  <td style={{ textAlign: "right" }}>${importe.toFixed(2)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-      <hr />
-      <div style={{ textAlign: "right", fontWeight: "bold" }}>
-        TOTAL: ${typeof venta.total === "number" ? venta.total.toFixed(2) : "0.00"}
+      {/* Resumen de totales */}
+      <div>
+        <table style={{ width: "100%", fontSize: 11, marginTop: 8 }}>
+          <tbody>
+            <tr>
+              <td colSpan={4} style={{ textAlign: "right" }}>Subtotal</td>
+              <td style={{ textAlign: "right" }}>${subtotalSinDescuento.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td colSpan={4} style={{ textAlign: "right" }}>Descuento total</td>
+              <td style={{ textAlign: "right" }}>
+                ${descuentoTotal.toFixed(2)}
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={4} style={{ textAlign: "right" }}>Subtotal c/desc</td>
+              <td style={{ textAlign: "right" }}>${subtotal.toFixed(2)}</td>
+            </tr>
+            {conIva && (
+              <tr>
+                <td colSpan={4} style={{ textAlign: "right" }}>IVA (16%)</td>
+                <td style={{ textAlign: "right" }}>${iva.toFixed(2)}</td>
+              </tr>
+            )}
+            <tr>
+              <td colSpan={4} style={{ textAlign: "right", fontWeight: "bold" }}>Total</td>
+              <td style={{ textAlign: "right", fontWeight: "bold" }}>${venta.total.toFixed(2)}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div style={{ textAlign: "center", marginTop: 10 }}>
         {leyenda}
       </div>
       <div style={{ height: 100 }} /> {/* Espacio extra entre tickets, ajusta el valor si lo deseas */}
+      {/* Dos líneas vacías al final del ticket */}
+      <div>&nbsp;.</div>
+      <div>&nbsp;</div>
       <style>
         {`
           @media print {

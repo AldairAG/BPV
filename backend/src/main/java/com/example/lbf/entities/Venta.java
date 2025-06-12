@@ -45,6 +45,6 @@ public class Venta {
 
     private String sucursal;
 
-    private Boolean anulado;
+    private Boolean anulada = false;
 
 }

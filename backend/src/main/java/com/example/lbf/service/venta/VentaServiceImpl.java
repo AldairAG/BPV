@@ -113,7 +113,7 @@ public class VentaServiceImpl implements VentaService {
             Venta venta = ventaOpt.get();
             
             // Marcar la venta como anulada
-            venta.setAnulado(true);
+            venta.setAnulada(true);
             
             // Devolver stock de productos
             for (ProductoVendido pv : venta.getProductosVendidos()) {

@@ -10,39 +10,25 @@ interface ModalTemplateProps {
 
 /**
  * Hook personalizado para gestionar el estado de un modal
- * @returns {Object} Métodos y estado para controlar el modal
  */
 export const useModal = () => {
     const [isOpen, setIsOpen] = useState(false);
-    
-    const openModal = useCallback(() => {
-        setIsOpen(true);
-    }, []);
-    
-    const closeModal = useCallback(() => {
-        setIsOpen(false);
-    }, []);
-    
-    const toggleModal = useCallback(() => {
-        setIsOpen(prev => !prev);
-    }, []);
-    
-    return {
-        isOpen,
-        openModal,
-        closeModal,
-        toggleModal
-    };
+
+    const openModal = useCallback(() => setIsOpen(true), []);
+    const closeModal = useCallback(() => setIsOpen(false), []);
+    const toggleModal = useCallback(() => setIsOpen(prev => !prev), []);
+
+    return { isOpen, openModal, closeModal, toggleModal };
 };
 
 /**
  * Componente de modal reutilizable con estilos de Tailwind
  */
-const ModalTemplate: React.FC<ModalTemplateProps> = ({ 
-    isOpen, 
-    onClose, 
+const ModalTemplate: React.FC<ModalTemplateProps> = ({
+    isOpen,
+    onClose,
     children,
-    title 
+    title
 }) => {
     const handleBackdropClick = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -53,7 +39,6 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
         [onClose]
     );
 
-    // Si el modal no está abierto, no renderizamos nada
     if (!isOpen) return null;
 
     return (
@@ -62,7 +47,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
             onClick={handleBackdropClick}
         >
             <div
-                className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-md mx-auto p-6 shadow-lg relative"
+                className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl mx-auto p-6 shadow-lg relative"
             >
                 <button
                     onClick={onClose}
@@ -71,7 +56,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
                 >
                     <XMarkIcon className="h-6 w-6" />
                 </button>
-                
+
                 {title && (
                     <div className="mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -79,7 +64,7 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
                         </h3>
                     </div>
                 )}
-                
+
                 <div className="mt-2">
                     {children}
                 </div>

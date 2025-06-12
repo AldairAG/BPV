@@ -168,133 +168,85 @@ const PanelVentas = () => {
     setMenuCollapsed(!menuCollapsed);
   };
 
-  // Modificar la estructura del componente para tener el menú siempre visible
+  // Modificar la estructura del componente para quitar la barra superior
   return (
-    <section className="flex flex-col w-full text-white bg-gray-900">
-      {/* Header responsive */}
-      {hasRole(ROLES.USER) && (
-        <header className="flex items-center justify-between h-16 bg-gray-900 
-        text-white px-4 md:px-6 border-b border-gray-700 z-10">
-          <div className="flex items-center">
-            <h1 className="text-xl md:text-2xl font-bold text-sky-500 truncate">
-              La Burbuja Feliz
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-2 md:gap-4">
-            {/* Botón de carrito en móvil */}
+    <section className="flex flex-col w-full min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800 text-gray-100">
+      <div className="flex flex-row w-full flex-1 min-h-0">
+        {/* Menú lateral */}
+        <aside className={`${menuCollapsed ? 'w-16' : 'w-60'} bg-slate-900 shadow-lg border-r border-slate-800 transition-all duration-300 flex flex-col`}>
+          <div className="flex items-center justify-between p-4 border-b border-slate-800">
+            {!menuCollapsed && <h2 className="text-lg font-semibold text-slate-200">Menú</h2>}
             <button
-              className="relative lg:hidden px-3 py-1 bg-blue-600 rounded-md"
-              onClick={toggleCarrito}
+              onClick={toggleMenuCollapse}
+              className="p-1 hover:bg-slate-800 rounded-full transition-colors"
             >
-              {carritoItems.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                  {carritoItems.length}
-                </span>
+              {menuCollapsed ? (
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                </svg>
+              ) : (
+                <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                </svg>
               )}
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
             </button>
-
-            {/* Nombre de usuario (visible en tabletas y escritorio) */}
-            {user && (
-              <span className="hidden md:inline text-gray-300 truncate max-w-[120px] lg:max-w-none">
-                {user.nombre}
-              </span>
-            )}
-
+          </div>
+          {user && !menuCollapsed && (
+            <div className="p-4 border-b border-slate-800">
+              <p className="text-xs text-slate-400">Usuario:</p>
+              <p className="font-medium text-slate-200">{user.nombre}</p>
+            </div>
+          )}
+          <nav className="flex-1 p-2 space-y-1">
             <button
-              onClick={logout}
-              className="px-2 py-1 md:px-4 md:py-1 text-xs md:text-sm bg-gray-700 rounded-md hover:bg-gray-600 transition-colors"
+              className={`w-full flex items-center gap-3 p-2 rounded hover:bg-slate-800 transition-colors ${menuCollapsed ? 'justify-center' : 'text-left'}`}
+              onClick={handleCorteCajaClick}
             >
-              Salir
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              {!menuCollapsed && <span>Corte de caja</span>}
+            </button>
+            <button
+              className={`w-full flex items-center gap-3 p-2 rounded hover:bg-slate-800 transition-colors ${menuCollapsed ? 'justify-center' : 'text-left'}`}
+              onClick={() => setShowCarrito(true)}
+            >
+              <div className="relative">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {carritoItems.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-blue-400 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
+                    {carritoItems.length}
+                  </span>
+                )}
+              </div>
+              {!menuCollapsed && <span>Carrito {carritoItems.length > 0 && `(${carritoItems.length})`}</span>}
+            </button>
+          </nav>
+          <div className="p-2 mt-auto">
+            <button
+              className={`w-full flex items-center gap-3 p-2 rounded hover:bg-slate-800 transition-colors text-red-400 ${menuCollapsed ? 'justify-center' : 'text-left'}`}
+              onClick={logout}
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              {!menuCollapsed && <span>Cerrar sesión</span>}
             </button>
           </div>
-        </header>
-      )}
+        </aside>
 
-      {/* Contenido principal con menú lateral siempre visible */}
-      <div className="flex flex-row w-full h-[calc(100vh-4rem)]">
-        {/* Menú lateral siempre visible pero contraíble */}
-        <div
-          className={`${menuCollapsed ? 'w-16' : 'w-64'} bg-gray-800 shadow-lg overflow-y-auto border-r border-gray-700 transition-all duration-300`}
-        >
-          <div className="flex flex-col h-full">
-            <div className="flex justify-between items-center p-4 border-b border-gray-700">
-              {!menuCollapsed && <h2 className="text-lg font-semibold">Menú</h2>}
-              <button 
-                onClick={toggleMenuCollapse}
-                className="p-1 hover:bg-gray-700 rounded-full transition-colors"
-              >
-                {menuCollapsed ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                  </svg>
-                )}
-              </button>
-            </div>
-
-            {user && !menuCollapsed && (
-              <div className="p-4 border-b border-gray-700">
-                <p className="text-sm text-gray-400">Usuario:</p>
-                <p className="font-medium">{user.nombre}</p>
-              </div>
-            )}
-
-            <div className="p-2 space-y-1 flex-grow">
-              <button
-                className={`w-full flex items-center gap-3 p-2 rounded hover:bg-gray-700 transition-colors ${menuCollapsed ? 'justify-center' : 'text-left'}`}
-                onClick={handleCorteCajaClick}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                {!menuCollapsed && <span>Corte de caja</span>}
-              </button>
-              <button
-                className={`w-full flex items-center gap-3 p-2 rounded hover:bg-gray-700 transition-colors ${menuCollapsed ? 'justify-center' : 'text-left'}`}
-                onClick={() => setShowCarrito(true)}
-              >
-                <div className="relative">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                  {carritoItems.length > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
-                      {carritoItems.length}
-                    </span>
-                  )}
-                </div>
-                {!menuCollapsed && <span>Carrito {carritoItems.length > 0 && `(${carritoItems.length})`}</span>}
-              </button>
-              <button
-                className={`w-full flex items-center gap-3 p-2 rounded hover:bg-gray-700 transition-colors text-red-400 ${menuCollapsed ? 'justify-center' : 'text-left'}`}
-                onClick={logout}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                {!menuCollapsed && <span>Cerrar sesión</span>}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Contenido principal responsive */}
-        <main className="flex flex-col lg:flex-row w-full overflow-hidden">
-          {/* Panel de productos (se oculta en móvil cuando se muestra el carrito) */}
+        {/* Contenido principal */}
+        <main className="flex flex-col lg:flex-row w-full flex-1 min-h-0 overflow-hidden">
+          {/* Panel de productos */}
           <div className={`w-full lg:w-2/3 xl:w-3/4 flex-shrink-0 overflow-y-auto ${showCarrito ? 'hidden lg:block' : 'block'}`}>
             <div className="p-3 md:p-4 lg:p-6 space-y-4">
               <div className="flex flex-col sm:flex-row justify-between gap-2 sm:items-center">
-                <h1 className="text-lg md:text-xl font-bold text-white">Módulo de ventas</h1>
+                <h1 className="text-lg md:text-xl font-bold text-slate-100">Módulo de ventas</h1>
                 <div className="flex items-center gap-2">
                   <button
-                    className={`flex text-xs md:text-sm items-center gap-1 ${viewMode === "cards" ? "bg-blue-800" : "bg-gray-700"
+                    className={`flex text-xs md:text-sm items-center gap-1 ${viewMode === "cards" ? "bg-blue-700" : "bg-slate-700"
                       } text-white px-2 py-1 md:px-3 md:py-2 rounded-md transition-colors`}
                     onClick={() => handleViewModeChange("cards")}
                   >
@@ -303,7 +255,7 @@ const PanelVentas = () => {
                   </button>
 
                   <button
-                    className={`flex items-center text-xs md:text-sm gap-1 ${viewMode === "list" ? "bg-blue-800" : "bg-gray-700"
+                    className={`flex items-center text-xs md:text-sm gap-1 ${viewMode === "list" ? "bg-blue-700" : "bg-slate-700"
                       } text-white px-2 py-1 md:px-3 md:py-2 rounded-md transition-colors`}
                     onClick={() => handleViewModeChange("list")}
                   >
@@ -324,12 +276,12 @@ const PanelVentas = () => {
                 onChange={handleSearch}
               />
 
-              <Card className="w-full bg-gray-800 p-2 md:p-4">
+              <Card className="w-full bg-slate-900/80 p-2 md:p-4">
                 <CardHead className="flex items-center justify-start gap-2 flex-wrap overflow-x-auto pb-2">
                   <Badge
                     key="todas"
-                    className={`cursor-pointer whitespace-nowrap ${selectedCategoria === null ? "bg-blue-600" : "bg-gray-600"
-                      } hover:bg-blue-700 transition-colors mb-2`}
+                    className={`cursor-pointer whitespace-nowrap ${selectedCategoria === null ? "bg-blue-500" : "bg-slate-800"
+                    } hover:bg-blue-600 transition-colors mb-2`}
                     onClick={() => {
                       setSelectedCategoria(null);
                       limpiarFiltros();
@@ -342,8 +294,8 @@ const PanelVentas = () => {
                     <Badge
                       key={categoria.categoriaId}
                       className={`cursor-pointer mb-2 whitespace-nowrap ${selectedCategoria === categoria.categoriaId
-                        ? "bg-blue-600"
-                        : ""
+                        ? "bg-blue-500"
+                        : "bg-slate-800"
                         }`}
                       style={{
                         backgroundColor: selectedCategoria === categoria.categoriaId
@@ -359,7 +311,7 @@ const PanelVentas = () => {
 
                 <CardContent className="mt-2 md:mt-4 overflow-y-auto">
                   {productosFiltrados.length === 0 ? (
-                    <div className="text-center py-8 text-gray-400">
+                    <div className="text-center py-8 text-slate-400">
                       {searchTerm || selectedCategoria !== null
                         ? "No se encontraron productos que coincidan con la búsqueda"
                         : "No hay productos disponibles"}
@@ -378,23 +330,23 @@ const PanelVentas = () => {
                     </div>
                   ) : (
                     <div className="overflow-x-auto max-h-[calc(100vh-16rem)] overflow-y-auto">
-                      <table className="w-full text-xs md:text-sm text-left text-gray-300">
-                        <thead className="text-xs uppercase bg-gray-700">
+                      <table className="w-full text-xs md:text-sm text-left text-slate-200">
+                        <thead className="text-xs uppercase bg-slate-800">
                           <tr>
-                            <th scope="col" className="px-2 md:px-4 py-2 md:py-3">Producto</th>
-                            <th scope="col" className="px-2 md:px-4 py-2 md:py-3 hidden sm:table-cell">Categoría</th>
-                            <th scope="col" className="px-2 md:px-4 py-2 md:py-3 text-right">Precio</th>
-                            <th scope="col" className="px-2 md:px-4 py-2 md:py-3 text-right hidden sm:table-cell">Stock</th>
-                            <th scope="col" className="px-2 md:px-4 py-2 md:py-3 text-right">Acción</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3">Producto</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 hidden sm:table-cell">Categoría</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-right">Precio</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-right hidden sm:table-cell">Stock</th>
+                            <th className="px-2 md:px-4 py-2 md:py-3 text-right">Acción</th>
                           </tr>
                         </thead>
                         <tbody>
                           {productosFiltrados.map(producto => (
-                            <tr key={producto.productoId} className="border-b border-gray-700 hover:bg-gray-700">
+                            <tr key={producto.productoId} className="border-b border-slate-800 hover:bg-slate-800/40">
                               <td className="px-2 md:px-4 py-2 md:py-3">
                                 <div className="flex flex-col">
                                   <span>{producto.nombre}</span>
-                                  <span className="text-xs text-gray-400 sm:hidden">
+                                  <span className="text-xs text-slate-400 sm:hidden">
                                     Stock: {producto.stock}
                                   </span>
                                 </div>
@@ -421,18 +373,18 @@ const PanelVentas = () => {
                                   {isInCart(producto.productoId) ? (
                                     <>
                                       <button
-                                        className="bg-red-600 hover:bg-red-700 px-2 md:px-3 py-1 rounded-md text-xs"
+                                        className="bg-red-500 hover:bg-red-600 px-2 md:px-3 py-1 rounded-md text-xs"
                                         onClick={() => removeFromCart(producto.productoId)}
                                       >
                                         Quitar
                                       </button>
-                                      <span className="bg-gray-700 px-2 md:px-3 py-1 rounded-md text-xs">
+                                      <span className="bg-blue-700 px-2 md:px-3 py-1 rounded-md text-xs">
                                         {getCartItemQuantity(producto.productoId)}
                                       </span>
                                     </>
                                   ) : (
                                     <button
-                                      className="bg-blue-600 hover:bg-blue-700 px-2 md:px-3 py-1 rounded-md text-xs"
+                                      className="bg-blue-500 hover:bg-blue-600 px-2 md:px-3 py-1 rounded-md text-xs"
                                       onClick={() => {
                                         handleAddToCart(producto, undefined);
                                       }}
@@ -458,22 +410,20 @@ const PanelVentas = () => {
             </div>
           </div>
 
-          {/* Carrito (se muestra en pantalla completa en móvil cuando está activo) */}
+          {/* Carrito */}
           <aside className={`w-full lg:w-1/3 xl:w-1/4 ${showCarrito ? 'block' : 'hidden lg:block'}`}>
             <div className="p-3 md:p-4 lg:p-0 lg:pr-4 lg:pt-6 h-full overflow-y-auto">
-              {/* Botón de volver en móvil */}
               {showCarrito && (
                 <button
                   className="lg:hidden mb-3 flex items-center gap-1 text-blue-400"
                   onClick={() => setShowCarrito(false)}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
                   Volver a productos
                 </button>
               )}
-
               <Carrito
                 items={carritoItems}
                 total={calcularTotal()}
@@ -486,31 +436,31 @@ const PanelVentas = () => {
             </div>
           </aside>
         </main>
-      </div>
 
-      {/* Indicador flotante de carrito para móvil */}
-      {!showCarrito && carritoItems.length > 0 && (
-        <button
-          className="fixed bottom-4 right-4 lg:hidden bg-blue-600 text-white rounded-full p-3 shadow-lg z-50"
-          onClick={() => setShowCarrito(true)}
+        {/* Indicador flotante de carrito para móvil */}
+        {!showCarrito && carritoItems.length > 0 && (
+          <button
+            className="fixed bottom-4 right-4 lg:hidden bg-blue-500 text-white rounded-full p-3 shadow-lg z-50"
+            onClick={() => setShowCarrito(true)}
+          >
+            <div className="absolute -top-2 -right-2 bg-blue-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+              {carritoItems.length}
+            </div>
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </button>
+        )}
+
+        {/* Modal de Corte de Caja */}
+        <ModalTemplate
+          isOpen={isCorteCajaOpen}
+          onClose={closeCorteCaja}
+          title="Corte de Caja"
         >
-          <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-            {carritoItems.length}
-          </div>
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-        </button>
-      )}
-
-      {/* Modal de Corte de Caja */}
-      <ModalTemplate
-        isOpen={isCorteCajaOpen}
-        onClose={closeCorteCaja}
-        title="Corte de Caja"
-      >
-        <CorteCaja onClose={closeCorteCaja} />
-      </ModalTemplate>
+          <CorteCaja onClose={closeCorteCaja} />
+        </ModalTemplate>
+      </div>
     </section>
   );
 }

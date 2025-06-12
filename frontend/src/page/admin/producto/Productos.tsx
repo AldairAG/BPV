@@ -198,7 +198,35 @@ const Productos = () => {
     };
 
     return (
-        <section className="flex flex-col w-full h-full p-4">
+        <section className="flex flex-col w-full h-full p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+            {/* Encabezado */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="text-3xl font-extrabold text-blue-900 dark:text-blue-200 tracking-tight mb-1">Gestión de Productos</h1>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        Administra tu catálogo, controla stock y precios de manera eficiente.
+                    </p>
+                </div>
+                <div className="flex gap-2">
+                    <Input
+                        id="search"
+                        className="w-64"
+                        placeholder="Buscar productos..."
+                        type="search"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+                    <Button
+                        onClick={handleOpenCreateModal}
+                        className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold shadow"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Nuevo Producto
+                    </Button>
+                </div>
+            </div>
+
+            {/* Modal de producto */}
             <ModalTemplate
                 isOpen={isOpen}
                 onClose={closeModal}
@@ -454,128 +482,113 @@ const Productos = () => {
                 </Formik>
             </ModalTemplate>
 
-            <div className="grid grid-cols-1 justify-between items-center mb-6 space-y-2">
-                <h1 className="text-2xl font-bold">Gestión de Productos</h1>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Input
-                        id="search"
-                        className="w-full"
-                        placeholder="Buscar productos..."
-                        type="search"
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                    />
-                    <Button onClick={handleOpenCreateModal}
-                        className="w-auto flex items-center justify-center"
-                    >
-                        <Plus className={"w-5 h-5"} />
-                        <span>Nuevo Producto</span>
-                    </Button>
-                </div>
-            </div>
-
-            <div className="rounded-lg border shadow-sm overflow-auto">
-                <div className="relative w-full overflow-auto">
-                    <table className="w-full caption-bottom text-sm">
-                        <thead className="[&amp;_tr]:border-b">
-                            <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">Producto</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">Categoría</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">Tipo</th>
-                                <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">Precio</th>
-                                <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">Stock</th>
-                                <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">Descuentos</th>
-                                <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="[&amp;_tr:last-child]:border-0">
-                            {productosFiltrados.length > 0 ? (
-                                productosFiltrados.map((producto) => (
-                                    <tr
-                                        key={producto.productoId}
-                                        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                                    >
-                                        <td className="p-4 align-middle">
-                                            <div>
-                                                <p className="font-medium">{producto.nombre}</p>
-                                                {producto.codigoBarras && (
-                                                    <p className="text-xs text-gray-500">Código: {producto.codigoBarras}</p>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td className="p-4 align-middle">
-                                            <div className="flex items-center gap-2">
-                                                {producto.categoria && (
-                                                    <>
-                                                        <div
-                                                            className="w-3 h-3 rounded-full"
-                                                            style={{ backgroundColor: producto.categoria.color }}
-                                                        ></div>
-                                                        <span>{producto.categoria.nombre}</span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </td>
-                                        <td className="p-4 align-middle">
+            {/* Tabla de productos */}
+            <div className="rounded-xl border border-blue-200 dark:border-gray-700 shadow-lg bg-white dark:bg-gray-900 overflow-auto">
+                <table className="w-full min-w-[900px] text-sm">
+                    <thead>
+                        <tr className="bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-100">
+                            <th className="h-12 px-4 text-left font-bold">Producto</th>
+                            <th className="h-12 px-4 text-left font-bold">Categoría</th>
+                            <th className="h-12 px-4 text-left font-bold">Tipo</th>
+                            <th className="h-12 px-4 text-right font-bold">Precio</th>
+                            <th className="h-12 px-4 text-right font-bold">Stock</th>
+                            <th className="h-12 px-4 text-right font-bold">Descuentos</th>
+                            <th className="h-12 px-4 text-right font-bold">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {productosFiltrados.length > 0 ? (
+                            productosFiltrados.map((producto, idx) => (
+                                <tr
+                                    key={producto.productoId}
+                                    className={`transition-colors ${idx % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-blue-50 dark:bg-gray-800"} hover:bg-blue-50/70 dark:hover:bg-blue-900/40`}
+                                >
+                                    <td className="p-4 align-middle">
+                                        <div>
+                                            <p className="font-semibold">{producto.nombre}</p>
+                                            {producto.codigoBarras && (
+                                                <p className="text-xs text-gray-500">Código: {producto.codigoBarras}</p>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="p-4 align-middle">
+                                        <div className="flex items-center gap-2">
+                                            {producto.categoria && (
+                                                <>
+                                                    <span
+                                                        className="w-3 h-3 rounded-full inline-block"
+                                                        style={{ backgroundColor: producto.categoria.color }}
+                                                    ></span>
+                                                    <span className="text-xs font-medium">{producto.categoria.nombre}</span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="p-4 align-middle">
+                                        <span className="px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 text-xs font-semibold">
                                             {producto.tipo || "Unidad"}
-                                        </td>
-                                        <td className="p-4 align-middle text-right">{formatPrice(producto.precio||0)}</td>
-                                        <td className="p-4 align-middle text-right">
-                                            <span className={`${producto.stock <= producto.stockMinimo ? 'text-red-500 font-bold' : ''}`}>
-                                                {producto.tipo === 'Unidad'
-                                                    ? producto.stock
-                                                    : producto.stock.toFixed(2)}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 align-middle text-right font-bold text-blue-700 dark:text-blue-200">
+                                        {formatPrice(producto.precio || 0)}
+                                    </td>
+                                    <td className="p-4 align-middle text-right">
+                                        <span className={`${producto.stock <= producto.stockMinimo ? 'text-red-600 font-bold' : 'text-green-700 dark:text-green-300 font-semibold'}`}>
+                                            {producto.tipo === 'Unidad'
+                                              ? producto.stock
+                                              : producto.stock.toFixed(2)}
+                                        </span>
+                                        <span className="text-xs text-gray-500 ml-1">
+                                            {producto.tipo === 'Unidad' ? 'pz' : producto.tipo === 'Líquido' ? 'lt' : 'pz'}
+                                        </span>
+                                        {producto.stock <= producto.stockMinimo && (
+                                            <span className="ml-2 px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full font-bold">
+                                              Stock bajo
                                             </span>
-                                            <span className="text-xs text-gray-500 ml-1">
-                                                {producto.tipo === 'Unidad' ? 'pz' : producto.tipo === 'Líquido' ? 'lt' : 'pz'}
-                                            </span>
-                                            {producto.stock <= producto.stockMinimo && (
-                                                <span className="ml-2 px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
-                                                    Stock bajo
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="p-4 align-middle text-right">
-                                            {producto.descuentos && producto.descuentos.some(d => d > 0) ? (
-                                                <div className="flex flex-col items-end">
-                                                    {producto.descuentos
-                                                        .filter(d => d > 0)
-                                                        .map((descuento, idx) => (
-                                                            <span key={idx} className="text-xs text-green-600">
-                                                                {descuento}%
-                                                            </span>
-                                                        ))}
-                                                </div>
-                                            ) : (
-                                                <span className="text-xs text-gray-500">Sin descuentos</span>
-                                            )}
-                                        </td>
-                                        <td className="p-4 align-middle text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <Button
-                                                    onClick={() => handleOpenEditModal(producto)}
-                                                >
-                                                    <Pencil className="w-4 h-4" />
-                                                </Button>
-                                                <Button
-                                                    onClick={() => handleDelete(producto.productoId)}
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
+                                        )}
+                                    </td>
+                                    <td className="p-4 align-middle text-right">
+                                        {producto.descuentos && producto.descuentos.some(d => d > 0) ? (
+                                            <div className="flex flex-col items-end gap-1">
+                                                {producto.descuentos
+                                                  .filter(d => d > 0)
+                                                  .map((descuento, idx) => (
+                                                    <span key={idx} className="text-xs text-green-600 font-semibold bg-green-50 rounded px-2">
+                                                      {descuento}%
+                                                    </span>
+                                                  ))}
                                             </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={6} className="p-4 text-center text-gray-500">
-                                        {searchTerm ? 'No se encontraron productos que coincidan con la búsqueda' : 'No hay productos registrados'}
+                                        ) : (
+                                            <span className="text-xs text-gray-400 italic">Sin descuentos</span>
+                                        )}
+                                    </td>
+                                    <td className="p-4 align-middle text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <Button
+                                                onClick={() => handleOpenEditModal(producto)}
+                                                className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 px-2 py-1 rounded shadow"
+                                            >
+                                                <Pencil className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                                onClick={() => handleDelete(producto.productoId)}
+                                                className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded shadow"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
                                     </td>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={7} className="p-6 text-center text-gray-500 dark:text-gray-400">
+                                    {searchTerm ? 'No se encontraron productos que coincidan con la búsqueda' : 'No hay productos registrados'}
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
         </section>
     );

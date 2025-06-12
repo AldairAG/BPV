@@ -72,67 +72,64 @@ const AdminLayout = () => {
     ];
 
     return (
-        <section className="flex flex-col h-screen w-full text-white">
-            <header className="flex border-b items-center border-b-gray-300 h-15 p-3">
-                <span className="text-xl md:text-2xl text-sky-500 font-semibold">La Burbuja Felíz -Administrador-</span>
+        <section className="flex flex-col h-screen w-full bg-gradient-to-br from-slate-900 via-gray-900 to-gray-800 text-white">
+            {/* Barra superior */}
+            <header className="sticky top-0 z-40 flex border-b border-indigo-900 items-center h-16 px-4 md:px-8 bg-indigo-950/95 shadow-lg">
+                <span className="text-xl md:text-2xl font-extrabold tracking-widest text-amber-400 select-none">
+                    La Burbuja Feliz <span className="font-normal text-indigo-200">- Admin -</span>
+                </span>
 
                 {/* Menú hamburguesa solo visible en móvil */}
-                <button 
-                    className="ml-auto lg:hidden p-1 hover:bg-gray-700 rounded-md"
+                <button
+                    className="ml-auto lg:hidden p-1 hover:bg-indigo-900 rounded-md"
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                     aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
                 >
-                    {isMenuOpen ? 
-                        <X className="h-6 w-6 text-sky-500" /> : 
-                        <Menu className="h-6 w-6 text-sky-500" />
+                    {isMenuOpen ?
+                        <X className="h-6 w-6 text-amber-400" /> :
+                        <Menu className="h-6 w-6 text-amber-400" />
                     }
                 </button>
 
                 {/* Menú horizontal para escritorio */}
-                <div className="hidden lg:flex flex-row items-center gap-2 ml-auto">
+                <nav className="hidden lg:flex flex-row items-center gap-2 ml-auto">
                     {navItems.map((item, index) => (
-                        <button 
+                        <button
                             key={index}
-                            onClick={() => handleNavigation(item.path)} 
-                            className="flex gap-2 items-center hover:bg-gray-700 px-3 py-1 rounded-md transition-colors"
+                            onClick={() => handleNavigation(item.path)}
+                            className="flex gap-2 items-center hover:bg-indigo-900/40 px-4 py-2 rounded-md transition-colors font-medium text-indigo-100"
                         >
                             {item.icon}
                             <span>{item.label}</span>
                         </button>
                     ))}
-                    
-                    {/* Botón de cerrar sesión */}
-                    <Button 
+                    <Button
                         onClick={handleLogout}
-                        className=""
+                        className="ml-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-md flex items-center gap-2"
                     >
                         <LogOut className="h-4 w-4" />
-                        <span className="max-[900px]:hidden">
-                            Cerrar sesión
-                        </span>
+                        <span className="max-[900px]:hidden">Cerrar sesión</span>
                     </Button>
-                </div>
+                </nav>
             </header>
 
             {/* Menú vertical para móvil */}
             {isMobile && isMenuOpen && (
-                <div className="lg:hidden bg-gray-800 border-b border-gray-700 overflow-y-auto">
+                <div className="lg:hidden bg-indigo-950 border-b border-indigo-900 shadow-md">
                     <nav className="flex flex-col p-2">
                         {navItems.map((item, index) => (
-                            <button 
+                            <button
                                 key={index}
-                                onClick={() => handleNavigation(item.path)} 
-                                className="flex gap-2 items-center hover:bg-gray-700 px-3 py-3 rounded-md transition-colors text-left"
+                                onClick={() => handleNavigation(item.path)}
+                                className="flex gap-2 items-center hover:bg-indigo-900/40 px-4 py-3 rounded-md transition-colors text-left font-medium text-indigo-100"
                             >
                                 {item.icon}
                                 <span>{item.label}</span>
                             </button>
                         ))}
-                        
-                        {/* Botón de cerrar sesión en móvil */}
-                        <button 
+                        <button
                             onClick={handleLogout}
-                            className="flex gap-2 items-center text-red-400 hover:bg-red-900/20 px-3 py-3 rounded-md transition-colors mt-2 text-left"
+                            className="flex gap-2 items-center text-red-400 hover:bg-red-900/20 px-4 py-3 rounded-md transition-colors mt-2 text-left font-semibold"
                         >
                             <LogOut className="h-5 w-5" />
                             <span>Cerrar sesión</span>
@@ -143,7 +140,7 @@ const AdminLayout = () => {
 
             {/* Contenido principal */}
             <div className="flex flex-1 overflow-y-auto">
-                <Outlet/>
+                <Outlet />
             </div>
         </section>
     );

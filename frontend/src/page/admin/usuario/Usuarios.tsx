@@ -73,7 +73,7 @@ const Usuarios = () => {
     const [usuariosFiltrados, setUsuariosFiltrados] = useState<UsuarioType[]>([]);
 
     // Obtener los métodos del hook useUser
-    const { getAllUsers, createUser, updateUser,deleteUser } = useUser();
+    const { getAllUsers, createUser, updateUser, deleteUser } = useUser();
 
     // Cargar usuarios al montar el componente
     useEffect(() => {
@@ -180,308 +180,252 @@ const Usuarios = () => {
     };
 
     return (
-        <main className=" w-full px-4 py-6">
+        <section className="flex flex-col w-full h-full p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+            {/* Modal de usuario */}
             <ModalTemplate
                 isOpen={isOpen}
                 onClose={closeModal}
                 title={editMode ? "Editar Usuario" : "Nuevo Usuario"}
             >
-                <Formik
-                    initialValues={initialValues}
-                    validationSchema={UsuarioSchema}
-                    onSubmit={handleSubmit}
-                    enableReinitialize
-                >
-                    {({ isSubmitting, handleChange, handleBlur, values }) => (
-                        <Form className="flex flex-col gap-4">
-                            <div>
-                                <Input
-                                    id="nombre"
-                                    label="Nombre completo"
-                                    name="nombre"
-                                    type="text"
-                                    required
-                                    placeholder="Ej: Juan Pérez"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.nombre}
-                                />
-                                <ErrorMessage
-                                    name="nombre"
-                                    component="div"
-                                    className="text-red-500 text-sm mt-1"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-1 gap-4">
-                                <div>
-                                    <Input
-                                        id="username"
-                                        label="Nombre de usuario"
-                                        name="username"
-                                        type="text"
-                                        required
-                                        placeholder="Ej: jperez"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.username}
-                                    />
-                                    <ErrorMessage
-                                        name="username"
-                                        component="div"
-                                        className="text-red-500 text-sm mt-1"
-                                    />
+                <div className="max-h-[75vh] overflow-y-auto px-1">
+                    <Formik
+                        initialValues={initialValues}
+                        validationSchema={UsuarioSchema}
+                        onSubmit={handleSubmit}
+                        enableReinitialize
+                    >
+                        {({ isSubmitting, handleChange, handleBlur, values }) => (
+                            <Form className="flex flex-col gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <Input
+                                            id="nombre"
+                                            label="Nombre completo"
+                                            name="nombre"
+                                            type="text"
+                                            required
+                                            placeholder="Ej: Juan Pérez"
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            value={values.nombre}
+                                        />
+                                        <ErrorMessage name="nombre" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
+                                    <div>
+                                        <Input
+                                            id="username"
+                                            label="Nombre de usuario"
+                                            name="username"
+                                            type="text"
+                                            required
+                                            placeholder="Ej: jperez"
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            value={values.username}
+                                        />
+                                        <ErrorMessage name="username" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
                                 </div>
-                                {/* <div>
-                                    <Input
-                                        id="email"
-                                        label="Correo electrónico"
-                                        name="email"
-                                        type="email"
-                                        required
-                                        placeholder="Ej: juan@ejemplo.com"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.email}
-                                    />
-                                    <ErrorMessage
-                                        name="email"
-                                        component="div"
-                                        className="text-red-500 text-sm mt-1"
-                                    />
-                                </div> */}
-                            </div>
-
-                            <div>
-                                <Input
-                                    id="contrasena"
-                                    label={"Contraseña"}
-                                    name="contrasena"
-                                    type="text"
-                                    placeholder={"Ingrese contraseña"}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.contrasena}
-                                />
-                                <ErrorMessage
-                                    name="contrasena"
-                                    component="div"
-                                    className="text-red-500 text-sm mt-1"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label htmlFor="rol" className="block text-sm font-medium mb-1">
-                                        Rol del usuario
-                                    </label>
-                                    <select
-                                        id="rol"
-                                        name="rol"
-                                        className="w-full p-2 border rounded-md"
-                                        value={values.rol}
+                                    <Input
+                                        id="contrasena"
+                                        label="Contraseña"
+                                        name="contrasena"
+                                        type="password"
+                                        placeholder="Ingrese contraseña"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
-                                        required
-                                    >
-                                        <option value="" disabled>
-                                            Seleccione un rol
-                                        </option>
-                                        {ROLES_DISPONIBLES.map((rol) => (
-                                            <option
-                                                className="text-gray-800"
-                                                key={rol.value}
-                                                value={rol.value}
-                                            >
-                                                {rol.label}
+                                        value={values.contrasena}
+                                    />
+                                    <ErrorMessage name="contrasena" component="div" className="text-red-500 text-sm mt-1" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label htmlFor="rol" className="block text-sm font-medium mb-1">
+                                            Rol del usuario
+                                        </label>
+                                        <select
+                                            id="rol"
+                                            name="rol"
+                                            className="w-full p-2 border rounded-md"
+                                            value={values.rol}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            required
+                                        >
+                                            <option value="" disabled>
+                                                Seleccione un rol
                                             </option>
-                                        ))}
-                                    </select>
-                                    <ErrorMessage
-                                        name="rol"
-                                        component="div"
-                                        className="text-red-500 text-sm mt-1"
-                                    />
+                                            {ROLES_DISPONIBLES.map((rol) => (
+                                                <option
+                                                    className="text-gray-800"
+                                                    key={rol.value}
+                                                    value={rol.value}
+                                                >
+                                                    {rol.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <ErrorMessage name="rol" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
+                                    <div>
+                                        <Input
+                                            id="sucursal"
+                                            label="Sucursal"
+                                            name="sucursal"
+                                            type="text"
+                                            required
+                                            placeholder="Ej: Central"
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            value={values.sucursal}
+                                        />
+                                        <ErrorMessage name="sucursal" component="div" className="text-red-500 text-sm mt-1" />
+                                    </div>
                                 </div>
-                                <div>
-                                    <Input
-                                        id="sucursal"
-                                        label="Sucursal"
-                                        name="sucursal"
-                                        type="text"
-                                        required
-                                        placeholder="Ej: Central"
+                                <div className="flex items-center gap-2 mt-2">
+                                    <input
+                                        id="activo"
+                                        name="activo"
+                                        type="checkbox"
+                                        className="w-4 h-4"
+                                        checked={values.activo}
                                         onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.sucursal}
                                     />
-                                    <ErrorMessage
-                                        name="sucursal"
-                                        component="div"
-                                        className="text-red-500 text-sm mt-1"
-                                    />
+                                    <label htmlFor="activo" className="text-sm font-medium">
+                                        Usuario activo
+                                    </label>
                                 </div>
-                            </div>
-
-                            <div className="flex items-center gap-2 mt-2">
-                                <input
-                                    id="activo"
-                                    name="activo"
-                                    type="checkbox"
-                                    className="w-4 h-4"
-                                    checked={values.activo}
-                                    onChange={handleChange}
-                                    value={values.activo ? "true" : "false"}
-                                />
-                                <label htmlFor="activo" className="text-sm font-medium">
-                                    Usuario activo
-                                </label>
-                            </div>
-
-                            <Button
-                                type="submit"
-                                disabled={isSubmitting}
-                            >
-                                {isSubmitting ? "Guardando..." : "Guardar usuario"}
-                            </Button>
-                        </Form>
-                    )}
-                </Formik>
+                                <Button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="mt-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 rounded shadow"
+                                >
+                                    {isSubmitting ? "Guardando..." : "Guardar usuario"}
+                                </Button>
+                            </Form>
+                        )}
+                    </Formik>
+                </div>
             </ModalTemplate>
 
-            <div className="flex justify-between items-center mb-6">
-                <div className="w-full space-y-2">
-                    <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 items-center gap-4 w-full">
-                        <Input
-                            id="search"
-                            className="w-full"
-                            placeholder="Buscar usuarios..."
-                            type="search"
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                        />
-                        <Button onClick={handleOpenCreateModal}>
-                            <Plus className={'w-5 h-5 mr-2'} />
-                            Nuevo Usuario
-                        </Button>
-                    </div>
+            {/* Encabezado */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                <div>
+                    <h1 className="text-3xl font-extrabold text-blue-900 dark:text-blue-200 tracking-tight mb-1">Gestión de Usuarios</h1>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        Administra los usuarios del sistema, roles y accesos.
+                    </p>
                 </div>
-
+                <div className="flex gap-2">
+                    <Input
+                        id="search"
+                        className="w-64"
+                        placeholder="Buscar usuarios..."
+                        type="search"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
+                    <Button
+                        onClick={handleOpenCreateModal}
+                        className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold shadow"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Nuevo Usuario
+                    </Button>
+                </div>
             </div>
-            <div className="rounded-lg border shadow-sm overflow-hidden">
-                <div className="relative w-full overflow-auto">
-                    <table className="w-full caption-bottom text-sm">
-                        <thead className="[&amp;_tr]:border-b">
-                            <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">Usuario</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">Rol</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">Email</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">Sucursal</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">Último Acceso</th>
-                                <th className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0">Estado</th>
-                                <th className="h-12 px-4 align-middle font-medium text-muted-foreground [&amp;:has([role=checkbox])]:pr-0 text-right">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="[&amp;_tr:last-child]:border-0">
-                            {usuariosFiltrados.length > 0 ? (
-                                usuariosFiltrados.map((usuario) => (
-                                    <tr
-                                        key={usuario.id}
-                                        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                                    >
-                                        <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
-                                            <div>
-                                                <div className="font-medium">{usuario.nombre}</div>
-                                                <div className="text-sm text-gray-500">@{usuario.username}</div>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
-                                            <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent hover:bg-primary/80 ${usuario.rol === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
+
+            {/* Tabla de usuarios */}
+            <div className="rounded-xl border border-blue-200 dark:border-gray-700 shadow-lg bg-white dark:bg-gray-900 overflow-auto">
+                <table className="w-full min-w-[900px] text-sm">
+                    <thead>
+                        <tr className="bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-100">
+                            <th className="h-12 px-4 text-left font-bold">Usuario</th>
+                            <th className="h-12 px-4 text-left font-bold">Rol</th>
+                            <th className="h-12 px-4 text-left font-bold">Email</th>
+                            <th className="h-12 px-4 text-left font-bold">Sucursal</th>
+                            <th className="h-12 px-4 text-left font-bold">Último Acceso</th>
+                            <th className="h-12 px-4 text-left font-bold">Estado</th>
+                            <th className="h-12 px-4 text-right font-bold">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {usuariosFiltrados.length > 0 ? (
+                            usuariosFiltrados.map((usuario) => (
+                                <tr
+                                    key={usuario.id}
+                                    className="transition-colors even:bg-blue-50/50 dark:even:bg-blue-900/20 hover:bg-blue-100/60 dark:hover:bg-blue-900/40"
+                                >
+                                    <td className="p-4 align-middle">
+                                        <div>
+                                            <div className="font-semibold">{usuario.nombre}</div>
+                                            <div className="text-xs text-gray-500">@{usuario.username}</div>
+                                        </div>
+                                    </td>
+                                    <td className="p-4 align-middle">
+                                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
+                                            ${usuario.rol === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
                                                 usuario.rol === 'CAJERO' ? 'bg-indigo-100 text-indigo-800' :
                                                     usuario.rol === 'VENDEDOR' ? 'bg-blue-100 text-blue-800' :
                                                         'bg-gray-100 text-gray-800'
-                                                }`}>
-                                                {usuario.rol}
-                                            </div>
-                                        </td>
-                                        <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{usuario.email}</td>
-                                        <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{usuario.sucursal || 'N/A'}</td>
-                                        <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">{formatLastAccess(usuario.ultimoAcceso)}</td>
-                                        <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0">
-                                            <div className="flex items-center">
-                                                <button
-                                                    type="button"
-                                                    role="switch"
-                                                    aria-checked={usuario.activo}
-                                                    data-state={usuario.activo ? "checked" : "unchecked"}
-                                                    value="on"
-                                                    className="peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input"
-                                                    onClick={() => {
-                                                        // Aquí implementarías la lógica para cambiar el estado
-                                                        console.log("Cambiar estado de usuario:", usuario.id);
-                                                    }}
-                                                >
-                                                    <span
-                                                        data-state={usuario.activo ? "checked" : "unchecked"}
-                                                        className="pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0"
-                                                    ></span>
-                                                </button>
-                                                <span className="ml-2">
-                                                    <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${usuario.activo ?
-                                                        'bg-green-50 text-green-700 border-green-200' :
-                                                        'bg-red-50 text-red-700 border-red-200'
-                                                        }`}>
-                                                        {usuario.activo ? (
-                                                            <>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check h-3 w-3 mr-1">
-                                                                    <path d="M20 6 9 17l-5-5"></path>
-                                                                </svg>
-                                                                Activo
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x h-3 w-3 mr-1">
-                                                                    <path d="M18 6 6 18"></path>
-                                                                    <path d="m6 6 12 12"></path>
-                                                                </svg>
-                                                                Inactivo
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="p-4 align-middle [&amp;:has([role=checkbox])]:pr-0 text-right">
-                                            <div className="flex justify-end space-x-2">
-                                                <button
-                                                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-10 w-10"
-                                                    onClick={() => handleOpenEditModal(usuario)}
-                                                >
-                                                    <SquarePen className={'w-5 h-5 text-blue-600'} />
-                                                </button>
-                                                <button
-                                                    className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 hover:bg-accent hover:text-accent-foreground h-10 w-10"
-                                                    onClick={() => handleDelete(usuario.id ?? 0)}
-                                                >
-                                                    <Trash2 className={'w-5 h-5 text-red-600'} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={7} className="p-4 text-center text-gray-500">
-                                        {searchTerm ? 'No se encontraron usuarios que coincidan con la búsqueda' : 'No hay usuarios registrados'}
+                                            }`}>
+                                            {usuario.rol}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 align-middle">{usuario.email}</td>
+                                    <td className="p-4 align-middle">{usuario.sucursal || 'N/A'}</td>
+                                    <td className="p-4 align-middle">{formatLastAccess(usuario.ultimoAcceso)}</td>
+                                    <td className="p-4 align-middle">
+                                        <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
+                                            ${usuario.activo ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                                            {usuario.activo ? (
+                                                <>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 mr-1">
+                                                        <path d="M20 6 9 17l-5-5"></path>
+                                                    </svg>
+                                                    Activo
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 mr-1">
+                                                        <path d="M18 6 6 18"></path>
+                                                        <path d="m6 6 12 12"></path>
+                                                    </svg>
+                                                    Inactivo
+                                                </>
+                                            )}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 align-middle text-right">
+                                        <div className="flex justify-end gap-2">
+                                            <Button
+                                                onClick={() => handleOpenEditModal(usuario)}
+                                                className="bg-yellow-400 hover:bg-yellow-500 text-yellow-900 px-2 py-1 rounded shadow"
+                                            >
+                                                <SquarePen className="w-4 h-4" />
+                                            </Button>
+                                            <Button
+                                                onClick={() => handleDelete(usuario.id ?? 0)}
+                                                className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded shadow"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </Button>
+                                        </div>
                                     </td>
                                 </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={7} className="p-6 text-center text-gray-500 dark:text-gray-400">
+                                    {searchTerm ? 'No se encontraron usuarios que coincidan con la búsqueda' : 'No hay usuarios registrados'}
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
-        </main>
+        </section>
     );
 }
 

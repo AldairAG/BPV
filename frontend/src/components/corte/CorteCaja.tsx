@@ -6,9 +6,10 @@ import type { VentaMonitoreoResponse } from '../../types/VentaTypes';
 import { Button } from '../ui/Button';
 import { toast } from 'react-hot-toast';
 import useUser from '../../hooks/useUser';
-import {EyeIcon, Printer } from 'lucide-react';
+import {EyeIcon, Printer, XCircleIcon } from 'lucide-react';
 import ModalTemplate, { useModal } from '../modal/ModalTemplate';
 import TicketPrint from '../../service/TicketPrint';
+import useCarrito from '../../hooks/useCarrito';
 
 interface CorteCajaProps {
   onClose: () => void;
@@ -31,6 +32,7 @@ const CorteCaja = ({ onClose }: CorteCajaProps) => {
   const [ventaSeleccionada, setVentaSeleccionada] = useState<VentaMonitoreoResponse | null>(null);
   // Usar el hook de modal para gestionar el estado del modal
   const { isOpen, openModal, closeModal } = useModal();
+  const {anularVenta}=useCarrito();
   /* const [imprimiendo, setImprimiendo] = useState(false);
    */
   // Fecha actual para el corte
@@ -132,8 +134,7 @@ const CorteCaja = ({ onClose }: CorteCajaProps) => {
       setVentaSeleccionada(null);
     }, 300);
   };
-
-  
+ 
   const getVentaParaTicket = (ventaSeleccionada: VentaMonitoreoResponse | null) => {
     if (!ventaSeleccionada) return undefined;
     return {
@@ -157,7 +158,6 @@ const CorteCaja = ({ onClose }: CorteCajaProps) => {
     };
   };
 
-  
   const findNombreById = (id: number) => {
     const productoEncontrado = ventaSeleccionada?.productosVendidos.find(producto =>
       producto.productoVentas.some(venta => venta.productoVendidoId === id)
@@ -465,14 +465,19 @@ const CorteCaja = ({ onClose }: CorteCajaProps) => {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {ventasFiltradas
+                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">                    {ventasFiltradas
                       .slice()
                       .sort((a, b) => b.venta.ventaId - a.venta.ventaId) // Ordena por ID descendente
-                      .map((venta) => (
-                        <tr key={venta.venta.ventaId} className={venta.venta.anulada ? 'text-gray-400 dark:text-gray-500' : ''}>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm">
+                      .map((venta) => (                        <tr key={venta.venta.ventaId} 
+                            className={`${venta.venta.anulada ? 
+                              'bg-red-50/10 dark:bg-red-900/10 text-gray-400 dark:text-gray-500 relative border-l-4 border-red-500 dark:border-red-800' : 
+                              'hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}>                          <td className="px-4 py-2 whitespace-nowrap text-sm">
                             #{venta.venta.ventaId}
+                            {venta.venta.anulada && (
+                              <span className="ml-2 text-xs text-red-600 dark:text-red-400">
+                                (Anulada)
+                              </span>
+                            )}
                           </td>
                           <td className="px-4 py-2 whitespace-nowrap text-sm">
                             {venta.venta.hora}
@@ -488,14 +493,19 @@ const CorteCaja = ({ onClose }: CorteCajaProps) => {
                             )}
                           </td>
                           <td className="px-4 py-2 whitespace-nowrap text-center">
-                            {venta.venta.anulada ? (
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
-                                Anulada
-                              </span>
+                            {venta.venta.anulada ? (                              <div className="flex items-center justify-center space-x-1">
+                                <span className="h-2 w-2 rounded-full bg-red-500 dark:bg-red-400"></span>
+                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                  Anulada
+                                </span>
+                              </div>
                             ) : (
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                Completada
-                              </span>
+                              <div className="flex items-center justify-center space-x-1">
+                                <span className="h-2 w-2 rounded-full bg-green-500 dark:bg-green-400"></span>
+                                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                  Completada
+                                </span>
+                              </div>
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
@@ -504,7 +514,16 @@ const CorteCaja = ({ onClose }: CorteCajaProps) => {
                               onClick={() => verDetalleVenta(venta)}
                             >
                               <EyeIcon className="h-4 w-4" />
-                            </button>
+                            </button>                            {!venta.venta.anulada && (
+                              <button 
+                                onClick={()=>anularVenta(venta.venta.ventaId)} 
+                                className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 ml-2"
+                                title="Anular venta"
+                              >
+                                <XCircleIcon className="h-4 w-4" />
+                                <span className="sr-only">Anular venta</span>
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}

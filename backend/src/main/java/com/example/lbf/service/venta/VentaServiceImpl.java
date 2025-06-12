@@ -105,21 +105,23 @@ public class VentaServiceImpl implements VentaService {
     public BigDecimal calcularTotalVentas(LocalDate fechaInicio, LocalDate fechaFin) {
         BigDecimal total = ventaRepository.calcularTotalVentasPorRango(fechaInicio, fechaFin);
         return total != null ? total : BigDecimal.ZERO;
-    }
-
-    @Override
+    }    @Override
     @Transactional
     public void anularVenta(Long ventaId) {
         Optional<Venta> ventaOpt = ventaRepository.findById(ventaId);
         if (ventaOpt.isPresent()) {
             Venta venta = ventaOpt.get();
-
+            
+            // Marcar la venta como anulada
+            venta.setAnulado(true);
+            
             // Devolver stock de productos
             for (ProductoVendido pv : venta.getProductosVendidos()) {
                 productoService.actualizarStock(pv.getProducto().getProductoId(), pv.getCantidad());
             }
-
-            ventaRepository.deleteById(ventaId);
+            
+            // Guardar los cambios
+            ventaRepository.save(venta);
         }
     }
 

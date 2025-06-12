@@ -220,7 +220,7 @@ const Reportes = () => {
               </CardHead>
               <CardContent className="flex flex-col items-center justify-center py-6">
                 <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                  {formatearPrecio(ingresoTotal)}
+                  {formatearPrecio(ingresoTotal||0)}
                 </span>
               </CardContent>
             </Card>

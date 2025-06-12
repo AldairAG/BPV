@@ -96,11 +96,18 @@ export const useProducto = () => {
    */
   const createProducto = async (producto: Omit<ProductoType, 'productoId'>): Promise<ProductoType | null> => {
     try {
-      if (producto.tipo==null) {
+      if (producto.tipo == null) {
         producto.tipo = TIPOS_PRODUCTO.PIEZA;
       }
-      
-      const nuevoProducto = await ProductoService.crearProducto(producto);
+
+      // Mapea los nombres a lo que espera el backend
+      const productoAEnviar = {
+        ...producto,
+        precioVenta: (producto as any).precioVenta ?? (producto as any).precio ?? 0,
+        precioCosto: (producto as any).precioCosto ?? (producto as any).precioCompra ?? 0,
+      };
+
+      const nuevoProducto = await ProductoService.crearProducto(productoAEnviar);
       console.log('Producto creado:', nuevoProducto);
       dispatch(addProducto(nuevoProducto));
       return nuevoProducto;

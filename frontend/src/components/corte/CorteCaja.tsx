@@ -521,21 +521,8 @@ const CorteCaja = ({ onClose }: CorteCajaProps) => {
                                   onClick={async () => {
                                     try {
                                       await VentaService.anularVenta(venta.venta.ventaId);
-                                      setVentas(prev =>
-                                        prev.map(v =>
-                                          v.venta.ventaId === venta.venta.ventaId
-                                            ? { ...v, venta: { ...v.venta, anulada: true } }
-                                            : v
-                                        )
-                                      );
-                                      setVentasFiltradas(prev =>
-                                        prev.map(v =>
-                                          v.venta.ventaId === venta.venta.ventaId
-                                            ? { ...v, venta: { ...v.venta, anulada: true } }
-                                            : v
-                                        )
-                                      );
                                       toast.success("Venta anulada correctamente");
+                                      window.location.reload(); // <-- Fuerza el refresco de la página
                                     } catch (error) {
                                       toast.error("No se pudo anular la venta");
                                     }

@@ -4,8 +4,10 @@ import java.util.List;
 import com.example.lbf.entities.Categoria;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class NuevoProductoRequest {
     private Boolean activo;
     private Categoria categoria;

@@ -104,6 +104,24 @@ export const useUser = () => {
     return requiredRoles.some(role => roles.includes(role));
   };
 
+    /**
+   * Obtiene todas las sucursales de los usuarios
+   * @returns {Promise<string[]>} Una lista de sucursales únicas
+   */
+  const getSucursales = async (): Promise<string[]> => {
+    try {
+      const usuarios = await UserService.getAllUsuarios();
+      const sucursales = usuarios
+        .filter(user => user.sucursal)
+        .map(user => user.sucursal)
+        .filter((value): value is string => value !== undefined)
+        .filter((value, index, self) => self.indexOf(value) === index); // Eliminar duplicados
+      return sucursales;
+    } catch {
+      return [];
+    }
+  }
+
   /**
    * Obtiene todos los usuarios
    */
@@ -156,7 +174,7 @@ export const useUser = () => {
   };
 
   const deleteUser = async (id: number): Promise<boolean> => {
-    try { 
+    try {
       await UserService.desactivarUsuario(id);
       // Si se elimina el usuario actual, limpiar el estado
       if (user && user.id === id) {
@@ -194,7 +212,8 @@ export const useUser = () => {
     getAllUsers,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    getSucursales
   };
 };
 

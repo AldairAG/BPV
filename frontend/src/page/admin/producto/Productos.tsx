@@ -11,6 +11,7 @@ import useCategoria from "../../../hooks/useCategoria";
 import type { ProductoType } from "../../../types/ProductoType";
 import type { CategoriaType } from "../../../types/CategoriaType";
 import { TIPOS_PRODUCTO } from "../../../constants/tipoProducto";
+import useUser from "../../../hooks/useUser";
 
 // Tipos de unidades disponibles
 const TIPOS_UNIDAD = [
@@ -40,6 +41,9 @@ const ProductoSchema = Yup.object().shape({
     tipo: Yup.string()
         .required("El tipo de unidad es obligatorio")
         .oneOf(TIPOS_UNIDAD.map(t => t.value), "Tipo de unidad no válido"),
+    sucursal: Yup.string()
+        .required("La sucursal es obligatoria")
+        .not([""], "Debe seleccionar una sucursal"),
     descuentos: Yup.array().of(
         Yup.number()
             .transform((value, originalValue) =>
@@ -56,6 +60,7 @@ const Productos = () => {
 
     // Estado para manejar la edición
     const [editMode, setEditMode] = useState(false);
+    const [sucursales, setSucursales] = useState<string[]>([]);
     const [initialValues, setInitialValues] = useState<{
         nombre: string;
         precio: string | number;
@@ -67,11 +72,13 @@ const Productos = () => {
         activo: boolean;
         productoId: number;
         tipo: string;
+        sucursal: string;
         descuentos: (string | number)[];
     }>({
         nombre: "",
         precio: "",
-        precioCompra: "", // <--- aquí
+        precioCompra: "",
+        sucursal: "",
         stock: "",
         stockMinimo: "",
         codigoBarras: "",
@@ -95,13 +102,25 @@ const Productos = () => {
         filtrarPorNombre
     } = useProducto();
 
+    const { getSucursales } = useUser();
+
     // Obtener categorías para el selector
     const { categorias, fetchCategorias } = useCategoria();
+
+    const fetchSucursales = async () => {
+        try {
+            const sucursalesData = await getSucursales();
+            setSucursales(sucursalesData);
+        } catch (error) {
+            console.error("Error al obtener sucursales:", error);
+        }
+    }
 
     // Cargar productos y categorías al montar el componente
     useEffect(() => {
         fetchProductos();
         fetchCategorias();
+        fetchSucursales(); // Cargar sucursales al montar el componente
     }, []);
 
     // Función para manejar el cambio en el campo de búsqueda
@@ -123,6 +142,7 @@ const Productos = () => {
             codigoBarras: "",
             categoria: null,
             activo: true,
+            sucursal: "", // Agregar sucursal aquí
             tipo: TIPOS_PRODUCTO.PIEZA, // Valor por defecto
             productoId: 0,
             descuentos: ["", "", "", ""]
@@ -133,25 +153,26 @@ const Productos = () => {
     // Función para abrir el modal de edición
     const handleOpenEditModal = (producto: ProductoType) => {
         console.log("Producto a editar:", producto);
-        
+
         setEditMode(true);
         setInitialValues({
-                    nombre: producto.nombre || "",
-                    precio: producto.precio !== undefined ? producto.precio : "",
-                    precioCompra: producto.precioCompra !== undefined
-                        ? producto.precioCompra
-                        : "",
-                    stock: producto.stock !== undefined ?producto.stock : "",
-                    stockMinimo: producto.stockMinimo !== undefined ? producto.stockMinimo : "",
-                    codigoBarras: producto.codigoBarras ?? "",
-                    categoria: producto.categoria || null,
-                    activo: producto.activo ?? true,
-                    productoId: producto.productoId ?? producto.id ?? 0,
-                    tipo: producto.tipo || TIPOS_PRODUCTO.PIEZA,
-                    descuentos: producto.descuentos?.length
-                        ? [...producto.descuentos.map(d => d === null || d === undefined ? "" : String(d)), ...Array(4 - producto.descuentos.length).fill("")]
-                        : ["", "", "", ""]
-                });
+            nombre: producto.nombre || "",
+            precio: producto.precio !== undefined ? producto.precio : "",
+            precioCompra: producto.precioCompra !== undefined
+                ? producto.precioCompra
+                : "",
+            stock: producto.stock !== undefined ? producto.stock : "",
+            stockMinimo: producto.stockMinimo !== undefined ? producto.stockMinimo : "",
+            codigoBarras: producto.codigoBarras ?? "",
+            categoria: producto.categoria || null,
+            activo: producto.activo ?? true,
+            productoId: producto.productoId ?? producto.id ?? 0,
+            tipo: producto.tipo || TIPOS_PRODUCTO.PIEZA,
+            sucursal: producto.sucursal || "", // Agregar sucursal aquí
+            descuentos: producto.descuentos?.length
+                ? [...producto.descuentos.map(d => d === null || d === undefined ? "" : String(d)), ...Array(4 - producto.descuentos.length).fill("")]
+                : ["", "", "", ""]
+        });
         seleccionarProducto(producto);
         openModal();
     };
@@ -288,6 +309,33 @@ const Productos = () => {
                                     {values.tipo === 'Unidad' && 'El stock se medirá en unidades/piezas.'}
                                     {values.tipo === 'Líquido' && 'El stock se medirá en litros.'}
                                 </p>
+                            </div>
+                            {/* Selector de sucursal */}
+                            <div>
+                                <label htmlFor="sucursal" className="block text-sm font-medium mb-1">
+                                    Sucursal
+                                </label>
+                                <select
+                                    id="sucursal"
+                                    name="sucursal"
+                                    className="w-full p-2 border rounded-md"
+                                    value={values.sucursal}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    required
+                                >
+                                    <option value="" disabled>Seleccione una sucursal</option>
+                                    {sucursales.map((sucursal) => (
+                                        <option key={sucursal} value={sucursal} className="text-gray-500">
+                                            {sucursal}
+                                        </option>
+                                    ))}
+                                </select>
+                                <ErrorMessage
+                                    name="sucursal"
+                                    component="div"
+                                    className="text-red-500 text-sm mt-1"
+                                />
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
@@ -535,15 +583,15 @@ const Productos = () => {
                                     <td className="p-4 align-middle text-right">
                                         <span className={`${producto.stock <= producto.stockMinimo ? 'text-red-600 font-bold' : 'text-green-700 dark:text-green-300 font-semibold'}`}>
                                             {producto.tipo === 'Unidad'
-                                              ? producto.stock
-                                              : producto.stock.toFixed(2)}
+                                                ? producto.stock
+                                                : producto.stock.toFixed(2)}
                                         </span>
                                         <span className="text-xs text-gray-500 ml-1">
                                             {producto.tipo === 'Unidad' ? 'pz' : producto.tipo === 'Líquido' ? 'lt' : 'pz'}
                                         </span>
                                         {producto.stock <= producto.stockMinimo && (
                                             <span className="ml-2 px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full font-bold">
-                                              Stock bajo
+                                                Stock bajo
                                             </span>
                                         )}
                                     </td>
@@ -551,12 +599,12 @@ const Productos = () => {
                                         {producto.descuentos && producto.descuentos.some(d => d > 0) ? (
                                             <div className="flex flex-col items-end gap-1">
                                                 {producto.descuentos
-                                                  .filter(d => d > 0)
-                                                  .map((descuento, idx) => (
-                                                    <span key={idx} className="text-xs text-green-600 font-semibold bg-green-50 rounded px-2">
-                                                      {descuento}%
-                                                    </span>
-                                                  ))}
+                                                    .filter(d => d > 0)
+                                                    .map((descuento, idx) => (
+                                                        <span key={idx} className="text-xs text-green-600 font-semibold bg-green-50 rounded px-2">
+                                                            {descuento}%
+                                                        </span>
+                                                    ))}
                                             </div>
                                         ) : (
                                             <span className="text-xs text-gray-400 italic">Sin descuentos</span>

@@ -18,6 +18,7 @@ import {
 import type { ProductoType } from '../types/ProductoType';
 import { ProductoService } from '../service/ProductoService';
 import { TIPOS_PRODUCTO } from '../constants/tipoProducto';
+import useUser from './useUser';
 
 /**
  * Hook personalizado `useProducto` para gestionar el estado de productos en la aplicación.
@@ -52,6 +53,8 @@ export const useProducto = () => {
   const productosFiltrados = useSelector(productoSelector.productosFiltrados);
   const productoActual = useSelector(productoSelector.productoActual);
 
+  const {user}=useUser();
+
   /**
    * Establece el producto seleccionado actualmente
    */
@@ -65,6 +68,13 @@ export const useProducto = () => {
   const fetchProductos = async (): Promise<ProductoType[]> => {
     try {
       const response = await ProductoService.getAllProductos();
+      // Si el usuario tiene una sucursal, filtra los productos por esa sucursal
+      if (user?.sucursal) {
+        const productosFiltrados = response.filter(producto => producto.sucursal === user.sucursal);
+        dispatch(setProductos(productosFiltrados));
+        return productosFiltrados;
+      }
+
       dispatch(setProductos(response));
       return response;
     } catch (error: any) {

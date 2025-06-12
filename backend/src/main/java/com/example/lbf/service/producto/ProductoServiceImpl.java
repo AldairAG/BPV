@@ -40,6 +40,7 @@ public class ProductoServiceImpl implements ProductoService {
         nuevoProducto.setPrecioCompra(producto.getPrecioCosto());
         nuevoProducto.setStockMinimo(producto.getStockMinimo());
         nuevoProducto.setActivo(producto.getActivo());
+        nuevoProducto.setSucursal(producto.getSucursal());
         
         // Validación opcional para los descuentos
         if (producto.getDescuentos() != null) {

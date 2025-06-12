@@ -18,5 +18,6 @@ public class NuevoProductoRequest {
     private Float stock;
     private Float stockMinimo;
     private String tipo;
+    private String sucursal;
     private List<Float> descuentos; // Lista de descuentos en porcentaje
 }

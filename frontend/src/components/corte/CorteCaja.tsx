@@ -524,6 +524,7 @@ const CorteCaja = ({ onClose }: CorteCajaProps) => {
                                       toast.success("Venta anulada correctamente");
                                       window.location.reload(); // <-- Fuerza el refresco de la página
                                     } catch (error) {
+                                      console.error("Error al anular la venta:", error);
                                       toast.error("No se pudo anular la venta");
                                     }
                                   }}

@@ -4,7 +4,6 @@ import { Badge, Card, CardContent, CardHead } from "../components/ui/Card";
 import ItemProductoCajero from "../components/items/ItemProducto";
 import Carrito from "../components/carrito/Carrito";
 import useUser from "../hooks/useUser";
-import { ROLES } from "../constants/roles";
 import useCategoria from "../hooks/useCategoria";
 import useProducto from "../hooks/useProducto";
 import useCarrito from "../hooks/useCarrito";
@@ -18,7 +17,7 @@ import CorteCaja from "../components/corte/CorteCaja";
 
 const PanelVentas = () => {
   // Hooks
-  const { logout, hasRole, user } = useUser();
+  const { logout, user } = useUser();
   const { categorias, fetchCategorias, seleccionarCategoria } = useCategoria();
   const {
     productosFiltrados,
@@ -148,11 +147,6 @@ const PanelVentas = () => {
     } finally {
       setProcessingVenta(false);
     }
-  };
-
-  // Alternar visualización del carrito en móvil
-  const toggleCarrito = () => {
-    setShowCarrito(!showCarrito);
   };
 
   // Añadir el estado para el modal de corte de caja

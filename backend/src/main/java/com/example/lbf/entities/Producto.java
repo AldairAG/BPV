@@ -3,7 +3,6 @@ package com.example.lbf.entities;
 import java.util.List;
 
 import com.example.lbf.entities.converters.DescuentosConverter;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
@@ -34,6 +33,7 @@ public class Producto {
     private Float stockMinimo;
     private String tipo;
     private Boolean activo;
+    private String sucursal;
     
     // Nuevo campo para descuentos
     @Convert(converter = DescuentosConverter.class)

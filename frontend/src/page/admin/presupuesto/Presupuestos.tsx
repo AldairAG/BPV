@@ -28,7 +28,7 @@ interface formValues {
         producto: ProductoType
         descuento?: number; // Descuento opcional para cada producto
     }[];
-    [key: string]: string | boolean | {productoId:number, cantidad: number; producto: ProductoType,descuento?:number }[];
+    [key: string]: string | boolean | { productoId: number, cantidad: number; producto: ProductoType, descuento?: number }[];
 }
 
 const Presupuestos = () => {
@@ -50,14 +50,14 @@ const Presupuestos = () => {
         (acc: number, prod: { cantidad: number; producto: ProductoType, descuento?: number }) =>
             acc +
             Number(prod.cantidad) *
-            (Number(prod.producto.precio) - (Number(prod.producto.precio) * (Number(prod.descuento)) / 100||0)), 0
-    )||0;
+            (Number(prod.producto.precio) - (Number(prod.producto.precio) * (Number(prod.descuento)) / 100 || 0)), 0
+    ) || 0;
     const iva = formValues.agregarIVA ? subtotal * 0.16 : 0;
     const total = subtotal + iva;
 
     useEffect(() => {
         console.log("Valores del formulario:", formValues);
-        
+
     }, [formValues]);
 
     // Handlers
@@ -69,7 +69,14 @@ const Presupuestos = () => {
         }));
     }
 
-    const handleModificarProducto = (productoId: number, value: number,name:string) => {
+    const handleBorrarProducto = (productoId: number) => {
+        setFormValues(prev => ({
+            ...prev,
+            productos: prev.productos.filter(prod => prod.productoId !== productoId)
+        }));
+    };
+
+    const handleModificarProducto = (productoId: number, value: number, name: string) => {
         setFormValues(prev => {
             const productosActualizados = prev.productos.map(prod => {
                 if (prod.productoId === productoId) {
@@ -110,7 +117,7 @@ const Presupuestos = () => {
                 {({ handleChange, handleBlur, values }) => (
                     <Form >
                         <div
-                            className="relative bg-white/95 w-[816px] h-[1056px] shadow-2xl rounded-lg border border-blue-200 font-mono flex flex-col mx-auto print:shadow-none print:bg-white print:border-none"
+                            className="relative bg-white/95 h-[1056px] shadow-2xl rounded-lg border border-blue-200 font-mono flex flex-col mx-auto print:shadow-none print:bg-white print:border-none"
                         >
                             <div
                                 className="w-full h-[20px] bg-blue-600 rounded-t-lg max-h-[2cm] print:bg-blue-600"
@@ -175,7 +182,11 @@ const Presupuestos = () => {
                                         <tbody>
                                             {formValues.productos.map((producto, i) => (
                                                 <tr key={i}>
-                                                    <ItemFilaProducto producto={producto.producto} handleModificarProducto={handleModificarProducto}/>
+                                                    <ItemFilaProducto
+                                                        producto={producto.producto}
+                                                        handleModificarProducto={handleModificarProducto}
+                                                        handleBorrarProducto={handleBorrarProducto}
+                                                    />
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -186,7 +197,7 @@ const Presupuestos = () => {
                             <div className="mb-5 mx-4 flex gap-2 print:hidden">
                                 <button
                                     className="px-3 py-1 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition text-xs font-semibold"
-                                    onClick={() => {setModalOpen(true)}}
+                                    onClick={() => { setModalOpen(true) }}
                                     type="button"
                                 >
                                     + Agregar producto

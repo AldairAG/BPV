@@ -1,7 +1,13 @@
 import { useState } from "react";
 import type { ProductoType } from "../../types/ProductoType";
+import { X } from "lucide-react";
 
-const ItemFilaProducto = ({ producto, handleModificarProducto }: { producto: ProductoType, handleModificarProducto: (index: number, value: number, name: string) => void }) => {
+const ItemFilaProducto = ({ producto, handleModificarProducto, handleBorrarProducto }: 
+    { producto: ProductoType, 
+        handleModificarProducto: (index: number, value: number, name: string) => void ,
+        handleBorrarProducto: (id: number) => void
+    },
+    ) => {
 
     const [descuento, setDescuento] = useState<number>(0);
     const [cantidad, setCantidad] = useState<number>(1);
@@ -65,16 +71,15 @@ const ItemFilaProducto = ({ producto, handleModificarProducto }: { producto: Pro
                 ).toFixed(2)}
             </td>
             <td className="px-2 py-1 text-center">
-                {/*                 {showRemove && (
                     <button
                         className="text-red-500 font-bold px-2 hover:text-red-700 print:hidden"
-                        onClick={onRemove}
+                        onClick={()=>handleBorrarProducto(producto.productoId)}
                         type="button"
                         title="Quitar producto"
                     >
-                        ×
+                       <X className="w-4 h-4 text-red-600" />
                     </button>
-                )} */}
+           
             </td>
         </tr>
     );

@@ -15,6 +15,7 @@ export type ProductoType = {
   activo: boolean;
   tipo: string;
   sucursal:string;
+  descripcion?: string;
   productoVentas: ProductoVendidoType[];
   descuentos?: number[]; // Array de hasta 4 descuentos en porcentaje
 }

@@ -68,6 +68,11 @@ const AdminLayout = () => {
             path: ADMIN_ROUTES.CATEGORIAS,
             icon: <Boxes className="h-5 w-5 text-sky-500" />,
             label: "Categorias"
+        },
+        {
+            path: ADMIN_ROUTES.PRESUPUESTOS,
+            icon: <ChartNoAxesCombined className="h-5 w-5 text-sky-500" />,
+            label: "Presupuestos"
         }
     ];
 

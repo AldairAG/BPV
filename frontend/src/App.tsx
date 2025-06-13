@@ -16,6 +16,7 @@ import RoleProtectedRoute from './components/navigation/RoleProtectedRoute';
 import { ROLES } from './constants/roles';
 import { useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import Presupuestos from "./service/Presupuestos";
 
 function App() {
   // Registrar el Service Worker para funcionalidad offline
@@ -68,6 +69,7 @@ function App() {
                 <Route path={ADMIN_ROUTES.USUARIOS} element={<Usuarios />} />
                 <Route path={ADMIN_ROUTES.REPORTES} element={<Reportes />} />
                 <Route path={ADMIN_ROUTES.VENTAS_PANEL} element={<PanelVentas />} />
+                <Route path={ADMIN_ROUTES.PRESUPUESTOS} element={<Presupuestos />} />
               </Route>
             </Route>
           </Route>

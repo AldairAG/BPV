@@ -15,4 +15,5 @@ export const ADMIN_ROUTES={
     CATEGORIAS: "categorias",
     USUARIOS: "usuarios",
     REPORTES: "reportes",
+    PRESUPUESTOS: "presupuestos"
 }

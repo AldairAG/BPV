@@ -125,15 +125,17 @@ const Reportes = () => {
   ];
 
   return (
-    <div className="flex flex-col w-full h-full p-4 bg-gray-50 dark:bg-gray-900">
-      <div className="flex justify-between items-center mb-6">
+    <div className="flex flex-col w-full h-full p-4 bg-gradient-to-br from-indigo-900 via-indigo-800 to-blue-900">
+      <div className="flex justify-between items-center mb-8">
         <div className="flex flex-col sm:flex-row items-start gap-4 w-full">
-          <h1 className="text-2xl font-bold">Reportes y Estadísticas</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-indigo-100 drop-shadow">
+            Reportes y Estadísticas
+          </h1>
 
           {/* Filtros y acciones */}
           <div className="flex items-center gap-4">
             {tabActual !== 'dashboard' && tabActual !== 'mensual' && tabActual !== 'stock' && (
-              <div className="bg-white dark:bg-gray-800 rounded-md shadow p-2">
+              <div className="bg-indigo-800 rounded-lg shadow p-2 border border-indigo-700">
                 <DatePickerWithRange
                   onChange={handleDateRangeChange}
                   initialDateFrom={unMesAtras}
@@ -147,7 +149,7 @@ const Reportes = () => {
             <select
               value={anio}
               onChange={(e) => setAnio(parseInt(e.target.value))}
-              className=" bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md p-2"
+              className="bg-indigo-800 border border-indigo-700 rounded-lg p-2 font-bold text-indigo-100"
             >
               {[...Array(5)].map((_, i) => {
                 const year = new Date().getFullYear() - i;
@@ -164,7 +166,7 @@ const Reportes = () => {
             <select
               value={limite}
               onChange={(e) => setLimite(parseInt(e.target.value))}
-              className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md p-2"
+              className="bg-indigo-800 border border-indigo-700 rounded-lg p-2 font-bold text-indigo-100"
             >
               <option value={5}>Top 5</option>
               <option value={10}>Top 10</option>
@@ -177,7 +179,7 @@ const Reportes = () => {
 
       {/* Mensaje de error */}
       {error && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded">
+        <div className="bg-red-900/80 border-l-4 border-red-500 text-red-100 p-4 mb-4 rounded shadow">
           <p className="font-bold">Error</p>
           <p>{error}</p>
         </div>
@@ -189,15 +191,15 @@ const Reportes = () => {
         onChange={setTabActual}
         className="w-full"
       >
-        <TabsList className="mb-6 overflow-auto">
-          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-          <TabsTrigger value="ventas">Monitoreo de Ventas</TabsTrigger>
-          <TabsTrigger value="productos">Productos Más Vendidos</TabsTrigger>
-          <TabsTrigger value="usuarios">Ventas por Usuario</TabsTrigger>
-          <TabsTrigger value="categorias">Ventas por Categoría</TabsTrigger>
-          <TabsTrigger value="diario">Ventas Diarias</TabsTrigger>
-          <TabsTrigger value="mensual">Ventas Mensuales</TabsTrigger>
-          <TabsTrigger value="stock">Stock Bajo</TabsTrigger>
+        <TabsList className="mb-8 overflow-auto bg-indigo-800 rounded-xl shadow p-2">
+          <TabsTrigger value="dashboard" className="font-bold text-indigo-100">Dashboard</TabsTrigger>
+          <TabsTrigger value="ventas" className="font-bold text-indigo-100">Monitoreo de Ventas</TabsTrigger>
+          <TabsTrigger value="productos" className="font-bold text-indigo-100">Productos Más Vendidos</TabsTrigger>
+          <TabsTrigger value="usuarios" className="font-bold text-indigo-100">Ventas por Usuario</TabsTrigger>
+          <TabsTrigger value="categorias" className="font-bold text-indigo-100">Ventas por Categoría</TabsTrigger>
+          <TabsTrigger value="diario" className="font-bold text-indigo-100">Ventas Diarias</TabsTrigger>
+          <TabsTrigger value="mensual" className="font-bold text-indigo-100">Ventas Mensuales</TabsTrigger>
+          <TabsTrigger value="stock" className="font-bold text-indigo-100">Stock Bajo Por Sucursal</TabsTrigger>
         </TabsList>
 
         {/* Loading overlay */}
@@ -820,6 +822,9 @@ const Reportes = () => {
                         Tipo
                       </th>
                       <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        Sucursal
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Stock Actual
                       </th>
                       <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -859,6 +864,11 @@ const Reportes = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <div className="text-sm text-gray-500 dark:text-gray-400">
                             {item.producto.tipo || "Unidad"}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {item.producto.sucursal || "sin sucursal"}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">

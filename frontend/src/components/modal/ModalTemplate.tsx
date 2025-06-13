@@ -43,11 +43,12 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
 
     return (
         <div
-            className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50"
+            className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50 px-2"
             onClick={handleBackdropClick}
         >
             <div
-                className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl mx-auto p-6 shadow-lg relative"
+                className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl mx-auto p-4 sm:p-6 shadow-lg relative
+                max-h-[90vh] overflow-y-auto"
             >
                 <button
                     onClick={onClose}

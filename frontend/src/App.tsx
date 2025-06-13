@@ -16,7 +16,7 @@ import RoleProtectedRoute from './components/navigation/RoleProtectedRoute';
 import { ROLES } from './constants/roles';
 import { useEffect } from 'react';
 import { toast } from 'react-hot-toast';
-import Presupuestos from "./service/Presupuestos";
+import Presupuestos from "./page/admin/presupuesto/Presupuestos";
 
 function App() {
   // Registrar el Service Worker para funcionalidad offline

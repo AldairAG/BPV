@@ -1,15 +1,9 @@
-import React, { useState } from "react";
-import ItemFilaProducto from "../components/items/ItemFilaProducto";
+import { useEffect, useState } from "react";
+import ItemFilaProducto from "../../../components/items/ItemFilaProducto";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { type ProductoType } from "../types/ProductoType";
+import type { ProductoType } from "../../../types/ProductoType";
 import * as Yup from "yup";
-
-interface Producto {
-    descripcion: string;
-    cantidad: number;
-    precio: number;
-    descuento: number;
-}
+import ModalBuscarProducto from "../../../components/modal/ModalBuscarProducto";
 
 const inputFields = [
     { name: "nombre", placeholder: "Nombre del cliente" },
@@ -20,14 +14,8 @@ const inputFields = [
     { name: "agregarIVA", placeholder: "Agregar IVA", type: "checkbox" },
 ]
 
-const productoFields = [
-    { name: "nombre", placeholder: "Nombre del producto" },
-    { name: "cantidad", placeholder: "Cantidad", type: "number" },
-    { name: "precio", placeholder: "Precio unitario", type: "number" },
-    { name: "descuento", placeholder: "Descuento (%)", type: "number" },
-];
 
-interface Cliente {
+interface formValues {
     nombre: string;
     telefono: string;
     email: string;
@@ -35,14 +23,17 @@ interface Cliente {
     pie: string;
     agregarIVA: boolean;
     productos: {
+        productoId: number // ID del producto
         cantidad: number
         producto: ProductoType
+        descuento?: number; // Descuento opcional para cada producto
     }[];
+    [key: string]: string | boolean | {productoId:number, cantidad: number; producto: ProductoType,descuento?:number }[];
 }
 
 const Presupuestos = () => {
 
-    const [cliente, setCliente] = useState<Cliente>({
+    const [formValues, setFormValues] = useState<formValues>({
         nombre: "",
         telefono: "",
         email: "",
@@ -52,30 +43,46 @@ const Presupuestos = () => {
         productos: []
     });
 
-    const [productos, setProductos] = useState<Producto[]>(
-        [{ descripcion: "", cantidad: 1, precio: 0, descuento: 0 }]
-    );
-    const [agregarIVA, setAgregarIVA] = useState(false);
-    const [pie, setPie] = useState("");
+    const [modalOpen, setModalOpen] = useState(false);
 
     // Calculos
-    const subtotal = productos.reduce(
-        (acc, prod) =>
+    const subtotal = formValues.productos.reduce(
+        (acc: number, prod: { cantidad: number; producto: ProductoType, descuento?: number }) =>
             acc +
             Number(prod.cantidad) *
-            (Number(prod.precio) - (Number(prod.precio) * Number(prod.descuento)) / 100),
-        0
-    );
-    const iva = agregarIVA ? subtotal * 0.16 : 0;
+            (Number(prod.producto.precio) - (Number(prod.producto.precio) * (Number(prod.descuento)) / 100||0)), 0
+    )||0;
+    const iva = formValues.agregarIVA ? subtotal * 0.16 : 0;
     const total = subtotal + iva;
 
-    // Handlers
-    const handleClienteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setCliente({ ...cliente, [e.target.name]: e.target.value });
-    };
+    useEffect(() => {
+        console.log("Valores del formulario:", formValues);
+        
+    }, [formValues]);
 
-    const agregarProducto = () => {
-        setProductos([...productos, { descripcion: "", cantidad: 1, precio: 0, descuento: 0 }]);
+    // Handlers
+
+    const handleAddProducto = (producto: ProductoType) => {
+        setFormValues(prev => ({
+            ...prev,
+            productos: [...prev.productos, { productoId: producto.productoId, cantidad: 1, producto }]
+        }));
+    }
+
+    const handleModificarProducto = (productoId: number, value: number,name:string) => {
+        setFormValues(prev => {
+            const productosActualizados = prev.productos.map(prod => {
+                if (prod.productoId === productoId) {
+                    return {
+                        ...prod,
+                        [name]: value, // Actualiza el campo específico
+                        cantidad: name === "cantidad" ? value : prod.cantidad, // Asegura que cantidad se actualice correctamente
+                    };
+                }
+                return prod;
+            });
+            return { ...prev, productos: productosActualizados };
+        });
     };
 
     const handleImprimir = () => {
@@ -87,33 +94,26 @@ const Presupuestos = () => {
             className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 py-10 w-full print:bg-white"
             style={{ overflow: "hidden" }}
         >
+            <ModalBuscarProducto
+                isOpen={modalOpen}
+                onClose={() => { setModalOpen(modalOpen => !modalOpen) }}
+                onSelect={handleAddProducto}
+            />
             <Formik
-                initialValues={cliente}
+                initialValues={formValues}
                 validationSchema={Yup.object({
                     nombre: Yup.string().required("Requerido"),
                     telefono: Yup.string().required("Requerido")
                 })}
-                onSubmit={values => setCliente(values)}
+                onSubmit={() => handleImprimir()}
             >
-                {({ handleSubmit }) => (
-                    <Form onBlur={handleSubmit}>
+                {({ handleChange, handleBlur, values }) => (
+                    <Form >
                         <div
-                            className="relative bg-white/95 shadow-2xl rounded-lg border border-blue-200 font-mono flex flex-col mx-auto print:shadow-none print:bg-white print:border-none"
-                            style={{
-                                width: "816px",
-                                minHeight: "1056px",
-                            }}
+                            className="relative bg-white/95 w-[816px] h-[1056px] shadow-2xl rounded-lg border border-blue-200 font-mono flex flex-col mx-auto print:shadow-none print:bg-white print:border-none"
                         >
-                            {/* Línea azul superior */}
                             <div
-                                className="w-full print:bg-blue-600"
-                                style={{
-                                    height: "20px",
-                                    background: "#2563eb",
-                                    borderTopLeftRadius: "0.5rem",
-                                    borderTopRightRadius: "0.5rem",
-                                    maxHeight: "2cm",
-                                }}
+                                className="w-full h-[20px] bg-blue-600 rounded-t-lg max-h-[2cm] print:bg-blue-600"
                             />
                             {/* Encabezado */}
                             <div className="flex flex-col items-center border-b-2 border-blue-300 pb-2 mb-4 pt-4 px-4">
@@ -141,8 +141,9 @@ const Presupuestos = () => {
                                                     type={field.type || "text"}
                                                     name={field.name}
                                                     placeholder={field.placeholder}
-                                                    value={cliente[field.name as keyof typeof cliente]}
-                                                    onChange={handleClienteChange}
+                                                    value={values[field.name]}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
                                                     className="border-b border-blue-300 bg-transparent px-2 py-1 focus:outline-none focus:border-blue-500 transition text-sm text-blue-900 print:bg-white"
                                                 />
                                                 <ErrorMessage
@@ -172,8 +173,10 @@ const Presupuestos = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {productos.map((prod, i) => (
-                                                <ItemFilaProducto />
+                                            {formValues.productos.map((producto, i) => (
+                                                <tr key={i}>
+                                                    <ItemFilaProducto producto={producto.producto} handleModificarProducto={handleModificarProducto}/>
+                                                </tr>
                                             ))}
                                         </tbody>
                                     </table>
@@ -183,15 +186,14 @@ const Presupuestos = () => {
                             <div className="mb-5 mx-4 flex gap-2 print:hidden">
                                 <button
                                     className="px-3 py-1 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition text-xs font-semibold"
-                                    onClick={agregarProducto}
+                                    onClick={() => {setModalOpen(true)}}
                                     type="button"
                                 >
                                     + Agregar producto
                                 </button>
                                 <button
                                     className="px-3 py-1 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700 transition text-xs font-semibold"
-                                    onClick={handleImprimir}
-                                    type="button"
+                                    type="submit"
                                 >
                                     Imprimir
                                 </button>
@@ -208,8 +210,15 @@ const Presupuestos = () => {
                                         <label className="flex items-center gap-2 cursor-pointer font-semibold text-black">
                                             <input
                                                 type="checkbox"
-                                                checked={agregarIVA}
-                                                onChange={e => setAgregarIVA(e.target.checked)}
+                                                name="agregarIVA"
+                                                onBlur={handleBlur}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    setFormValues(prev => ({
+                                                        ...prev,
+                                                        agregarIVA: e.target.checked
+                                                    }));
+                                                }}
                                                 className="accent-blue-600"
                                             />
                                             IVA (16%)
@@ -243,8 +252,8 @@ const Presupuestos = () => {
                                         className="w-full border-b border-blue-300 bg-transparent px-3 py-2 focus:outline-none focus:border-blue-500 transition text-sm text-blue-900 print:bg-white"
                                         rows={2}
                                         placeholder="Agrega aquí una dirección u observación si es necesario..."
-                                        value={pie}
-                                        onChange={e => setPie(e.target.value)}
+                                        value={values.pie}
+                                        onChange={handleChange}
                                     />
                                 </div>
                             </div>

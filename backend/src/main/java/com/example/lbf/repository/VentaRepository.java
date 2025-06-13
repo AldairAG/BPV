@@ -16,7 +16,7 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
     List<Venta> findByFecha(LocalDate fecha);
     List<Venta> findByFechaBetween(LocalDate fechaInicio, LocalDate fechaFin);
     
-    @Query("SELECT SUM(v.total) FROM Venta v WHERE v.fecha BETWEEN :fechaInicio AND :fechaFin")
+    @Query("SELECT SUM(v.total) FROM Venta v WHERE v.fecha BETWEEN :fechaInicio AND :fechaFin AND v.anulada = false")
     BigDecimal calcularTotalVentasPorRango(LocalDate fechaInicio, LocalDate fechaFin);
     
     @Query("SELECT v FROM Venta v JOIN v.usuario u WHERE " +

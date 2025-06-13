@@ -154,6 +154,7 @@ class OfflineProductoService {
             color: '',
             productos: []
           },
+          sucursal: '',
           activo: false,
           tipo: '',
           productoVentas: []
@@ -177,6 +178,7 @@ class OfflineProductoService {
           color: '',
           productos: []
         },
+        sucursal: '',
         activo: false,
         tipo: '',
         productoVentas: []

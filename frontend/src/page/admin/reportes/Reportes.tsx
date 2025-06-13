@@ -220,7 +220,7 @@ const Reportes = () => {
               </CardHead>
               <CardContent className="flex flex-col items-center justify-center py-6">
                 <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                  {formatearPrecio(ingresoTotal||0)}
+                  {formatearPrecio(ingresoTotal || 0)}
                 </span>
               </CardContent>
             </Card>
@@ -687,27 +687,28 @@ const Reportes = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {ventasDiarias.map((item) => {
+                    {[...ventasDiarias].reverse().map((item) => {
+                      
                       const fecha = new Date(item.fecha);
                       const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
                       const diaSemana = diasSemana[fecha.getDay()];
 
                       return (
-                        <tr key={item.fecha} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
-                              {fecha.toLocaleDateString()}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
-                              {diaSemana}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-green-600 dark:text-green-400">
-                            {formatearPrecio(item.total)}
-                          </td>
-                        </tr>
+                      <tr key={item.fecha} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {item.fecha}
+                        </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {diaSemana}
+                        </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-green-600 dark:text-green-400">
+                        {formatearPrecio(item.total)}
+                        </td>
+                      </tr>
                       );
                     })}
                   </tbody>
@@ -894,7 +895,7 @@ const Reportes = () => {
         <TabsContent value="ventas" className="space-y-6">
           <Card className="bg-white dark:bg-gray-800">
             <CardContent>
-                  <MonitoreoVentas fechaInicio={fechaInicio} fechaFin={fechaFin}/>
+              <MonitoreoVentas fechaInicio={fechaInicio} fechaFin={fechaFin} />
             </CardContent>
           </Card>
         </TabsContent>

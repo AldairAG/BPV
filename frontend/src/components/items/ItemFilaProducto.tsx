@@ -1,88 +1,209 @@
-import { useState } from "react";
-import type { ProductoType } from "../../types/ProductoType";
+import React from "react";
 import { X } from "lucide-react";
+import type { ProductoType } from "../../types/ProductoType";
 
-const ItemFilaProducto = ({ producto, handleModificarProducto, handleBorrarProducto }: 
-    { producto: ProductoType, 
-        handleModificarProducto: (index: number, value: number, name: string) => void ,
-        handleBorrarProducto: (id: number) => void
-    },
-    ) => {
+// Estilos base para celdas
+const cellStyle: React.CSSProperties = {
+  padding: "10px 14px",
+  color: "#1e293b",
+  background: "#fff",
+  borderBottom: "1px solid #e5e7eb",
+  fontSize: 16,
+  verticalAlign: "middle",
+  minWidth: 90,
+  maxWidth: 260,
+  overflow: "visible",
+  whiteSpace: "normal",
+  wordBreak: "break-word",
+  height: 40,
+};
 
-    const [descuento, setDescuento] = useState<number>(0);
-    const [cantidad, setCantidad] = useState<number>(1);
+// Estilos para inputs y selects para que llenen la celda y no se corten
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        console.log(`onChange: ${e.target.name} = ${e.target.value} for producto ID ${producto.productoId}`);
-        
-        if (e.target.name === "descuento") {        
-            setDescuento(Number(e.target.value));
-        } else if (e.target.name === "cantidad") {
-            setCantidad(Number(e.target.value));
-        }
-        handleModificarProducto(producto.productoId, Number(e.target.value), e.target.name);
-    }; 
-
-    return (
-        <tr className="hover:bg-blue-100/60 print:hover:bg-white">
-            <td className="px-2 py-1">
-                <input type="text"
-                    value={producto?.nombre}
-                    placeholder="Nombre del producto"
-                    className="text-blue-900 bg-transparent border-b border-blue-100 focus:outline-none focus:border-blue-500 transition w-full px-1 py-0.5 print:bg-whitez"
-                />
-            </td>
-            <td className="px-2 py-1">
-                <input
-                    type="number"
-                    min={1}
-                    name="cantidad"
-                    className="w-14 border-b border-blue-100 bg-transparent px-1 py-0.5 focus:outline-none focus:border-blue-500 transition text-right text-blue-900 print:bg-white"
-                    value={cantidad}
-                    onChange={e => onChange(e)}
-                />
-            </td>
-            <td className="px-2 py-1">
-                <input
-                    type="number"
-                    min={0}
-                    step={0.01}
-                    className="w-16 border-b border-blue-100 bg-transparent px-1 py-0.5 focus:outline-none focus:border-blue-500 transition text-right text-blue-900 print:bg-white"
-                    value={producto?.precio}
-                />
-            </td>
-            <td className="px-2 py-1">
-                <select
-                    name="descuento"
-                    className="w-full border-b border-blue-100 bg-transparent px-1 py-0.5 focus:outline-none focus:border-blue-500 transition text-blue-900 print:bg-white"
-                    value={descuento|| 0}
-                    onChange={e => onChange(e)}
-                >
-                    {producto?.descuentos?.map((desc, idx) => (
-                        <option key={idx} value={desc}>
-                            {desc}
-                        </option>
-                    ))}
-                </select>
-            </td>
-            <td className="px-2 py-1 text-right font-mono bg-blue-100 text-blue-900 print:bg-white">
-                {(
-                    (cantidad*producto.precio)-((descuento/100)*(producto?.precio*cantidad))
-                ).toFixed(2)}
-            </td>
-            <td className="px-2 py-1 text-center">
-                    <button
-                        className="text-red-500 font-bold px-2 hover:text-red-700 print:hidden"
-                        onClick={()=>handleBorrarProducto(producto.productoId)}
-                        type="button"
-                        title="Quitar producto"
-                    >
-                       <X className="w-4 h-4 text-red-600" />
-                    </button>
-           
-            </td>
-        </tr>
-    );
-}
+const ItemFilaProducto = ({
+  producto,
+  cantidad,
+  descuento,
+  handleModificarProducto,
+  handleBorrarProducto,
+  productoId,
+  modoPDF = false, // <--- NUEVO
+}: {
+  producto: ProductoType;
+  cantidad: number;
+  descuento?: number;
+  handleModificarProducto: (id: number, value: number, name: string) => void;
+  handleBorrarProducto: (id: number) => void;
+  productoId: number;
+  modoPDF?: boolean; // <--- NUEVO
+}) => (
+  <>
+    {/* Descripción */}
+    <td style={{ ...cellStyle, minWidth: 160, maxWidth: 300 }}>
+      {modoPDF ? (
+        <span style={{ fontWeight: 500 }}>{producto?.nombre}</span>
+      ) : (
+        <input
+          type="text"
+          value={producto?.nombre}
+          placeholder="Nombre del producto"
+          style={{
+            color: "#1e293b",
+            background: "#fff",
+            border: "none",
+            borderBottom: "1px solid #e5e7eb",
+            outline: "none",
+            width: "100%",
+            height: 32,
+            padding: "4px 8px",
+            fontSize: 16,
+            fontWeight: 500,
+            boxSizing: "border-box",
+            display: "block",
+          }}
+          readOnly
+        />
+      )}
+    </td>
+    {/* Cantidad */}
+    <td style={{ ...cellStyle, minWidth: 60, maxWidth: 90 }}>
+      {modoPDF ? (
+        <span>{cantidad}</span>
+      ) : (
+        <input
+          type="number"
+          min={1}
+          name="cantidad"
+          style={{
+            color: "#1e293b",
+            background: "#fff",
+            border: "none",
+            borderBottom: "1px solid #e5e7eb",
+            outline: "none",
+            width: "100%",
+            height: 32,
+            padding: "4px 8px",
+            fontSize: 16,
+            boxSizing: "border-box",
+            display: "block",
+          }}
+          value={cantidad}
+          onChange={e =>
+            handleModificarProducto(productoId, Number(e.target.value), "cantidad")
+          }
+        />
+      )}
+    </td>
+    {/* Precio unitario */}
+    <td style={{ ...cellStyle, minWidth: 80, maxWidth: 110, textAlign: "right" }}>
+      {modoPDF ? (
+        <span>{producto?.precio}</span>
+      ) : (
+        <input
+          type="number"
+          min={0}
+          step={0.01}
+          style={{
+            color: "#1e293b",
+            background: "#fff",
+            border: "none",
+            borderBottom: "1px solid #e5e7eb",
+            outline: "none",
+            width: "100%",
+            height: 32,
+            padding: "4px 8px",
+            fontSize: 16,
+            boxSizing: "border-box",
+            display: "block",
+            textAlign: "right",
+          }}
+          value={producto?.precio}
+          readOnly
+        />
+      )}
+    </td>
+    {/* Descuento */}
+    <td style={{ ...cellStyle, minWidth: 80, maxWidth: 110 }}>
+      {modoPDF ? (
+        <span>{descuento ?? 0}%</span>
+      ) : (
+        <select
+          name="descuento"
+          style={{
+            color: "#1e293b",
+            background: "#fff",
+            border: "none",
+            borderBottom: "1px solid #e5e7eb",
+            outline: "none",
+            width: "100%",
+            height: 32,
+            padding: "4px 8px",
+            fontSize: 16,
+            boxSizing: "border-box",
+            minWidth: 60,
+            appearance: "none",
+            display: "block",
+          }}
+          value={descuento ?? 0}
+          onChange={e =>
+            handleModificarProducto(productoId, Number(e.target.value), "descuento")
+          }
+        >
+          <option value={0}>0%</option>
+          {producto?.descuentos?.filter(d => d !== 0).map((desc, idx) => (
+            <option key={idx} value={desc}>
+              {desc}%
+            </option>
+          ))}
+        </select>
+      )}
+    </td>
+    {/* Sub Total */}
+    <td
+      style={{
+        ...cellStyle,
+        background: "#f1f5f9",
+        textAlign: "right",
+        fontFamily: "monospace",
+        fontWeight: 500,
+        minWidth: 90,
+        maxWidth: 120,
+      }}
+    >
+      {(
+        cantidad * producto.precio -
+        ((descuento ?? 0) / 100) * (producto.precio * cantidad)
+      ).toFixed(2)}
+    </td>
+    {/* Quitar producto */}
+    <td
+      style={{
+        ...cellStyle,
+        textAlign: "center",
+        minWidth: 40,
+        maxWidth: 60,
+      }}
+    >
+      {!modoPDF && (
+        <button
+          style={{
+            color: "#ef4444",
+            fontWeight: 700,
+            padding: "0 8px",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            height: 32,
+          }}
+          onClick={() => handleBorrarProducto(productoId)}
+          type="button"
+          title="Quitar producto"
+        >
+          <X style={{ width: 16, height: 16, color: "#dc2626" }} />
+        </button>
+      )}
+    </td>
+  </>
+);
 
 export default ItemFilaProducto;

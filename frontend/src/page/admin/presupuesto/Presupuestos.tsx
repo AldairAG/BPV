@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ItemFilaProducto from "../../../components/items/ItemFilaProducto";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import type { ProductoType } from "../../../types/ProductoType";
 import * as Yup from "yup";
 import ModalBuscarProducto from "../../../components/modal/ModalBuscarProducto";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const inputFields = [
     { name: "nombre", placeholder: "Nombre del cliente" },
@@ -12,8 +14,7 @@ const inputFields = [
     { name: "direccion", placeholder: "Dirección" },
     { name: "pie", placeholder: "Pie de página" },
     { name: "agregarIVA", placeholder: "Agregar IVA", type: "checkbox" },
-]
-
+];
 
 interface formValues {
     nombre: string;
@@ -23,16 +24,15 @@ interface formValues {
     pie: string;
     agregarIVA: boolean;
     productos: {
-        productoId: number // ID del producto
-        cantidad: number
-        producto: ProductoType
-        descuento?: number; // Descuento opcional para cada producto
+        productoId: number;
+        cantidad: number;
+        producto: ProductoType;
+        descuento?: number;
     }[];
     [key: string]: string | boolean | { productoId: number, cantidad: number; producto: ProductoType, descuento?: number }[];
 }
 
 const Presupuestos = () => {
-
     const [formValues, setFormValues] = useState<formValues>({
         nombre: "",
         telefono: "",
@@ -44,30 +44,37 @@ const Presupuestos = () => {
     });
 
     const [modalOpen, setModalOpen] = useState(false);
+    const pdfRef = useRef<HTMLDivElement>(null);
 
-    // Calculos
-    const subtotal = formValues.productos.reduce(
+    const subtotalConDescuento = formValues.productos.reduce(
         (acc: number, prod: { cantidad: number; producto: ProductoType, descuento?: number }) =>
             acc +
             Number(prod.cantidad) *
-            (Number(prod.producto.precio) - (Number(prod.producto.precio) * (Number(prod.descuento)) / 100 || 0)), 0
+            (Number(prod.producto.precio) - (Number(prod.producto.precio) * (Number(prod.descuento ?? 0)) / 100)), 0
     ) || 0;
-    const iva = formValues.agregarIVA ? subtotal * 0.16 : 0;
-    const total = subtotal + iva;
+
+    // Total ahorrado en $ (suma de descuentos de cada producto)
+    const totalAhorrado = formValues.productos.reduce(
+        (acc: number, prod: { cantidad: number; producto: ProductoType, descuento?: number }) =>
+            acc +
+            Number(prod.cantidad) *
+            (Number(prod.producto.precio) * (Number(prod.descuento ?? 0) / 100)), 0
+    ) || 0;
+
+    const iva = formValues.agregarIVA ? subtotalConDescuento * 0.16 : 0;
+    const total = subtotalConDescuento + iva;
 
     useEffect(() => {
         console.log("Valores del formulario:", formValues);
-
     }, [formValues]);
 
     // Handlers
-
     const handleAddProducto = (producto: ProductoType) => {
         setFormValues(prev => ({
             ...prev,
             productos: [...prev.productos, { productoId: producto.productoId, cantidad: 1, producto }]
         }));
-    }
+    };
 
     const handleBorrarProducto = (productoId: number) => {
         setFormValues(prev => ({
@@ -82,8 +89,8 @@ const Presupuestos = () => {
                 if (prod.productoId === productoId) {
                     return {
                         ...prod,
-                        [name]: value, // Actualiza el campo específico
-                        cantidad: name === "cantidad" ? value : prod.cantidad, // Asegura que cantidad se actualice correctamente
+                        [name]: value,
+                        cantidad: name === "cantidad" ? value : prod.cantidad,
                     };
                 }
                 return prod;
@@ -96,10 +103,51 @@ const Presupuestos = () => {
         window.print();
     };
 
+    const handleGuardarPDF = async () => {
+        console.log("Intentando guardar PDF...");
+        if (!pdfRef.current) {
+            console.warn("No se encontró el contenido para exportar. Intenta de nuevo.");
+            return;
+        }
+        try {
+            // Forzar colores seguros para html2canvas
+            pdfRef.current.style.background = "#fff";
+            pdfRef.current.style.color = "#222";
+            // Renderizar a canvas
+            const canvas = await html2canvas(pdfRef.current, {
+                backgroundColor: "#fff",
+                useCORS: true,
+                scale: 2,
+            });
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF({
+                orientation: "portrait",
+                unit: "pt",
+                format: "a4"
+            });
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+            pdf.save("presupuesto.pdf");
+        } catch (err) {
+            console.error("Error generando PDF:", err);
+            alert("No se pudo generar el PDF. Intenta simplificar el diseño o consulta soporte.");
+        }
+    };
+
     return (
         <div
-            className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 py-10 w-full print:bg-white"
-            style={{ overflow: "hidden" }}
+            style={{
+                minHeight: "100vh",
+                // Fondo degradado azul oscuro
+                background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #0ea5e9 100%)",
+                padding: "40px 0",
+                width: "100%",
+                overflow: "hidden",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+            }}
         >
             <ModalBuscarProducto
                 isOpen={modalOpen}
@@ -115,35 +163,145 @@ const Presupuestos = () => {
                 onSubmit={() => handleImprimir()}
             >
                 {({ handleChange, handleBlur, values }) => (
-                    <Form >
-                        <div
-                            className="relative bg-white/95 h-[1056px] shadow-2xl rounded-lg border border-blue-200 font-mono flex flex-col mx-auto print:shadow-none print:bg-white print:border-none"
+                    <Form>
+                        {/* Botón flotante Agregar producto */}
+                        <button
+                            style={{
+                                position: "fixed",
+                                top: "30%",
+                                right: 0,
+                                zIndex: 1000,
+                                background: "#22c55e",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "8px 0 0 8px",
+                                padding: "12px 20px",
+                                fontWeight: "bold",
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                                cursor: "pointer",
+                                marginBottom: 12,
+                            }}
+                            onClick={() => setModalOpen(true)}
+                            type="button"
                         >
-                            <div
-                                className="w-full h-[20px] bg-blue-600 rounded-t-lg max-h-[2cm] print:bg-blue-600"
-                            />
+                            + Agregar producto
+                        </button>
+
+                        {/* Botón Guardar PDF, justo después del div con ref */}
+                        <button
+                            type="button"
+                            onClick={handleGuardarPDF}
+                            style={{
+                                position: "fixed",
+                                top: "40%",
+                                right: 0,
+                                zIndex: 1000,
+                                background: "#2563eb",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "8px 0 0 8px",
+                                padding: "12px 20px",
+                                fontWeight: "bold",
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                                cursor: "pointer",
+                            }}
+                        >
+                            Guardar PDF
+                        </button>
+
+                        {/* Contenedor a exportar */}
+                        <div
+                            ref={pdfRef}
+                            style={{
+                                background: "#fff",
+                                minHeight: 900,
+                                maxWidth: 900,
+                                margin: "0 auto",
+                                borderRadius: 16,
+                                border: "1px solid #2563eb",
+                                boxShadow: "0 2px 16px rgba(37,99,235,0.10)",
+                                display: "flex",
+                                flexDirection: "column",
+                                fontFamily: "sans-serif",
+                                color: "#222",
+                                padding: 24,
+                                position: "relative"
+                            }}
+                        >
+                            <div style={{
+                                width: "100%",
+                                height: 20,
+                                background: "#2563eb",
+                                borderTopLeftRadius: 12,
+                                borderTopRightRadius: 12,
+                                marginBottom: 16
+                            }} />
                             {/* Encabezado */}
-                            <div className="flex flex-col items-center border-b-2 border-blue-300 pb-2 mb-4 pt-4 px-4">
-                                <span className="text-lg font-bold text-blue-800 tracking-widest uppercase mb-1">
+                            <div style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                borderBottom: "2px solid #93c5fd",
+                                paddingBottom: 8,
+                                marginBottom: 24,
+                                paddingTop: 16,
+                                paddingLeft: 16,
+                                paddingRight: 16
+                            }}>
+                                <span style={{
+                                    fontSize: 22,
+                                    fontWeight: 700,
+                                    color: "#2563eb",
+                                    letterSpacing: 2,
+                                    textTransform: "uppercase",
+                                    marginBottom: 4
+                                }}>
                                     Presupuestos
                                 </span>
-                                <span className="text-base font-semibold text-blue-700 text-center">
+                                <span style={{
+                                    fontSize: 18,
+                                    fontWeight: 600,
+                                    color: "#1e40af",
+                                    textAlign: "center"
+                                }}>
                                     Artículos de limpieza "La Burbuja Feliz"
                                 </span>
-                                <span className="text-xs text-gray-700 text-center font-normal">
+                                <span style={{
+                                    fontSize: 13,
+                                    color: "#334155",
+                                    textAlign: "center",
+                                    fontWeight: 400
+                                }}>
                                     Tel: 2281278853 &nbsp;|&nbsp; Fabricación, venta y distribución de productos químicos para limpieza a granel, mayoreo y menudeo.
                                 </span>
                             </div>
 
                             {/* Datos del cliente */}
-                            <div className="mb-5 border border-blue-100 rounded-lg p-3 bg-blue-50/60 mx-4 print:bg-white">
-                                <h3 className="font-bold text-blue-800 mb-2 tracking-wide uppercase text-xs">Datos del cliente</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-
+                            <div style={{
+                                marginBottom: 24,
+                                border: "1px solid #93c5fd",
+                                borderRadius: 10,
+                                padding: 16,
+                                background: "#f1f5f9"
+                            }}>
+                                <h3 style={{
+                                    fontWeight: 700,
+                                    color: "#2563eb",
+                                    marginBottom: 8,
+                                    letterSpacing: 1,
+                                    textTransform: "uppercase",
+                                    fontSize: 13
+                                }}>Datos del cliente</h3>
+                                <div style={{
+                                    display: "grid",
+                                    gridTemplateColumns: "1fr 1fr",
+                                    gap: 12,
+                                    maxWidth: 700
+                                }}>
                                     {inputFields
                                         .filter(field => field.name !== "pie" && field.name !== "agregarIVA")
                                         .map((field, index) => (
-                                            <div key={index} className="flex flex-col">
+                                            <div key={index} style={{ display: "flex", flexDirection: "column" }}>
                                                 <Field
                                                     type={field.type || "text"}
                                                     name={field.name}
@@ -151,41 +309,78 @@ const Presupuestos = () => {
                                                     value={values[field.name]}
                                                     onChange={handleChange}
                                                     onBlur={handleBlur}
-                                                    className="border-b border-blue-300 bg-transparent px-2 py-1 focus:outline-none focus:border-blue-500 transition text-sm text-blue-900 print:bg-white"
+                                                    style={{
+                                                        borderBottom: "1px solid #93c5fd",
+                                                        background: "transparent",
+                                                        padding: "6px 8px",
+                                                        fontSize: 15,
+                                                        color: "#222",
+                                                        outline: "none"
+                                                    }}
                                                 />
                                                 <ErrorMessage
                                                     name={field.name}
-                                                    component="div"
-                                                    className="text-red-500 text-xs mt-1"
+                                                    render={msg => (
+                                                        <div style={{ color: "#ef4444", fontSize: 12, marginTop: 2 }}>
+                                                            {msg}
+                                                        </div>
+                                                    )}
                                                 />
                                             </div>
                                         ))}
-
                                 </div>
                             </div>
 
                             {/* Productos */}
-                            <div className="mb-5 mx-4 print:bg-white">
-                                <h3 className="font-bold text-blue-800 mb-2 tracking-wide uppercase text-xs">Productos</h3>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full border border-blue-200 rounded-lg bg-blue-50/40 text-xs shadow print:bg-white">
+                            <div style={{ marginBottom: 24 }}>
+                                <h3 style={{
+                                    fontWeight: 700,
+                                    color: "#2563eb",
+                                    marginBottom: 8,
+                                    letterSpacing: 1,
+                                    textTransform: "uppercase",
+                                    fontSize: 13
+                                }}>Productos</h3>
+                                <div style={{
+                                    overflowX: "auto",
+                                    borderRadius: 12,
+                                    background: "#fff",
+                                    boxShadow: "0 1px 4px rgba(37,99,235,0.06)"
+                                }}>
+                                    <table style={{
+                                        width: "100%",
+                                        borderCollapse: "collapse",
+                                        background: "#f1f5f9",
+                                        fontSize: 15,
+                                        borderRadius: 8,
+                                        overflow: "hidden"
+                                    }}>
                                         <thead>
-                                            <tr className="bg-blue-600 text-white uppercase print:bg-blue-600 print:text-white">
-                                                <th className="border-b border-blue-200 px-2 py-1 font-semibold">Descripción</th>
-                                                <th className="border-b border-blue-200 px-2 py-1 font-semibold">Cantidad</th>
-                                                <th className="border-b border-blue-200 px-2 py-1 font-semibold">P/U</th>
-                                                <th className="border-b border-blue-200 px-2 py-1 font-semibold">Descuentos</th>
-                                                <th className="border-b border-blue-200 px-2 py-1 font-semibold bg-blue-500 text-white">Sub Total</th>
-                                                <th className="border-b border-blue-200 px-2 py-1"></th>
+                                            <tr style={{ background: "#2563eb" }}>
+                                                <th style={{ padding: 10, color: "#fff", textAlign: "left", borderTopLeftRadius: 8 }}>Descripción</th>
+                                                <th style={{ padding: 10, color: "#fff", textAlign: "left" }}>Cantidad</th>
+                                                <th style={{ padding: 10, color: "#fff", textAlign: "left" }}>P/U</th>
+                                                <th style={{ padding: 10, color: "#fff", textAlign: "left" }}>Descuentos</th>
+                                                <th style={{ padding: 10, color: "#fff", textAlign: "left", borderTopRightRadius: 8 }}>Sub Total</th>
+                                                <th style={{ padding: 10 }}></th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {formValues.productos.map((producto, i) => (
-                                                <tr key={i}>
+                                                <tr key={i} style={{
+                                                    background: "#fff",
+                                                    transition: "background 0.2s"
+                                                }}
+                                                    onMouseOver={e => (e.currentTarget.style.background = "#e0e7ff")}
+                                                    onMouseOut={e => (e.currentTarget.style.background = "#fff")}
+                                                >
                                                     <ItemFilaProducto
                                                         producto={producto.producto}
+                                                        cantidad={producto.cantidad}
+                                                        descuento={producto.descuento}
                                                         handleModificarProducto={handleModificarProducto}
                                                         handleBorrarProducto={handleBorrarProducto}
+                                                        productoId={producto.productoId}
                                                     />
                                                 </tr>
                                             ))}
@@ -193,32 +388,37 @@ const Presupuestos = () => {
                                     </table>
                                 </div>
                             </div>
-                            {/* Botones de acción */}
-                            <div className="mb-5 mx-4 flex gap-2 print:hidden">
-                                <button
-                                    className="px-3 py-1 bg-blue-600 text-white rounded shadow hover:bg-blue-700 transition text-xs font-semibold"
-                                    onClick={() => { setModalOpen(true) }}
-                                    type="button"
-                                >
-                                    + Agregar producto
-                                </button>
-                                <button
-                                    className="px-3 py-1 bg-indigo-600 text-white rounded shadow hover:bg-indigo-700 transition text-xs font-semibold"
-                                    type="submit"
-                                >
-                                    Imprimir
-                                </button>
-                            </div>
 
                             {/* Totales */}
-                            <div className="flex flex-col md:flex-row md:justify-end gap-4 items-end mb-5 mx-4 print:bg-white">
-                                <div className="flex flex-col gap-2 w-full md:w-72 bg-blue-100 border border-blue-200 rounded-lg p-3 shadow-lg print:bg-white">
-                                    <div className="flex justify-between">
-                                        <span className="font-semibold text-black">Sub Total</span>
-                                        <span className="font-mono text-black">${subtotal.toFixed(2)}</span>
+                            <div style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                justifyContent: "flex-end",
+                                gap: 16,
+                                alignItems: "flex-end",
+                                marginBottom: 24
+                            }}>
+                                <div style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: 8,
+                                    width: 280,
+                                    background: "#f1f5f9",
+                                    border: "1px solid #93c5fd",
+                                    borderRadius: 10,
+                                    padding: 16,
+                                    boxShadow: "0 1px 4px rgba(37,99,235,0.06)"
+                                }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                        <span style={{ fontWeight: 600, color: "#222" }}>Subtotal</span>
+                                        <span style={{ fontFamily: "monospace", color: "#222" }}>${subtotalConDescuento.toFixed(2)}</span>
                                     </div>
-                                    <div className="flex items-center justify-between">
-                                        <label className="flex items-center gap-2 cursor-pointer font-semibold text-black">
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                        <span style={{ fontWeight: 600, color: "#16a34a" }}>Total ahorrado</span>
+                                        <span style={{ fontFamily: "monospace", color: "#16a34a" }}>-${totalAhorrado.toFixed(2)}</span>
+                                    </div>
+                                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                                        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontWeight: 600, color: "#222" }}>
                                             <input
                                                 type="checkbox"
                                                 name="agregarIVA"
@@ -230,37 +430,52 @@ const Presupuestos = () => {
                                                         agregarIVA: e.target.checked
                                                     }));
                                                 }}
-                                                className="accent-blue-600"
+                                                style={{ accentColor: "#2563eb" }}
                                             />
                                             IVA (16%)
                                         </label>
-                                        <span className="font-mono text-black">${iva.toFixed(2)}</span>
+                                        <span style={{ fontFamily: "monospace", color: "#222" }}>${iva.toFixed(2)}</span>
                                     </div>
-                                    <div className="flex justify-between font-bold text-base border-t pt-2">
-                                        <span className="text-black">Total General</span>
-                                        <span className="font-mono text-black">${total.toFixed(2)}</span>
+                                    <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 700, fontSize: 17, borderTop: "1px solid #93c5fd", paddingTop: 8 }}>
+                                        <span style={{ color: "#222" }}>Total general</span>
+                                        <span style={{ fontFamily: "monospace", color: "#222" }}>${total.toFixed(2)}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Pie de página */}
-                            <div className="mt-auto print:bg-white">
+                            <div style={{ marginTop: "auto" }}>
                                 <div
-                                    className="w-full print:bg-blue-600"
                                     style={{
-                                        height: "20px",
+                                        width: "100%",
+                                        height: 20,
                                         background: "#2563eb",
-                                        borderBottomLeftRadius: "0.5rem",
-                                        borderBottomRightRadius: "0.5rem",
-                                        maxHeight: "2cm",
+                                        borderBottomLeftRadius: 12,
+                                        borderBottomRightRadius: 12,
+                                        maxHeight: "2cm"
                                     }}
                                 />
-                                <div className="px-4 pt-4 pb-2">
-                                    <label className="block font-bold text-blue-800 mb-1 uppercase text-xs">
+                                <div style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 16, paddingBottom: 8 }}>
+                                    <label style={{
+                                        display: "block",
+                                        fontWeight: 700,
+                                        color: "#2563eb",
+                                        marginBottom: 4,
+                                        textTransform: "uppercase",
+                                        fontSize: 13
+                                    }}>
                                         Observaciones / Dirección adicional:
                                     </label>
                                     <textarea
-                                        className="w-full border-b border-blue-300 bg-transparent px-3 py-2 focus:outline-none focus:border-blue-500 transition text-sm text-blue-900 print:bg-white"
+                                        style={{
+                                            width: "100%",
+                                            borderBottom: "1px solid #93c5fd",
+                                            background: "transparent",
+                                            padding: "8px 12px",
+                                            fontSize: 15,
+                                            color: "#222",
+                                            outline: "none"
+                                        }}
                                         rows={2}
                                         placeholder="Agrega aquí una dirección u observación si es necesario..."
                                         value={values.pie}
@@ -272,7 +487,7 @@ const Presupuestos = () => {
                     </Form>
                 )}
             </Formik>
-        </div >
+        </div>
     );
 };
 

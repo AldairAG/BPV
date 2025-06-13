@@ -34,7 +34,8 @@ public class ReporteServiceImpl implements ReporteService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProductosMasVendidosResponse> getProductosMasVendidos(LocalDate fechaInicio, LocalDate fechaFin, int limite) {
+    public List<ProductosMasVendidosResponse> getProductosMasVendidos(LocalDate fechaInicio, LocalDate fechaFin,
+            int limite) {
         List<Object[]> resultados = productoVendidoRepository.findProductosMasVendidos(fechaInicio, fechaFin);
 
         List<ProductosMasVendidosResponse> productosVendidos = new ArrayList<>();
@@ -48,7 +49,7 @@ public class ReporteServiceImpl implements ReporteService {
             Number cantidad = (Number) resultado[1];
 
             productosVendidos.add(new ProductosMasVendidosResponse(producto, cantidad.intValue()));
-            
+
             count++;
         }
 
@@ -72,11 +73,11 @@ public class ReporteServiceImpl implements ReporteService {
 
         // Convertir el Map a una lista de DTOs
         List<VentaPorUsuarioDTO> ventasPorUsuario = new ArrayList<>();
-        
+
         for (Map.Entry<Usuario, BigDecimal> entry : ventasPorUsuarioMap.entrySet()) {
             ventasPorUsuario.add(new VentaPorUsuarioDTO(entry.getKey(), entry.getValue()));
         }
-        
+
         return ventasPorUsuario;
     }
 
@@ -92,9 +93,8 @@ public class ReporteServiceImpl implements ReporteService {
             Number total = (Number) resultado[1];
 
             ventasPorCategoria.add(new VentaPorCategoriaDTO(
-                categoria, 
-                BigDecimal.valueOf(total.doubleValue())
-            ));
+                    categoria,
+                    BigDecimal.valueOf(total.doubleValue())));
         }
 
         return ventasPorCategoria;
@@ -103,15 +103,17 @@ public class ReporteServiceImpl implements ReporteService {
     @Override
     @Transactional(readOnly = true)
     public List<VentaDiariaDTO> getVentasDiarias(LocalDate fechaInicio, LocalDate fechaFin) {
-        return ventaRepository.findByFechaBetween(fechaInicio, fechaFin).stream()
+         
+        List<VentaDiariaDTO> ventas = ventaRepository.findByFechaBetween(fechaInicio, fechaFin).stream()
+            .filter(venta -> venta != null && (venta.getAnulada() == null || !venta.getAnulada())) // Ignorar ventas anuladas y null
             .collect(Collectors.groupingBy(
                 Venta::getFecha,
-                Collectors.mapping(Venta::getTotal, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
-            ))
+                Collectors.mapping(Venta::getTotal, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))))
             .entrySet().stream()
             .map(entry -> new VentaDiariaDTO(entry.getKey(), entry.getValue()))
             .sorted((a, b) -> a.getFecha().compareTo(b.getFecha()))
             .collect(Collectors.toList());
+        return ventas;
     }
 
     @Override
@@ -134,14 +136,14 @@ public class ReporteServiceImpl implements ReporteService {
 
         // Convertir el Map a una lista de DTOs
         List<VentaMensualDTO> ventasMensuales = new ArrayList<>();
-        
+
         for (Map.Entry<Integer, BigDecimal> entry : ventasMensualesMap.entrySet()) {
             ventasMensuales.add(new VentaMensualDTO(entry.getKey(), entry.getValue()));
         }
-        
+
         // Ordenar por mes
         ventasMensuales.sort((a, b) -> Integer.compare(a.getMes(), b.getMes()));
-        
+
         return ventasMensuales;
     }
 
@@ -159,9 +161,9 @@ public class ReporteServiceImpl implements ReporteService {
         return productos.stream()
                 .filter(producto -> producto.getStock() <= producto.getStockMinimo())
                 .map(producto -> {
-                    float porcentaje = producto.getStockMinimo() > 0 
-                        ? producto.getStock() / producto.getStockMinimo() 
-                        : 0;
+                    float porcentaje = producto.getStockMinimo() > 0
+                            ? producto.getStock() / producto.getStockMinimo()
+                            : 0;
                     return new ProductoBajoStockDTO(producto, porcentaje);
                 })
                 .collect(Collectors.toList());

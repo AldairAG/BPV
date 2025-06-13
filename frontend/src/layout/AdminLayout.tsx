@@ -77,11 +77,17 @@ const AdminLayout = () => {
     ];
 
     return (
-        <section className="flex flex-col h-screen w-full bg-gradient-to-br from-slate-900 via-gray-900 to-gray-800 text-white">
+        <section
+            className="flex flex-col h-screen w-full text-white"
+            style={{
+                // Fondo degradado azul compatible
+                background: "linear-gradient(135deg, #d8dbe6 0%, #5d8b12 60%, #bdd0da 100%)"
+            }}
+        >
             {/* Barra superior */}
             <header className="sticky top-0 z-40 flex border-b border-indigo-900 items-center h-16 px-4 md:px-8 bg-indigo-950/95 shadow-lg">
                 <span className="text-xl md:text-2xl font-extrabold tracking-widest text-amber-400 select-none">
-                    La Burbuja Feliz <span className="font-normal text-indigo-200">- Admin -</span>
+                    La Burbuja Felíz <span className="font-normal text-indigo-200">- Admin -</span>
                 </span>
 
                 {/* Menú hamburguesa solo visible en móvil */}

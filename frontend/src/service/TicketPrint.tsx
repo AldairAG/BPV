@@ -164,10 +164,12 @@ const TicketPrint: React.FC<TicketPrintProps> = ({ venta, config }) => {
       <div style={{ textAlign: "center", marginTop: 10 }}>
         {leyenda}
       </div>
-      <div style={{ height: 100 }} /> {/* Espacio extra entre tickets, ajusta el valor si lo deseas */}
+      <div style={{ height: 160 }} /> {/* Espacio extra entre tickets, ajusta el valor si lo deseas */}
       {/* Dos líneas vacías al final del ticket */}
       <div>&nbsp;.</div>
       <div>&nbsp;</div>
+      
+      
       <style>
         {`
           @media print {
@@ -175,7 +177,7 @@ const TicketPrint: React.FC<TicketPrintProps> = ({ venta, config }) => {
               width: 180px !important;
               min-width: 180px !important;
               max-width: 180px !important;
-              margin: 0 0 90px 0 !important; /* 40px de espacio entre tickets */
+              margin: 0 0 40px 0 !important; /* 40px de espacio entre tickets */
               padding: 0 !important;
               background: #fff !important;
               color: #000 !important;

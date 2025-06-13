@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import { useReactToPrint } from "react-to-print";
-import TicketPrint from "../service/TicketPrint";
-import type { TicketConfig, TicketPrintProps } from "../types/TicketTypes";
+import TicketPrint from "../../service/TicketPrint";
+import type { TicketConfig, TicketPrintProps } from "../../types/TicketTypes";
 
 const venta: TicketPrintProps["venta"] = {
   fecha: "2025-06-08",

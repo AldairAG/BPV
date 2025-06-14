@@ -32,7 +32,7 @@ unMesAtras.setMonth(hoy.getMonth() - 1);
 const formatearFecha = (fecha: Date): string => {
   const timeZone = 'America/Mexico_City';
   const fechaZonaMexico = formatInTimeZone(fecha, timeZone, 'yyyy-MM-dd');
-  return format(fechaZonaMexico, 'yyyy-MM-dd', { timeZone });
+  return fechaZonaMexico;
 };
 
 const formatearPrecio = (valor: number): string => {

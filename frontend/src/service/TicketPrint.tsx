@@ -3,10 +3,10 @@ import type { TicketConfig, TicketPrintProps } from '../types/TicketTypes';
 import logo from '../assets/logo.png'; // Ajusta la ruta si es necesario
 
 const defaultConfig: TicketConfig = {
-  nombreTienda: "La Burbuja Felíz",
+  nombreTienda: "La Burbuja Felíz | Fabricación, venta y distribución de productos químicos para limpieza a granel, mayoreo y menudeo.",
   rfc: "",
   direccion: "",
-  telefono: "",
+  telefono: "2281278853",
   leyenda: "¡Gracias por su compra!",
   anchoPapel: "80mm",
   fuente: "A",

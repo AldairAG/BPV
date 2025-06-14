@@ -14,7 +14,8 @@ import { toast } from "react-hot-toast";
 import type { ClienteType } from "../types/ClienteType";
 import ModalTemplate, { useModal } from "../components/modal/ModalTemplate";
 import CorteCaja from "../components/corte/CorteCaja";
-import { BookCopy } from "lucide-react";
+import { BookCopy, BarChart3, ShoppingCart, LogOut, Menu, X } from "lucide-react";
+import logo from "../assets/logo.png";
 import { ADMIN_ROUTES } from "../constants/routes";
 import { useNavigate } from "react-router-dom";
 
@@ -62,10 +63,6 @@ const PanelVentas = () => {
     fetchProductos();
   }, []);
 
-  // Manejar la navegación
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
   // Mostrar errores del carrito
   useEffect(() => {
     if (error) {
@@ -170,62 +167,82 @@ const PanelVentas = () => {
     setMenuCollapsed(!menuCollapsed);
   };
 
+  // Navegación a presupuestos
+  const handlePresupuestos = () => {
+    navigate(ADMIN_ROUTES.PRESUPUESTOS_ALTER);
+  };
+
   // Modificar la estructura del componente para quitar la barra superior
   return (
-    <section className="flex flex-col w-full min-h-screen bg-gradient-to-br from-gray-900 via-slate-900 to-gray-800 text-gray-100">
+    <section className="flex flex-col w-full min-h-screen bg-blue-900 text-whiteh-900">
       <div className="flex flex-row w-full flex-1 min-h-0">
         {/* Menú lateral */}
-        <aside className={`${menuCollapsed ? 'w-16' : 'w-60'} bg-slate-900 shadow-lg border-r border-slate-800 transition-all duration-300 flex flex-col`}>
-          <div className="flex items-center justify-between p-4 border-b border-slate-800">
-            {!menuCollapsed && <h2 className="text-lg font-semibold text-slate-200">Menú</h2>}
+        <aside className={`${menuCollapsed ? 'w-16' : 'w-64'} bg-blue-700 shadow-xl border-r border-blue-400 transition-all duration-300 flex flex-col`}>
+          {/* Logo y cerrar sesión */}
+          <div className="flex items-center justify-between p-4 border-b border-blue-400 bg-blue-700">
+            {!menuCollapsed && (
+              <div className="flex items-center gap-2">
+                <img
+                  src={logo}
+                  alt="Logo"
+                  className="w-10 h-10 rounded-lg shadow bg-white object-contain ring-2 ring-blue-500"
+                />
+                <span className="text-lg font-bold text-white tracking-wide">La Burbuja</span>
+              </div>
+            )}
             <button
-              onClick={toggleMenuCollapse}
-              className="p-1 hover:bg-slate-800 rounded-full transition-colors"
+              onClick={() => setMenuCollapsed(!menuCollapsed)}
+              className="p-1 hover:bg-blue-400 rounded-full transition-colors"
+              title={menuCollapsed ? "Expandir menú" : "Colapsar menú"}
             >
               {menuCollapsed ? (
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-                </svg>
+                <Menu className="h-6 w-6 text-white" />
               ) : (
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                </svg>
+                <X className="h-6 w-6 text-white" />
               )}
             </button>
           </div>
+          {/* Botón cerrar sesión arriba */}
+          <div className="p-2 border-b border-blue-400 bg-blue-500">
+            <button
+              className={`w-full flex items-center gap-3 p-2 rounded-xl hover:bg-blue-400 transition-all duration-150 text-white ${menuCollapsed ? 'justify-center' : 'text-left'}`}
+              onClick={logout}
+            >
+              <LogOut className="h-5 w-5" />
+              {!menuCollapsed && <span>Cerrar sesión</span>}
+            </button>
+          </div>
+          {/* Usuario */}
           {user && !menuCollapsed && (
-            <div className="p-4 border-b border-slate-800">
-              <p className="text-xs text-slate-400">Usuario:</p>
-              <p className="font-medium text-slate-200">{user.nombre}</p>
+            <div className="p-4 border-b border-blue-400 bg-blue-500">
+              <p className="text-xs text-blue-200">Usuario:</p>
+              <p className="font-medium text-white">{user.nombre}</p>
             </div>
           )}
-          <nav className="flex-1 p-2 space-y-1">
+          {/* Navegación */}
+          <nav className="flex-1 p-2 space-y-1 bg-blue-500">
             <button
-              className={`w-full flex items-center gap-3 p-2 rounded hover:bg-slate-800 transition-colors ${menuCollapsed ? 'justify-center' : 'text-left'}`}
+              className={`w-full flex items-center gap-3 p-2 rounded-xl hover:bg-blue-400 transition-all duration-150 text-white ${menuCollapsed ? 'justify-center' : 'text-left'}`}
               onClick={handleCorteCajaClick}
             >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+              <ShoppingCart className="h-5 w-5" />
               {!menuCollapsed && <span>Corte de caja</span>}
             </button>
             <button
-              className={`w-full flex items-center gap-3 p-2 rounded hover:bg-slate-800 transition-colors ${menuCollapsed ? 'justify-center' : 'text-left'}`}
-              onClick={() => handleNavigation(ADMIN_ROUTES.PRESUPUESTOS_ALTER)}
+              className={`w-full flex items-center gap-3 p-2 rounded-xl hover:bg-blue-400 transition-all duration-150 text-white ${menuCollapsed ? 'justify-center' : 'text-left'}`}
+              onClick={handlePresupuestos}
             >
-              <BookCopy className="w-5 h-5 text-white" />
-              {!menuCollapsed && <span>Cotizar</span>}
+              <BookCopy className="w-5 h-5" />
+              {!menuCollapsed && <span>Presupuestos</span>}
             </button>
             <button
-              className={`w-full flex items-center gap-3 p-2 rounded hover:bg-slate-800 transition-colors ${menuCollapsed ? 'justify-center' : 'text-left'}`}
+              className={`w-full flex items-center gap-3 p-2 rounded-xl hover:bg-blue-400 transition-all duration-150 text-white ${menuCollapsed ? 'justify-center' : 'text-left'}`}
               onClick={() => setShowCarrito(true)}
             >
               <div className="relative">
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+                <ShoppingCart className="h-5 w-5" />
                 {carritoItems.length > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-blue-400 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
+                  <span className="absolute -top-2 -right-2 bg-white text-blue-500 rounded-full w-4 h-4 flex items-center justify-center text-xs animate-bounce">
                     {carritoItems.length}
                   </span>
                 )}
@@ -233,16 +250,8 @@ const PanelVentas = () => {
               {!menuCollapsed && <span>Carrito {carritoItems.length > 0 && `(${carritoItems.length})`}</span>}
             </button>
           </nav>
-          <div className="p-2 mt-auto">
-            <button
-              className={`w-full flex items-center gap-3 p-2 rounded hover:bg-slate-800 transition-colors text-red-400 ${menuCollapsed ? 'justify-center' : 'text-left'}`}
-              onClick={logout}
-            >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              {!menuCollapsed && <span>Cerrar sesión</span>}
-            </button>
+          <div className="px-7 py-4 text-xs text-blue-100 border-t border-blue-400 bg-blue-500 text-center">
+            &copy; {new Date().getFullYear()} La Burbuja Cajero
           </div>
         </aside>
 
@@ -252,7 +261,7 @@ const PanelVentas = () => {
           <div className={`w-full lg:w-2/3 xl:w-3/4 flex-shrink-0 overflow-y-auto ${showCarrito ? 'hidden lg:block' : 'block'}`}>
             <div className="p-3 md:p-4 lg:p-6 space-y-4">
               <div className="flex flex-col sm:flex-row justify-between gap-2 sm:items-center">
-                <h1 className="text-lg md:text-xl font-bold text-slate-100">Módulo de ventas</h1>
+                <h1 className="text-lg md:text-xl font-bold text-blue-300 drop-shadow animate-fade-in">Módulo de ventas</h1>
                 <div className="flex items-center gap-2">
                   <button
                     className={`flex text-xs md:text-sm items-center gap-1 ${viewMode === "cards" ? "bg-blue-700" : "bg-slate-700"
@@ -275,7 +284,7 @@ const PanelVentas = () => {
               </div>
 
               <Input
-                className="w-full"
+                className="w-full border-b-4 border-blue-700 focus:border-blue-900 transition-all"
                 placeholder="Buscar producto..."
                 id="search"
                 name="search"
@@ -285,7 +294,7 @@ const PanelVentas = () => {
                 onChange={handleSearch}
               />
 
-              <Card className="w-full bg-slate-900/80 p-2 md:p-4">
+              <Card className="w-full bg-slate-900/80 p-2 md:p-4 shadow-lg">
                 <CardHead className="flex items-center justify-start gap-2 flex-wrap overflow-x-auto pb-2">
                   <Badge
                     key="todas"
@@ -320,7 +329,7 @@ const PanelVentas = () => {
 
                 <CardContent className="mt-2 md:mt-4 overflow-y-auto">
                   {productosFiltrados.length === 0 ? (
-                    <div className="text-center py-8 text-slate-400">
+                    <div className="text-center py-8 text-slate-400 animate-fade-in">
                       {searchTerm || selectedCategoria !== null
                         ? "No se encontraron productos que coincidan con la búsqueda"
                         : "No hay productos disponibles"}
@@ -351,7 +360,7 @@ const PanelVentas = () => {
                         </thead>
                         <tbody>
                           {productosFiltrados.map(producto => (
-                            <tr key={producto.productoId} className="border-b border-slate-800 hover:bg-slate-800/40">
+                            <tr key={producto.productoId} className="border-b border-slate-800 hover:bg-slate-800/40 transition-colors">
                               <td className="px-2 md:px-4 py-2 md:py-3">
                                 <div className="flex flex-col">
                                   <span>{producto.nombre}</span>
@@ -382,7 +391,7 @@ const PanelVentas = () => {
                                   {isInCart(producto.productoId) ? (
                                     <>
                                       <button
-                                        className="bg-red-500 hover:bg-red-600 px-2 md:px-3 py-1 rounded-md text-xs"
+                                        className="bg-red-500 hover:bg-red-600 px-2 md:px-3 py-1 rounded-md text-xs transition-all"
                                         onClick={() => removeFromCart(producto.productoId)}
                                       >
                                         Quitar
@@ -393,16 +402,17 @@ const PanelVentas = () => {
                                     </>
                                   ) : (
                                     <button
-                                      className="bg-blue-500 hover:bg-blue-600 px-2 md:px-3 py-1 rounded-md text-xs"
+                                      className="bg-blue-500 hover:bg-blue-600 px-2 md:px-3 py-1 rounded-md text-xs transition-all"
                                       onClick={() => {
                                         handleAddToCart(producto, undefined);
                                       }}
                                       disabled={producto.stock <= 0 || loading}
                                     >
-                                      {producto.tipo === "Liquido" ?
-                                        <span className="hidden sm:inline">Seleccionar cantidad</span> :
+                                      {producto.tipo === "Liquido" ? (
+                                        <span className="hidden sm:inline">Seleccionar cantidad</span>
+                                      ) : (
                                         <span className="hidden sm:inline">Agregar</span>
-                                      }
+                                      )}
                                       <span className="sm:hidden">+</span>
                                     </button>
                                   )}
@@ -449,15 +459,13 @@ const PanelVentas = () => {
         {/* Indicador flotante de carrito para móvil */}
         {!showCarrito && carritoItems.length > 0 && (
           <button
-            className="fixed bottom-4 right-4 lg:hidden bg-blue-500 text-white rounded-full p-3 shadow-lg z-50"
+            className="fixed bottom-4 right-4 lg:hidden bg-blue-500 text-white rounded-full p-3 shadow-lg z-50 animate-bounce"
             onClick={() => setShowCarrito(true)}
           >
-            <div className="absolute -top-2 -right-2 bg-blue-400 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+            <div className="absolute -top-2 -right-2 bg-white text-blue-500 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
               {carritoItems.length}
             </div>
-            <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
+            <ShoppingCart className="h-6 w-6" />
           </button>
         )}
 
@@ -472,6 +480,6 @@ const PanelVentas = () => {
       </div>
     </section>
   );
-}
+};
 
 export default PanelVentas;

@@ -180,7 +180,7 @@ const Usuarios = () => {
     };
 
     return (
-        <section className="flex flex-col w-full h-full p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+        <section className="flex flex-col w-full h-full p-4 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 min-h-screen">
             {/* Modal de usuario */}
             <ModalTemplate
                 isOpen={isOpen}
@@ -312,8 +312,8 @@ const Usuarios = () => {
             {/* Encabezado */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-blue-900 dark:text-blue-200 tracking-tight mb-1">Gestión de Usuarios</h1>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-1">Gestión de Usuarios</h1>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">
                         Administra los usuarios del sistema, roles y accesos.
                     </p>
                 </div>
@@ -328,7 +328,7 @@ const Usuarios = () => {
                     />
                     <Button
                         onClick={handleOpenCreateModal}
-                        className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold shadow"
+                        className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white font-semibold shadow"
                     >
                         <Plus className="w-5 h-5" />
                         Nuevo Usuario
@@ -337,10 +337,10 @@ const Usuarios = () => {
             </div>
 
             {/* Tabla de usuarios */}
-            <div className="rounded-xl border border-blue-200 dark:border-gray-700 shadow-lg bg-white dark:bg-gray-900 overflow-auto">
+            <div className="rounded-xl border border-gray-300 dark:border-gray-700 shadow-lg bg-white dark:bg-gray-900 overflow-auto">
                 <table className="w-full min-w-[900px] text-sm">
                     <thead>
-                        <tr className="bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-100">
+                        <tr className="bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                             <th className="h-12 px-4 text-left font-bold">Usuario</th>
                             <th className="h-12 px-4 text-left font-bold">Rol</th>
                             <th className="h-12 px-4 text-left font-bold">Email</th>
@@ -355,30 +355,30 @@ const Usuarios = () => {
                             usuariosFiltrados.map((usuario) => (
                                 <tr
                                     key={usuario.id}
-                                    className="transition-colors even:bg-blue-50/50 dark:even:bg-blue-900/20 hover:bg-blue-100/60 dark:hover:bg-blue-900/40"
+                                    className="transition-colors even:bg-gray-100 dark:even:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
                                 >
                                     <td className="p-4 align-middle">
                                         <div>
-                                            <div className="font-semibold">{usuario.nombre}</div>
-                                            <div className="text-xs text-gray-500">@{usuario.username}</div>
+                                            <div className="font-semibold text-gray-900 dark:text-white">{usuario.nombre}</div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">@{usuario.username}</div>
                                         </div>
                                     </td>
                                     <td className="p-4 align-middle">
                                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
-                                            ${usuario.rol === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                                                usuario.rol === 'CAJERO' ? 'bg-indigo-100 text-indigo-800' :
-                                                    usuario.rol === 'VENDEDOR' ? 'bg-blue-100 text-blue-800' :
-                                                        'bg-gray-100 text-gray-800'
+                                            ${usuario.rol === 'ADMIN' ? 'bg-gray-800 text-white' :
+                                                usuario.rol === 'CAJERO' ? 'bg-blue-700 text-white' :
+                                                    usuario.rol === 'VENDEDOR' ? 'bg-green-700 text-white' :
+                                                        'bg-gray-400 text-white'
                                             }`}>
                                             {usuario.rol}
                                         </span>
                                     </td>
-                                    <td className="p-4 align-middle">{usuario.email}</td>
-                                    <td className="p-4 align-middle">{usuario.sucursal || 'N/A'}</td>
-                                    <td className="p-4 align-middle">{formatLastAccess(usuario.ultimoAcceso)}</td>
+                                    <td className="p-4 align-middle text-gray-800 dark:text-gray-100">{usuario.email}</td>
+                                    <td className="p-4 align-middle text-gray-800 dark:text-gray-100">{usuario.sucursal || 'N/A'}</td>
+                                    <td className="p-4 align-middle text-gray-700 dark:text-gray-200">{formatLastAccess(usuario.ultimoAcceso)}</td>
                                     <td className="p-4 align-middle">
                                         <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
-                                            ${usuario.activo ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
+                                            ${usuario.activo ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
                                             {usuario.activo ? (
                                                 <>
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3 mr-1">

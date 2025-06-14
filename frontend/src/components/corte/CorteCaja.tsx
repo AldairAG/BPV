@@ -8,7 +8,7 @@ import { toast } from 'react-hot-toast';
 import useUser from '../../hooks/useUser';
 import {EyeIcon, Printer } from 'lucide-react';
 import ModalTemplate, { useModal } from '../modal/ModalTemplate';
-import TicketPrint from '../../service/TicketPrint';
+import TicketPrint from "../../service/TicketPrint";
 
 interface CorteCajaProps {
   onClose: () => void;
@@ -341,7 +341,35 @@ const CorteCaja = ({ onClose }: CorteCajaProps) => {
           </div>
           <Button
             className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 mt-4 w-full"
-            onClick={() => window.print()}
+            onClick={() => {
+              const printContents = document.getElementById("ticket-area")?.innerHTML;
+              if (printContents) {
+                const printWindow = window.open('', '', 'height=600,width=400');
+                if (printWindow) {
+                  printWindow.document.write(`
+                    <html>
+                      <head>
+                        <title>Imprimir Ticket</title>
+                        <style>
+                          body { background: #fff; color: #000; margin: 0; }
+                          .ticket-content { width: 180px !important; min-width: 180px !important; max-width: 180px !important; margin: 0 auto; }
+                          @media print { @page { margin: 0; } }
+                        </style>
+                      </head>
+                      <body>
+                        ${printContents}
+                      </body>
+                    </html>
+                  `);
+                  printWindow.document.close();
+                  printWindow.focus();
+                  setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                  }, 300);
+                }
+              }
+            }}
             disabled={ventaSeleccionada.venta.anulada}
           >
             <Printer className="h-4 w-4" />
@@ -365,26 +393,6 @@ const CorteCaja = ({ onClose }: CorteCajaProps) => {
             {renderDetalleVenta()}
           </div>
         </ModalTemplate>
-
-        {/* Estilos para la impresión del ticket */}
-        <style>{`
-          @media print {
-            body * {
-              visibility: hidden !important;
-            }
-            #ticket-area, #ticket-area * {
-              visibility: visible !important;
-            }
-            #ticket-area {
-              position: absolute;
-              left: 0;
-              top: 0;
-              width: 100vw;
-              background: #fff;
-              z-index: 9999;
-            }
-          }
-        `}</style>
 
         <div className="mb-6">
           <h3 className="text-lg font-medium">Corte de Caja - {fechaFormateada}</h3>

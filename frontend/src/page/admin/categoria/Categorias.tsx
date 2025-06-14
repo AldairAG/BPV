@@ -84,7 +84,7 @@ const Categorias = () => {
     };
 
     return (
-        <section className="flex flex-col w-full h-full p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+        <section className="flex flex-col w-full h-full p-4 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 min-h-screen">
             {/* Modal de categoría */}
             <ModalTemplate
                 isOpen={isOpen}
@@ -139,7 +139,7 @@ const Categorias = () => {
                                 <Button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="mt-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 rounded shadow"
+                                    className="mt-2 bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 rounded shadow"
                                 >
                                     {isSubmitting ? "Guardando..." : "Guardar"}
                                 </Button>
@@ -152,15 +152,15 @@ const Categorias = () => {
             {/* Encabezado */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-blue-900 dark:text-blue-200 tracking-tight mb-1">Gestión de Categorías</h1>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-1">Gestión de Categorías</h1>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">
                         Organiza tus productos por categorías y colores personalizados.
                     </p>
                 </div>
                 <div className="flex gap-2">
                     <Button
                         onClick={handleOpenCreateModal}
-                        className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold shadow"
+                        className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white font-semibold shadow"
                     >
                         <Plus className="w-5 h-5" />
                         Nueva Categoría
@@ -169,10 +169,10 @@ const Categorias = () => {
             </div>
 
             {/* Tabla de categorías */}
-            <div className="rounded-xl border border-blue-200 dark:border-gray-700 shadow-lg bg-white dark:bg-gray-900 overflow-auto">
+            <div className="rounded-xl border border-gray-300 dark:border-gray-700 shadow-lg bg-white dark:bg-gray-900 overflow-auto">
                 <table className="w-full min-w-[600px] text-sm">
                     <thead>
-                        <tr className="bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-100">
+                        <tr className="bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                             <th className="h-12 px-4 text-left font-bold">Categoría</th>
                             <th className="h-12 px-4 text-left font-bold">Color</th>
                             <th className="h-12 px-4 text-right font-bold">Acciones</th>
@@ -183,16 +183,16 @@ const Categorias = () => {
                             categorias.map((categoria) => (
                                 <tr
                                     key={categoria.categoriaId}
-                                    className="transition-colors even:bg-blue-50/50 dark:even:bg-blue-900/20 hover:bg-blue-100/60 dark:hover:bg-blue-900/40"
+                                    className="transition-colors even:bg-gray-100 dark:even:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
                                 >
-                                    <td className="p-4 align-middle font-semibold">{categoria.nombre}</td>
+                                    <td className="p-4 align-middle font-semibold text-gray-900 dark:text-white">{categoria.nombre}</td>
                                     <td className="p-4 align-middle">
                                         <div className="flex items-center gap-2">
                                             <div
                                                 className="w-6 h-6 rounded-full border border-gray-300 dark:border-gray-700"
                                                 style={{ backgroundColor: categoria.color }}
                                             ></div>
-                                            <span className="text-xs text-gray-500">{categoria.color}</span>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">{categoria.color}</span>
                                         </div>
                                     </td>
                                     <td className="p-4 align-middle text-right">

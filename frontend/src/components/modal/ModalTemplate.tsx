@@ -43,30 +43,35 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
 
     return (
         <div
-            className="fixed inset-0 bg-gray-900/80 flex items-center justify-center z-50 px-2"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-blue-900/70 backdrop-blur-sm px-2 py-4"
             onClick={handleBackdropClick}
         >
             <div
-                className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl mx-auto p-4 sm:p-6 shadow-lg relative
-                max-h-[90vh] overflow-y-auto"
+                className="
+                    relative w-full max-w-lg md:max-w-xl lg:max-w-2xl
+                    bg-gray-800
+                    rounded-2xl shadow-2xl border border-blue-400
+                    p-4 sm:p-8
+                    max-h-[90vh] overflow-y-auto
+                    animate-fade-in
+                    text-white
+                "
             >
                 <button
                     onClick={onClose}
-                    className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                    className="absolute top-4 right-4 text-white hover:text-blue-200 bg-blue-700 hover:bg-blue-600 rounded-full p-1 transition-colors shadow"
                     aria-label="Cerrar modal"
                 >
                     <XMarkIcon className="h-6 w-6" />
                 </button>
 
                 {title && (
-                    <div className="mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                            {title}
-                        </h3>
+                    <div className="mb-6 pb-2 border-b border-blue-400">
+                        <h3 className="text-2xl font-bold text-white tracking-wide">{title}</h3>
                     </div>
                 )}
 
-                <div className="mt-2">
+                <div className="mt-2 text-white">
                     {children}
                 </div>
             </div>

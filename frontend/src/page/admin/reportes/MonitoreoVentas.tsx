@@ -177,167 +177,145 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
     }
   }
 
-  // Renderizar el contenido del modal de detalle de venta
-   const renderDetalleVenta = () => {
+  // --- ESTILO DETALLE DE VENTA ---
+  const renderDetalleVenta = () => {
     if (!ventaSeleccionada) return null;
 
     return (
-      <>
+      <div className="space-y-6">
         {ventaSeleccionada.venta.anulada && (
-          <div className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 p-3 rounded-md mb-4 text-sm">
+          <div className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200 p-3 rounded-lg mb-2 text-sm font-semibold flex items-center gap-2 shadow">
+            <span className="inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             Esta venta ha sido anulada
           </div>
         )}
 
-        <div className="mb-4 grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-800 dark:text-gray-100">
           <div>
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Fecha y Hora</h4>
-            <p className="text-sm">
+            <h4 className="text-xs font-semibold text-blue-600 uppercase">Fecha y Hora</h4>
+            <p className="text-base font-medium">
               {new Date(ventaSeleccionada.venta.fecha).toLocaleDateString()}
-              <span className="ml-2 text-gray-600 dark:text-gray-400">
-                {ventaSeleccionada.venta.hora}
-              </span>
+              <span className="ml-2 text-blue-500 font-mono">{ventaSeleccionada.venta.hora}</span>
             </p>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Usuario</h4>
-            <p className="text-sm">{ventaSeleccionada?.usuario?.nombre || "Desconocido"}</p>
+            <h4 className="text-xs font-semibold text-blue-600 uppercase">Usuario</h4>
+            <p className="text-base font-medium">{ventaSeleccionada?.usuario?.nombre || "Desconocido"}</p>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">IVA</h4>
-            <p className="text-sm">{ventaSeleccionada.venta.conIva ? 'Incluido' : 'No incluido'}</p>
+            <h4 className="text-xs font-semibold text-blue-600 uppercase">IVA</h4>
+            <p className="text-base">{ventaSeleccionada.venta.conIva ? 'Incluido' : 'No incluido'}</p>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Total</h4>
-            <p className="text-sm font-bold">{formatearPrecio(ventaSeleccionada.venta.total)}</p>
+            <h4 className="text-xs font-semibold text-blue-600 uppercase">Total</h4>
+            <p className="text-lg font-bold text-blue-700">{formatearPrecio(ventaSeleccionada.venta.total)}</p>
           </div>
           <div>
-            <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">Cliente</h4>
-            <p className="text-sm">
+            <h4 className="text-xs font-semibold text-blue-600 uppercase">Cliente</h4>
+            <p className="text-base font-bold">
               {ventaSeleccionada.cliente ? (
-                <span className="font-bold">
-                  {ventaSeleccionada.cliente.nombre || "Sin nombre"}
-                </span>
+                ventaSeleccionada.cliente.nombre || "Sin nombre"
               ) : (
-                <span className="text-gray-500 dark:text-gray-400">- - -</span>
+                <span className="text-gray-400">- - -</span>
               )}
             </p>
           </div>
         </div>
 
-        <h4 className="font-medium mb-2 text-gray-700 dark:text-gray-300">Productos Vendidos</h4>
-        <div className="max-h-80 overflow-y-auto border dark:border-gray-700 rounded-md">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-100 dark:bg-gray-800 sticky top-0">
-              <tr>
-                <th scope="col" className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                  Producto
-                </th>
-                <th scope="col" className="px-4 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
-                  Cant.
-                </th>
-                <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400">
-                  Precio
-                </th>
-                <th scope="col" className="px-4 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400">
-                  Subtotal
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {ventaSeleccionada?.venta?.productosVendidos?.length > 0 ? (
-                ventaSeleccionada.venta.productosVendidos.map((productoVendido, index) => (
-                  <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-4 py-2 whitespace-nowrap text-xs">
-                      <div className="font-medium">
+        <div>
+          <h4 className="font-semibold mb-2 text-blue-700">Productos Vendidos</h4>
+          <div className="max-h-80 overflow-y-auto border dark:border-gray-700 rounded-lg shadow">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-800 text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-900 sticky top-0 z-10">
+                <tr>
+                  <th className="px-4 py-2 text-left font-bold text-gray-700 dark:text-gray-200">Producto</th>
+                  <th className="px-4 py-2 text-center font-bold text-gray-700 dark:text-gray-200">Cant.</th>
+                  <th className="px-4 py-2 text-right font-bold text-gray-700 dark:text-gray-200">Precio</th>
+                  <th className="px-4 py-2 text-right font-bold text-gray-700 dark:text-gray-200">Subtotal</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-950 divide-y divide-gray-100 dark:divide-gray-900">
+                {ventaSeleccionada?.venta?.productosVendidos?.length > 0 ? (
+                  ventaSeleccionada.venta.productosVendidos.map((productoVendido, index) => (
+                    <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-900/60 transition">
+                      <td className="px-4 py-2 whitespace-nowrap font-medium">
                         {productoVendido.productoVendidoId != null
                           ? findNombreById(productoVendido.productoVendidoId) || "Producto desconocido"
                           : "Producto desconocido"}
-                      </div>
-                      {typeof productoVendido.descuento === "number" && productoVendido.descuento > 0 ? (
-                        <div className="text-xs text-green-600 dark:text-green-400">
-                          Descuento: {productoVendido.descuento}%
-                        </div>
-                      ) : null}
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-xs text-center">
-                      {productoVendido.cantidad}
-                      {productoVendido.producto?.tipo === "Líquido"
-                        ? " lt"
-                        : productoVendido.producto?.tipo === "Sólido"
-                          ? " kg"
-                          : " uds"}
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-xs text-right">
-                      {formatearPrecio(productoVendido.precioUnitario)}
-                    </td>
-                    <td className="px-4 py-2 whitespace-nowrap text-xs text-right font-medium">
-                      {formatearPrecio(productoVendido.subtotal)}
+                        {typeof productoVendido.descuento === "number" && productoVendido.descuento > 0 && (
+                          <span className="ml-2 text-xs text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-900 px-2 py-0.5 rounded-full font-semibold">
+                            -{productoVendido.descuento}%
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap text-center">{productoVendido.cantidad}
+                        <span className="text-xs text-gray-400">
+                          {productoVendido.producto?.tipo === "Líquido"
+                            ? " lt"
+                            : productoVendido.producto?.tipo === "Sólido"
+                              ? " kg"
+                              : " uds"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 whitespace-nowrap text-right">{formatearPrecio(productoVendido.precioUnitario)}</td>
+                      <td className="px-4 py-2 whitespace-nowrap text-right font-semibold">{formatearPrecio(productoVendido.subtotal)}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-4 text-center text-gray-400">
+                      No hay productos en esta venta
                     </td>
                   </tr>
-                ))
-              ) : (
+                )}
+              </tbody>
+              <tfoot className="bg-gray-100 dark:bg-gray-900">
                 <tr>
-                  <td colSpan={4} className="px-4 py-4 text-center text-gray-500 dark:text-gray-400">
-                    No hay productos en esta venta
-                  </td>
-                </tr>
-              )}
-            </tbody>
-            <tfoot className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <td colSpan={2} className="px-4 py-2 whitespace-nowrap"></td>
-                <td className="px-4 py-2 whitespace-nowrap text-xs text-right font-medium">
-                  Subtotal:
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap text-xs text-right font-medium">
-                  {formatearPrecio(
-                    ventaSeleccionada.venta.productosVendidos?.reduce(
-                      (total, p) => total + (p.subtotal || 0), 0
-                    ) || 0
-                  )}
-                </td>
-              </tr>
-              {ventaSeleccionada.venta.conIva && (
-                <tr>
-                  <td colSpan={2} className="px-4 py-2 whitespace-nowrap"></td>
-                  <td className="px-4 py-2 whitespace-nowrap text-xs text-right font-medium">
-                    IVA (16%):
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap text-xs text-right font-medium">
+                  <td colSpan={2}></td>
+                  <td className="px-4 py-2 text-right font-semibold">Subtotal:</td>
+                  <td className="px-4 py-2 text-right font-semibold">
                     {formatearPrecio(
-                      ventaSeleccionada.venta.total - (
-                        ventaSeleccionada.venta.productosVendidos?.reduce(
-                          (total, p) => total + (p.subtotal || 0), 0
-                        ) || 0
-                      )
+                      ventaSeleccionada.venta.productosVendidos?.reduce(
+                        (total, p) => total + (p.subtotal || 0), 0
+                      ) || 0
                     )}
                   </td>
                 </tr>
-              )}
-              <tr>
-                <td colSpan={2} className="px-4 py-2 whitespace-nowrap"></td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm text-right font-bold">
-                  Total:
-                </td>
-                <td className="px-4 py-2 whitespace-nowrap text-sm text-right font-bold">
-                  {formatearPrecio(ventaSeleccionada.venta.total)}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+                {ventaSeleccionada.venta.conIva && (
+                  <tr>
+                    <td colSpan={2}></td>
+                    <td className="px-4 py-2 text-right font-semibold">IVA (16%):</td>
+                    <td className="px-4 py-2 text-right font-semibold">
+                      {formatearPrecio(
+                        ventaSeleccionada.venta.total - (
+                          ventaSeleccionada.venta.productosVendidos?.reduce(
+                            (total, p) => total + (p.subtotal || 0), 0
+                          ) || 0
+                        )
+                      )}
+                    </td>
+                  </tr>
+                )}
+                <tr>
+                  <td colSpan={2}></td>
+                  <td className="px-4 py-2 text-right text-base font-bold">Total:</td>
+                  <td className="px-4 py-2 text-right text-base font-bold text-blue-700">{formatearPrecio(ventaSeleccionada.venta.total)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
         </div>
 
         {/* Área del ticket a imprimir */}
-        <div id="ticket-area" style={{ marginTop: 24 }}>
+        <div id="ticket-area" className="mt-6">
           {ventaSeleccionada && (
             <TicketPrint venta={getVentaParaTicket(ventaSeleccionada)} />
           )}
         </div>
 
-        <div className="mt-4 text-right">
+        <div className="flex justify-end mt-6">
           <Button
-            className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+            className="bg-gradient-to-r from-blue-700 to-gray-800 hover:from-blue-800 hover:to-gray-900 text-white font-semibold flex items-center gap-2 px-6 py-2 rounded-lg shadow"
             onClick={() => window.print()}
             disabled={ventaSeleccionada.venta.anulada}
           >
@@ -345,7 +323,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
             Imprimir Ticket
           </Button>
         </div>
-      </>
+      </div>
     );
   };
 
@@ -373,21 +351,21 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
   };
 
   return (
-    <Card className="bg-white dark:bg-gray-800 w-full">
+    <Card className="bg-white dark:bg-gray-900 w-full shadow-xl border border-gray-200 dark:border-gray-800">
       <CardHead>
-        <CardTittle className="flex items-center">
+        <CardTittle className="flex items-center text-gray-800 dark:text-gray-100">
           <FileTextIcon className="h-5 w-5 mr-2" />
           Monitoreo de Ventas
         </CardTittle>
       </CardHead>
 
-      <CardContent className="flex flex-col space-y-4">
+      <CardContent className="flex flex-col space-y-6">
         {/* Filtros */}
         <div className="mb-4 grid md:grid-cols-3 sm:grid-cols-2 gap-4 items-center sm:items-end">
           <div className="w-full">
             <label
               htmlFor="cliente-filter"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1"
             >
               Filtrar por cliente
             </label>
@@ -396,7 +374,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                 id="cliente-filter"
                 value={filtroCliente}
                 onChange={handleFiltroClienteChange}
-                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white"
+                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-900 dark:text-white"
               >
                 <option value="">Todos los clientes</option>
                 {clientesUnicos.map(cliente => (
@@ -411,7 +389,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
           <div className="w-full">
             <label
               htmlFor="hora-inicio-filter"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1"
             >
               Hora inicio
             </label>
@@ -420,14 +398,14 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
               type="time"
               value={filtroHoraInicio}
               onChange={handleFiltroHoraInicioChange}
-              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white"
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-900 dark:text-white"
             />
           </div>
 
           <div className="w-full">
             <label
               htmlFor="hora-fin-filter"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              className="block text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1"
             >
               Hora fin
             </label>
@@ -436,7 +414,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
               type="time"
               value={filtroHoraFin}
               onChange={handleFiltroHoraFinChange}
-              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-700 dark:text-white"
+              className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md dark:bg-gray-900 dark:text-white"
             />
           </div>
 
@@ -448,53 +426,39 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                 setFiltroHoraFin("");
                 setVentasFiltradas(ventasOriginales);
               }}
-              className="h-full bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              className="h-full bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 rounded-md font-semibold"
             >
               Limpiar filtros
             </Button>
           </div>
 
-          <div className="ml-auto text-sm text-gray-500 dark:text-gray-400 sm:col-span-2 md:col-span-1">
+          <div className="ml-auto text-sm text-gray-600 dark:text-gray-300 sm:col-span-2 md:col-span-1">
             Mostrando {ventasFiltradas.length} de {ventasOriginales.length} ventas
           </div>
         </div>
 
         {loading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="w-12 h-12 border-4 border-t-blue-500 border-b-blue-700 rounded-full animate-spin"></div>
+            <div className="w-12 h-12 border-4 border-t-blue-500 border-b-gray-700 rounded-full animate-spin"></div>
           </div>
         ) : (
-          <div className="w-full overflow-x-auto">
-            <table className="w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-100 dark:bg-gray-800">
+          <div className="w-full overflow-x-auto rounded-lg shadow">
+            <table className="w-full divide-y divide-gray-200 dark:divide-gray-800 text-sm">
+              <thead className="bg-gray-100 dark:bg-gray-900">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    ID
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Fecha
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Usuario
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Cliente
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Estado
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Acción
-                  </th>
+                  <th className="px-6 py-3 text-left font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">ID</th>
+                  <th className="px-6 py-3 text-left font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Fecha</th>
+                  <th className="px-6 py-3 text-left font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Usuario</th>
+                  <th className="px-6 py-3 text-left font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Cliente</th>
+                  <th className="px-6 py-3 text-right font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Total</th>
+                  <th className="px-6 py-3 text-center font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Estado</th>
+                  <th className="px-6 py-3 text-center font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">Acción</th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="bg-white dark:bg-gray-950 divide-y divide-gray-100 dark:divide-gray-900">
                 {ventasFiltradas.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                    <td colSpan={7} className="px-6 py-4 text-center text-gray-400 dark:text-gray-500">
                       No se encontraron ventas con los filtros seleccionados
                     </td>
                   </tr>
@@ -502,28 +466,20 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                   ventasFiltradas.map((ventaResponse) => (
                     <tr
                       key={ventaResponse.venta.ventaId}
-                      className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${ventaResponse.venta.anulada ? 'text-gray-400 dark:text-gray-500' : ''}`}
+                      className={`hover:bg-gray-50 dark:hover:bg-gray-900/60 transition ${ventaResponse.venta.anulada ? 'text-gray-400 dark:text-gray-700' : ''}`}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        #{ventaResponse.venta.ventaId}
+                      <td className="px-6 py-4 whitespace-nowrap font-semibold">#{ventaResponse.venta.ventaId}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="font-medium">{ventaResponse.venta.fecha}</div>
+                        <div className="text-xs text-blue-500">{ventaResponse.venta.hora}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <div className="font-medium">
-                          {ventaResponse.venta.fecha}
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
-                          {ventaResponse.venta.hora}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {ventaResponse?.usuario?.nombre || 'Desconocido'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <td className="px-6 py-4 whitespace-nowrap">{ventaResponse?.usuario?.nombre || 'Desconocido'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
                         {ventaResponse?.cliente?.nombre ||
-                          <span className="text-gray-400 dark:text-gray-500">Sin cliente</span>
+                          <span className="text-gray-400">Sin cliente</span>
                         }
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-right font-semibold">
                         {ventaResponse.venta.anulada ? (
                           <span className="line-through">{formatearPrecio(ventaResponse.venta.total)}</span>
                         ) : (
@@ -541,9 +497,9 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                           </span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm">
+                      <td className="px-6 py-4 whitespace-nowrap text-center">
                         <button
-                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                          className="text-blue-700 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition"
                           onClick={() => verDetalleVenta(ventaResponse)}
                         >
                           <EyeIcon className="h-4 w-4" />

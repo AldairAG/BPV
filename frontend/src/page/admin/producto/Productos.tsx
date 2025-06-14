@@ -219,19 +219,19 @@ const Productos = () => {
     };
 
     return (
-        <section className="flex flex-col w-full h-full p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 min-h-screen">
+        <section className="flex flex-col w-full h-full p-4 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 min-h-screen">
             {/* Encabezado */}
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-extrabold text-blue-900 dark:text-blue-200 tracking-tight mb-1">Gestión de Productos</h1>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-1">Gestión de Productos</h1>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">
                         Administra tu catálogo, controla stock y precios de manera eficiente.
                     </p>
                 </div>
                 <div className="flex gap-2">
                     <Input
                         id="search"
-                        className="w-64"
+                        className="w-64 border-b-2 border-gray-400 focus:border-gray-600 transition-all text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-white dark:bg-gray-800"
                         placeholder="Buscar productos..."
                         type="search"
                         value={searchTerm}
@@ -239,7 +239,7 @@ const Productos = () => {
                     />
                     <Button
                         onClick={handleOpenCreateModal}
-                        className="flex items-center gap-2 bg-blue-700 hover:bg-blue-800 text-white font-semibold shadow"
+                        className="flex items-center gap-2 bg-gray-800 hover:bg-gray-900 text-white font-semibold shadow"
                     >
                         <Plus className="w-5 h-5" />
                         Nuevo Producto
@@ -531,10 +531,10 @@ const Productos = () => {
             </ModalTemplate>
 
             {/* Tabla de productos */}
-            <div className="rounded-xl border border-blue-200 dark:border-gray-700 shadow-lg bg-white dark:bg-gray-900 overflow-auto">
+            <div className="rounded-xl border border-gray-300 dark:border-gray-700 shadow-lg bg-white dark:bg-gray-900 overflow-auto">
                 <table className="w-full min-w-[900px] text-sm">
                     <thead>
-                        <tr className="bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-100">
+                        <tr className="bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
                             <th className="h-12 px-4 text-left font-bold">Producto</th>
                             <th className="h-12 px-4 text-left font-bold">Categoría</th>
                             <th className="h-12 px-4 text-left font-bold">Tipo</th>
@@ -549,13 +549,13 @@ const Productos = () => {
                             productosFiltrados.map((producto, idx) => (
                                 <tr
                                     key={producto.productoId}
-                                    className={`transition-colors ${idx % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-blue-50 dark:bg-gray-800"} hover:bg-blue-50/70 dark:hover:bg-blue-900/40`}
+                                    className={`transition-colors ${idx % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50 dark:bg-gray-800"} hover:bg-gray-200/70 dark:hover:bg-gray-800/40`}
                                 >
                                     <td className="p-4 align-middle">
                                         <div>
-                                            <p className="font-semibold">{producto.nombre}</p>
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">{producto.nombre}</p>
                                             {producto.codigoBarras && (
-                                                <p className="text-xs text-gray-500">Código: {producto.codigoBarras}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">Código: {producto.codigoBarras}</p>
                                             )}
                                         </div>
                                     </td>
@@ -567,17 +567,17 @@ const Productos = () => {
                                                         className="w-3 h-3 rounded-full inline-block"
                                                         style={{ backgroundColor: producto.categoria.color }}
                                                     ></span>
-                                                    <span className="text-xs font-medium">{producto.categoria.nombre}</span>
+                                                    <span className="text-xs font-medium text-gray-800 dark:text-gray-200">{producto.categoria.nombre}</span>
                                                 </>
                                             )}
                                         </div>
                                     </td>
                                     <td className="p-4 align-middle">
-                                        <span className="px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 text-xs font-semibold">
+                                        <span className="px-2 py-1 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-xs font-semibold">
                                             {producto.tipo || "Unidad"}
                                         </span>
                                     </td>
-                                    <td className="p-4 align-middle text-right font-bold text-blue-700 dark:text-blue-200">
+                                    <td className="p-4 align-middle text-right font-bold text-gray-800 dark:text-gray-200">
                                         {formatPrice(producto.precio || 0)}
                                     </td>
                                     <td className="p-4 align-middle text-right">
@@ -586,7 +586,7 @@ const Productos = () => {
                                                 ? producto.stock
                                                 : producto.stock.toFixed(2)}
                                         </span>
-                                        <span className="text-xs text-gray-500 ml-1">
+                                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
                                             {producto.tipo === 'Unidad' ? 'pz' : producto.tipo === 'Líquido' ? 'lt' : 'pz'}
                                         </span>
                                         {producto.stock <= producto.stockMinimo && (
@@ -601,7 +601,7 @@ const Productos = () => {
                                                 {producto.descuentos
                                                     .filter(d => d > 0)
                                                     .map((descuento, idx) => (
-                                                        <span key={idx} className="text-xs text-green-600 font-semibold bg-green-50 rounded px-2">
+                                                        <span key={idx} className="text-xs text-green-700 dark:text-green-300 font-semibold bg-green-50 dark:bg-green-900 rounded px-2">
                                                             {descuento}%
                                                         </span>
                                                     ))}

@@ -11,6 +11,7 @@ services:
       DB_URL: jdbc:postgresql://200.58.100.28:5432/db_lbf
       DB_USER_NAME: postgres
       DB_PASSWORD: 1234
+      TZ: Etc/GMT+6
     restart: always
 
   frontend:

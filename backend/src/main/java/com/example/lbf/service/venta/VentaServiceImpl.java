@@ -34,9 +34,11 @@ public class VentaServiceImpl implements VentaService {
 
         Venta venta = new Venta();
         venta.setUsuario(usuario);
-        venta.setFecha(LocalDate.now());
+        java.time.ZoneOffset zonaCDMX = java.time.ZoneOffset.of("-06:00");
+        java.time.LocalDate fechaCDMX = LocalDate.now(zonaCDMX);
+        venta.setFecha(fechaCDMX);
         java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("hh:mm a");
-        String horaFormateada = java.time.LocalTime.now().format(formatter);
+        String horaFormateada = java.time.ZonedDateTime.now(zonaCDMX).format(formatter);
         venta.setHora(horaFormateada);
         venta.setConIva(ventaRequest.getConIva());
         venta.setSucursal(ventaRequest.getSucursal());

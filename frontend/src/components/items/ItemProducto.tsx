@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Droplets, Package, ShoppingCart, Plus, Check, SquarePen, Trash2 } from "lucide-react";
+import { Droplets, Package, ShoppingCart, Plus, Check, SquarePen, Trash2, Home } from "lucide-react";
 import { Badge, Card } from "../ui/Card";
 import type { ProductoType } from "../../types/ProductoType";
 import ModalProductoGranel from "../carrito/ModalProductoGranel";
@@ -95,6 +95,14 @@ const ItemProductoCajero: React.FC<ItemProductoCajeroProps> = ({
                             <Package className="w-3 h-3 text-gray-300" />
                             <span className="text-sm">
                                 {producto.tipo || "sin unidad"}
+                            </span>
+                        </div>
+                    </div>
+                    <div className="text-xs text-gray-300 mb-2">
+                        <div className="flex items-center gap-2">
+                            <Home className="w-3 h-3 text-gray-300" />
+                            <span className="text-sm">
+                                {producto.sucursal || "sin sucursal"}
                             </span>
                         </div>
                     </div>

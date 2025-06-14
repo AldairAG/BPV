@@ -823,6 +823,9 @@ const Reportes = () => {
                         Tipo
                       </th>
                       <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        sucursal
+                      </th>
+                      <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Stock Actual
                       </th>
                       <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -862,6 +865,11 @@ const Reportes = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <div className="text-sm text-gray-500 dark:text-gray-400">
                             {item.producto.tipo || "Unidad"}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-center">
+                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                            {item.producto.sucursal || "sin sucursal"}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">

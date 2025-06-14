@@ -22,6 +22,7 @@ import {
 } from "recharts";
 import { TIPOS_PRODUCTO } from "../../../constants/tipoProducto";
 import MonitoreoVentas from "./MonitoreoVentas";
+import { format, formatInTimeZone} from "date-fns-tz";
 
 // Helpers para fechas
 const hoy = new Date();
@@ -29,7 +30,9 @@ const unMesAtras = new Date();
 unMesAtras.setMonth(hoy.getMonth() - 1);
 
 const formatearFecha = (fecha: Date): string => {
-  return fecha.toISOString().split('T')[0];
+  const timeZone = 'America/Mexico_City';
+  const fechaZonaMexico = formatInTimeZone(fecha, timeZone, 'yyyy-MM-dd');
+  return format(fechaZonaMexico, 'yyyy-MM-dd', { timeZone });
 };
 
 const formatearPrecio = (valor: number): string => {
@@ -688,27 +691,27 @@ const Reportes = () => {
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     {[...ventasDiarias].reverse().map((item) => {
-                      
+
                       const fecha = new Date(item.fecha);
                       const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
                       const diaSemana = diasSemana[fecha.getDay()];
 
                       return (
-                      <tr key={item.fecha} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {item.fecha}
-                        </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {diaSemana}
-                        </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-green-600 dark:text-green-400">
-                        {formatearPrecio(item.total)}
-                        </td>
-                      </tr>
+                        <tr key={item.fecha} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              {item.fecha}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              {diaSemana}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-green-600 dark:text-green-400">
+                            {formatearPrecio(item.total)}
+                          </td>
+                        </tr>
                       );
                     })}
                   </tbody>

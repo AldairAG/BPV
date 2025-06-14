@@ -1,9 +1,5 @@
 import { useState } from "react";
-<<<<<<< HEAD
-import { Droplets, Package, ShoppingCart, Plus, Check, SquarePen, Trash2, HomeIcon } from "lucide-react";
-=======
-import { Droplets, Package, ShoppingCart, Plus, Check, SquarePen, Trash2, Home } from "lucide-react";
->>>>>>> f2afb403fbb55d9545489da0603534bffcc3c52f
+import { Droplets, Package, ShoppingCart, Plus, Check, SquarePen, Trash2, HomeIcon, Home } from "lucide-react";
 import { Badge, Card } from "../ui/Card";
 import type { ProductoType } from "../../types/ProductoType";
 import ModalProductoGranel from "../carrito/ModalProductoGranel";

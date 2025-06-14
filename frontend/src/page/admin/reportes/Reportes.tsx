@@ -22,11 +22,7 @@ import {
 } from "recharts";
 import { TIPOS_PRODUCTO } from "../../../constants/tipoProducto";
 import MonitoreoVentas from "./MonitoreoVentas";
-<<<<<<< HEAD
 import { formatInTimeZone } from "date-fns-tz";
-=======
-import { formatInTimeZone} from "date-fns-tz";
->>>>>>> f2afb403fbb55d9545489da0603534bffcc3c52f
 
 // Helpers para fechas
 const hoy = new Date();
@@ -829,11 +825,7 @@ const Reportes = () => {
                         Tipo
                       </th>
                       <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-<<<<<<< HEAD
                         Sucursal
-=======
-                        sucursal
->>>>>>> f2afb403fbb55d9545489da0603534bffcc3c52f
                       </th>
                       <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                         Stock Actual

@@ -22,7 +22,7 @@ import {
 } from "recharts";
 import { TIPOS_PRODUCTO } from "../../../constants/tipoProducto";
 import MonitoreoVentas from "./MonitoreoVentas";
-import { format, formatInTimeZone} from "date-fns-tz";
+import { formatInTimeZone} from "date-fns-tz";
 
 // Helpers para fechas
 const hoy = new Date();

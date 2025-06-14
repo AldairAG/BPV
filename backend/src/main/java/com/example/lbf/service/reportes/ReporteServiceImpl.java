@@ -150,6 +150,12 @@ public class ReporteServiceImpl implements ReporteService {
     @Override
     @Transactional(readOnly = true)
     public BigDecimal calcularIngresoTotal(LocalDate fechaInicio, LocalDate fechaFin) {
+        LocalDate currentDate = LocalDate.now();
+        if (fechaInicio.isAfter(currentDate)) {
+            fechaInicio = currentDate;
+        }
+        System.out.println("Fecha actual: " + currentDate);
+        System.out.println("Calculando ingreso total desde: " + fechaInicio + " hasta: " + fechaFin);
         return ventaRepository.calcularTotalVentasPorRango(fechaInicio, fechaFin);
     }
 

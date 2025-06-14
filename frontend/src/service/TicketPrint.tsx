@@ -168,11 +168,19 @@ const TicketPrint: React.FC<TicketPrintProps> = ({ venta, config }) => {
       {/* Dos líneas vacías al final del ticket */}
       <div>&nbsp;.</div>
       <div>&nbsp;</div>
-      
-      
+
+
       <style>
         {`
           @media print {
+            html, body {
+              counter-reset: page 1; 
+              width: 100% !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              background: #fff !important;
+              counter-reset: page 1; 
+            }
             .ticket-content {
               width: 180px !important;
               min-width: 180px !important;

@@ -162,6 +162,10 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
     }, 300);
   };
 
+  const imprimirTicket = async () => {
+    window.print();
+  }
+
   const findNombreById = (id: number) => {
     const productoEncontrado = ventaSeleccionada?.productosVendidos.find(producto =>
       producto.productoVentas.some(venta => venta.productoVendidoId === id)
@@ -258,7 +262,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                         </span>
                       </td>
                       <td className="px-4 py-2 whitespace-nowrap text-right">{formatearPrecio(productoVendido.precioUnitario)}</td>
-                      <td className="px-4 py-2 whitespace-nowrap text-right font-semibold">{formatearPrecio(productoVendido.subtotal)}</td>
+                      <td className="px-4 py-2 whitespace-nowrap text-right font-semibold text-with-400 ">{formatearPrecio(productoVendido.subtotal)}</td>
                     </tr>
                   ))
                 ) : (
@@ -315,8 +319,36 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
 
         <div className="flex justify-end mt-6">
           <Button
-            className="bg-gradient-to-r from-blue-700 to-gray-800 hover:from-blue-800 hover:to-gray-900 text-white font-semibold flex items-center gap-2 px-6 py-2 rounded-lg shadow"
-            onClick={() => window.print()}
+            className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2 mt-4 w-full"
+            onClick={() => {
+              const printContents = document.getElementById("ticket-area")?.innerHTML;
+              if (printContents) {
+                const printWindow = window.open('', '', 'height=600,width=400');
+                if (printWindow) {
+                  printWindow.document.write(`
+                    <html>
+                      <head>
+                        <title>Imprimir Ticket</title>
+                        <style>
+                          body { background: #fff; color: #000; margin: 0; }
+                          .ticket-content { width: 180px !important; min-width: 180px !important; max-width: 180px !important; margin: 0 auto; }
+                          @media print { @page { margin: 0; } }
+                        </style>
+                      </head>
+                      <body>
+                        ${printContents}
+                      </body>
+                    </html>
+                  `);
+                  printWindow.document.close();
+                  printWindow.focus();
+                  setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                  }, 300);
+                }
+              }
+            }}
             disabled={ventaSeleccionada.venta.anulada}
           >
             <Printer className="h-4 w-4" />
@@ -458,7 +490,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
               <tbody className="bg-white dark:bg-gray-950 divide-y divide-gray-100 dark:divide-gray-900">
                 {ventasFiltradas.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-6 py-4 text-center text-gray-400 dark:text-gray-500">
+                    <td colSpan={7} className="px-6 py-4 text-center text-sky-400 bg-white">
                       No se encontraron ventas con los filtros seleccionados
                     </td>
                   </tr>
@@ -466,17 +498,23 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                   ventasFiltradas.map((ventaResponse) => (
                     <tr
                       key={ventaResponse.venta.ventaId}
-                      className={`hover:bg-gray-50 dark:hover:bg-gray-900/60 transition ${ventaResponse.venta.anulada ? 'text-gray-400 dark:text-gray-700' : ''}`}
+                      className={`
+                        hover:bg-sky-50 dark:hover:bg-sky-900/60 transition
+                        ${ventaResponse.venta.anulada
+                          ? 'text-sky-400 dark:text-sky-300'
+                          : 'text-sky-700 dark:text-white'}
+                        bg-white dark:bg-sky-950
+                      `}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap font-semibold">#{ventaResponse.venta.ventaId}</td>
+                      <td className="px-6 py-4 whitespace-nowrap font-semibold">{`#${ventaResponse.venta.ventaId}`}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-medium">{ventaResponse.venta.fecha}</div>
-                        <div className="text-xs text-blue-500">{ventaResponse.venta.hora}</div>
+                        <div className="text-xs text-sky-400">{ventaResponse.venta.hora}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">{ventaResponse?.usuario?.nombre || 'Desconocido'}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {ventaResponse?.cliente?.nombre ||
-                          <span className="text-gray-400">Sin cliente</span>
+                          <span className="text-sky-300">Sin cliente</span>
                         }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right font-semibold">
@@ -499,7 +537,7 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <button
-                          className="text-blue-700 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 transition"
+                          className="text-sky-700 hover:text-sky-900 dark:text-white dark:hover:text-sky-300 transition"
                           onClick={() => verDetalleVenta(ventaResponse)}
                         >
                           <EyeIcon className="h-4 w-4" />

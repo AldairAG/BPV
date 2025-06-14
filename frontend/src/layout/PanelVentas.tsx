@@ -187,7 +187,7 @@ const PanelVentas = () => {
                   alt="Logo"
                   className="w-10 h-10 rounded-lg shadow bg-white object-contain ring-2 ring-blue-500"
                 />
-                <span className="text-lg font-bold text-white tracking-wide">La Burbuja</span>
+                <span className="text-lg font-bold text-white tracking-wide">La Burbuja Felíz</span>
               </div>
             )}
             <button

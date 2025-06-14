@@ -1,16 +1,24 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../constants/routes";
 import { ShoppingCartIcon, UserGroupIcon } from "@heroicons/react/24/outline";
 import { Boxes, ChartNoAxesCombined, LogOut, Menu, Package, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/Button";
 import useUser from "../hooks/useUser";
+import logo from '../assets/logo.png'; // Asegúrate de que la ruta sea correcta
 
 const AdminLayout = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { logout } = useUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+    // Nuevo: Estado para mostrar/ocultar menú lateral en escritorio
+    const [showSidebar, setShowSidebar] = useState(true);
+
+    // Solo mostrar menú lateral en área de ventas
+    const isVentas = location.pathname.startsWith(ADMIN_ROUTES.VENTAS_PANEL);
 
     // Manejar la navegación
     const handleNavigation = (path: string) => {
@@ -149,8 +157,77 @@ const AdminLayout = () => {
                 </div>
             )}
 
+            {/* Menú lateral para escritorio SOLO en ventas y si showSidebar es true */}
+            {isVentas && showSidebar && (
+                <aside className="hidden lg:flex h-screen w-64 bg-gradient-to-b from-indigo-950 via-indigo-900 to-blue-900/95 shadow-2xl border-r border-indigo-800 flex-col fixed z-40">
+                    {/* Logo y título */}
+                    <div className="flex items-center gap-3 px-6 py-7 border-b border-indigo-800 bg-indigo-950/80">
+                        <img
+                            src={logo}
+                            alt="Logo"
+                            className="w-12 h-12 rounded-xl shadow-lg bg-white object-contain ring-2 ring-amber-400"
+                        />
+                        <span className="text-2xl font-black text-amber-400 tracking-widest drop-shadow select-none font-mono">
+                            Burbuja <span className="text-indigo-100 font-normal">Admin</span>
+                        </span>
+                        {/* Botón para ocultar menú */}
+                        <button
+                            onClick={() => setShowSidebar(false)}
+                            className="ml-auto bg-indigo-900/80 text-amber-400 rounded-full p-1 hover:bg-indigo-800 transition"
+                            title="Ocultar menú"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                    </div>
+                    {/* Navegación */}
+                    <nav className="flex-1 flex flex-col gap-2 px-3 py-6">
+                        {navItems.map((item) => (
+                            <button
+                                key={item.path}
+                                onClick={() => handleNavigation(item.path)}
+                                className={`
+                                  group flex items-center gap-3 px-5 py-3 rounded-xl font-semibold text-base transition-all duration-200
+                                  ${location.pathname.startsWith(item.path)
+                                    ? "bg-gradient-to-r from-amber-400 to-amber-300 text-indigo-900 shadow-xl ring-2 ring-amber-400"
+                                    : "text-indigo-100 hover:bg-indigo-800/80 hover:text-amber-300 hover:scale-[1.03]"}
+                                  focus:outline-none focus:ring-2 focus:ring-amber-400
+                                `}
+                            >
+                                <span className="text-xl transition-transform group-hover:scale-110">{item.icon}</span>
+                                <span className="truncate">{item.label}</span>
+                            </button>
+                        ))}
+                        {/* Separador */}
+                        <div className="my-5 border-t border-indigo-800" />
+                        {/* Botón cerrar sesión */}
+                        <button
+                            onClick={logout}
+                            className="flex items-center gap-3 px-5 py-3 rounded-xl font-semibold text-base text-red-100 bg-gradient-to-r from-red-700 to-red-900 hover:from-red-600 hover:to-red-800 hover:text-amber-300 shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-amber-400"
+                        >
+                            <LogOut className="h-6 w-6" />
+                            <span className="truncate">Cerrar sesión</span>
+                        </button>
+                    </nav>
+                    {/* Footer opcional */}
+                    <div className="px-6 py-4 text-xs text-indigo-300 border-t border-indigo-800 bg-indigo-950/80">
+                        &copy; {new Date().getFullYear()} La Burbuja Feliz
+                    </div>
+                </aside>
+            )}
+
+            {/* Botón para mostrar menú lateral si está oculto (solo en ventas) */}
+            {isVentas && !showSidebar && (
+                <button
+                    onClick={() => setShowSidebar(true)}
+                    className="hidden lg:flex fixed top-20 left-4 z-50 bg-amber-400 text-indigo-900 rounded-full p-2 shadow-lg hover:bg-amber-300 transition"
+                    title="Mostrar menú"
+                >
+                    <Menu className="w-6 h-6" />
+                </button>
+            )}
+
             {/* Contenido principal */}
-            <div className="flex flex-1 overflow-y-auto">
+            <div className={`flex flex-1 overflow-y-auto ${isVentas && showSidebar ? "lg:ml-64" : ""}`}>
                 <Outlet />
             </div>
         </section>

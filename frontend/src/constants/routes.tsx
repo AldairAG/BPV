@@ -15,5 +15,6 @@ export const ADMIN_ROUTES={
     CATEGORIAS: "categorias",
     USUARIOS: "usuarios",
     REPORTES: "reportes",
-    PRESUPUESTOS: "presupuestos"
+    PRESUPUESTOS: "presupuestos",
+    PRESUPUESTOS_ALTER: "/admin/presupuestos"
 }

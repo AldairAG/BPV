@@ -26,7 +26,7 @@ function App() {
         navigator.serviceWorker.register('/serviceWorker.js')
           .then(registration => {
             console.log('Service Worker registrado correctamente:', registration);
-            toast.success('La aplicación está lista para trabajar sin conexión', { 
+            toast.success('La aplicación está lista para trabajar sin conexión', {
               duration: 5000,
               id: 'sw-registered'
             });
@@ -69,8 +69,8 @@ function App() {
                 <Route path={ADMIN_ROUTES.USUARIOS} element={<Usuarios />} />
                 <Route path={ADMIN_ROUTES.REPORTES} element={<Reportes />} />
                 <Route path={ADMIN_ROUTES.VENTAS_PANEL} element={<PanelVentas />} />
-                <Route path={ADMIN_ROUTES.PRESUPUESTOS} element={<Presupuestos />} />
               </Route>
+              <Route path={ADMIN_ROUTES.PRESUPUESTOS} element={<Presupuestos />} />
             </Route>
           </Route>
 

@@ -1,7 +1,7 @@
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { ADMIN_ROUTES } from "../constants/routes";
 import { ShoppingCartIcon, UserGroupIcon } from "@heroicons/react/24/outline";
-import { Boxes, ChartNoAxesCombined, LogOut, Menu, Package, X } from "lucide-react";
+import { BookCopy, Boxes, ChartNoAxesCombined, LogOut, Menu, Package, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "../components/ui/Button";
 import useUser from "../hooks/useUser";
@@ -79,7 +79,7 @@ const AdminLayout = () => {
         },
         {
             path: ADMIN_ROUTES.PRESUPUESTOS,
-            icon: <ChartNoAxesCombined className="h-5 w-5 text-sky-500" />,
+            icon: <BookCopy className="h-5 w-5 text-sky-500" />,
             label: "Presupuestos"
         }
     ];

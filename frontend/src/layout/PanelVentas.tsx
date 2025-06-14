@@ -1,4 +1,4 @@
-import { CreditCardIcon, ListBulletIcon,  } from "@heroicons/react/24/outline";
+import { CreditCardIcon, ListBulletIcon, } from "@heroicons/react/24/outline";
 import { Input } from "../components/ui/Input";
 import { Badge, Card, CardContent, CardHead } from "../components/ui/Card";
 import ItemProductoCajero from "../components/items/ItemProducto";
@@ -14,6 +14,9 @@ import { toast } from "react-hot-toast";
 import type { ClienteType } from "../types/ClienteType";
 import ModalTemplate, { useModal } from "../components/modal/ModalTemplate";
 import CorteCaja from "../components/corte/CorteCaja";
+import { BookCopy } from "lucide-react";
+import { ADMIN_ROUTES } from "../constants/routes";
+import { useNavigate } from "react-router-dom";
 
 const PanelVentas = () => {
   // Hooks
@@ -51,6 +54,7 @@ const PanelVentas = () => {
 
   // Añadir estado para el menú contraído
   const [menuCollapsed, setMenuCollapsed] = useState(false);
+  const navigate = useNavigate();
 
   // Cargar datos iniciales
   useEffect(() => {
@@ -58,6 +62,10 @@ const PanelVentas = () => {
     fetchProductos();
   }, []);
 
+  // Manejar la navegación
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
   // Mostrar errores del carrito
   useEffect(() => {
     if (error) {
@@ -129,12 +137,12 @@ const PanelVentas = () => {
   };
 
   // Función para procesar la venta
-  const handleProcessVenta = async (conIva: boolean, cliente: ClienteType | null,descuenos:Record<number, number>) => {
+  const handleProcessVenta = async (conIva: boolean, cliente: ClienteType | null, descuenos: Record<number, number>) => {
     setProcessingVenta(true);
     try {
       console.log(carritoItems);
-      
-      const ventaRealizada = await procesarVenta(conIva, cliente,descuenos);
+
+      const ventaRealizada = await procesarVenta(conIva, cliente, descuenos);
       if (ventaRealizada) {
         toast.success(`Venta realizada con éxito. Total: $${ventaRealizada.total.toFixed(2)}`);
         fetchProductos();
@@ -200,6 +208,13 @@ const PanelVentas = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
               {!menuCollapsed && <span>Corte de caja</span>}
+            </button>
+            <button
+              className={`w-full flex items-center gap-3 p-2 rounded hover:bg-slate-800 transition-colors ${menuCollapsed ? 'justify-center' : 'text-left'}`}
+              onClick={() => handleNavigation(ADMIN_ROUTES.PRESUPUESTOS_ALTER)}
+            >
+              <BookCopy className="w-5 h-5 text-white" />
+              {!menuCollapsed && <span>Cotizar</span>}
             </button>
             <button
               className={`w-full flex items-center gap-3 p-2 rounded hover:bg-slate-800 transition-colors ${menuCollapsed ? 'justify-center' : 'text-left'}`}
@@ -275,7 +290,7 @@ const PanelVentas = () => {
                   <Badge
                     key="todas"
                     className={`cursor-pointer whitespace-nowrap ${selectedCategoria === null ? "bg-blue-500" : "bg-slate-800"
-                    } hover:bg-blue-600 transition-colors mb-2`}
+                      } hover:bg-blue-600 transition-colors mb-2`}
                     onClick={() => {
                       setSelectedCategoria(null);
                       limpiarFiltros();

@@ -197,14 +197,13 @@ const useReportes = () => {
         ReporteService.getVentasAñoActual(),
         ReporteService.getProductosMasVendidos('1970-01-01', '2100-12-31', 10) // Todos los tiempos
       ]);
-
       // Actualizar todos los estados
       setIngresoTotal(ventasHoy);
       setProductosBajoStock(productosBajo);
       setVentasDiarias(ventasUltimaSemana);
       setVentasMensuales(ventasAnuales);
       setProductosMasVendidos(productosMasVendidos);
-
+      
       // Devolver los datos como un objeto para facilitar su uso
       return {
         ventasHoy,

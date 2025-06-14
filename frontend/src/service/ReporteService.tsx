@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { apiClient } from './apiClient';
 import type { ProductoType } from '../types/ProductoType';
 import type { UsuarioType } from '../types/UsuarioType';

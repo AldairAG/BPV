@@ -14,7 +14,7 @@ import { toast } from "react-hot-toast";
 import type { ClienteType } from "../types/ClienteType";
 import ModalTemplate, { useModal } from "../components/modal/ModalTemplate";
 import CorteCaja from "../components/corte/CorteCaja";
-import { BookCopy, BarChart3, ShoppingCart, LogOut, Menu, X } from "lucide-react";
+import { BookCopy, ShoppingCart, LogOut, Menu, X } from "lucide-react";
 import logo from "../assets/logo.png";
 import { ADMIN_ROUTES } from "../constants/routes";
 import { useNavigate } from "react-router-dom";

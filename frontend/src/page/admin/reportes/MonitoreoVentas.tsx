@@ -162,10 +162,6 @@ const MonitoreoVentas = ({ fechaInicio, fechaFin }: MonitoreoVentasProps) => {
     }, 300);
   };
 
-  const imprimirTicket = async () => {
-    window.print();
-  }
-
   const findNombreById = (id: number) => {
     const productoEncontrado = ventaSeleccionada?.productosVendidos.find(producto =>
       producto.productoVentas.some(venta => venta.productoVendidoId === id)

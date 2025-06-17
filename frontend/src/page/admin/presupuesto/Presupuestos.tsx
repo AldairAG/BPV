@@ -139,8 +139,7 @@ const Presupuestos = () => {
         <div
             style={{
                 minHeight: "100vh",
-                // Fondo degradado azul oscuro
-                background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #0ea5e9 100%)",
+                background: "#093283", // gris muy claro, sin degradado
                 padding: "40px 0",
                 width: "100%",
                 overflow: "hidden",
@@ -187,7 +186,7 @@ const Presupuestos = () => {
                             + Agregar producto
                         </button>
 
-                        {/* Botón Guardar PDF, justo después del div con ref */}
+                        {/* Botón Guardar PDF */}
                         <button
                             type="button"
                             onClick={handleGuardarPDF}
@@ -213,13 +212,14 @@ const Presupuestos = () => {
                         <div
                             ref={pdfRef}
                             style={{
-                                background: "#fff",
+                                background: "#f9fafb", // gris casi blanco, menos intenso que blanco puro
                                 minHeight: 900,
+                                width: "100%",
                                 maxWidth: 900,
                                 margin: "0 auto",
                                 borderRadius: 16,
-                                border: "1px solid #2563eb",
-                                boxShadow: "0 2px 16px rgba(37,99,235,0.10)",
+                                border: "1px solid #e5e7eb",
+                                boxShadow: "0 2px 16px rgba(37,99,235,0.08)",
                                 display: "flex",
                                 flexDirection: "column",
                                 fontFamily: "sans-serif",
@@ -227,6 +227,7 @@ const Presupuestos = () => {
                                 padding: 24,
                                 position: "relative"
                             }}
+                            className="responsive-presupuesto-container"
                         >
                             <div style={{
                                 width: "100%",
@@ -277,13 +278,16 @@ const Presupuestos = () => {
                             </div>
 
                             {/* Datos del cliente */}
-                            <div style={{
-                                marginBottom: 24,
-                                border: "1px solid #93c5fd",
-                                borderRadius: 10,
-                                padding: 16,
-                                background: "#f1f5f9"
-                            }}>
+                            <div
+                                style={{
+                                    marginBottom: 24,
+                                    border: "1px solid #93c5fd",
+                                    borderRadius: 10,
+                                    padding: 16,
+                                    background: "#f1f5f9"
+                                }}
+                                className="responsive-datos-cliente"
+                            >
                                 <h3 style={{
                                     fontWeight: 700,
                                     color: "#2563eb",
@@ -292,12 +296,15 @@ const Presupuestos = () => {
                                     textTransform: "uppercase",
                                     fontSize: 13
                                 }}>Datos del cliente</h3>
-                                <div style={{
-                                    display: "grid",
-                                    gridTemplateColumns: "1fr 1fr",
-                                    gap: 12,
-                                    maxWidth: 700
-                                }}>
+                                <div
+                                    style={{
+                                        display: "grid",
+                                        gridTemplateColumns: "1fr 1fr",
+                                        gap: 12,
+                                        maxWidth: 700
+                                    }}
+                                    className="responsive-datos-grid"
+                                >
                                     {inputFields
                                         .filter(field => field.name !== "pie" && field.name !== "agregarIVA")
                                         .map((field, index) => (
@@ -341,20 +348,25 @@ const Presupuestos = () => {
                                     textTransform: "uppercase",
                                     fontSize: 13
                                 }}>Productos</h3>
-                                <div style={{
-                                    overflowX: "auto",
-                                    borderRadius: 12,
-                                    background: "#fff",
-                                    boxShadow: "0 1px 4px rgba(37,99,235,0.06)"
-                                }}>
-                                    <table style={{
-                                        width: "100%",
-                                        borderCollapse: "collapse",
-                                        background: "#f1f5f9",
-                                        fontSize: 15,
-                                        borderRadius: 8,
-                                        overflow: "hidden"
-                                    }}>
+                                <div
+                                    style={{
+                                        overflowX: "auto",
+                                        borderRadius: 12,
+                                        background: "#fff",
+                                        boxShadow: "0 1px 4px rgba(37,99,235,0.06)"
+                                    }}
+                                >
+                                    <table
+                                        style={{
+                                            width: "100%",
+                                            borderCollapse: "collapse",
+                                            background: "#f1f5f9",
+                                            fontSize: 15,
+                                            borderRadius: 8,
+                                            overflow: "hidden"
+                                        }}
+                                        className="responsive-productos-table"
+                                    >
                                         <thead>
                                             <tr style={{ background: "#2563eb" }}>
                                                 <th style={{ padding: 10, color: "#fff", textAlign: "left", borderTopLeftRadius: 8 }}>Descripción</th>
@@ -390,14 +402,17 @@ const Presupuestos = () => {
                             </div>
 
                             {/* Totales */}
-                            <div style={{
-                                display: "flex",
-                                flexDirection: "row",
-                                justifyContent: "flex-end",
-                                gap: 16,
-                                alignItems: "flex-end",
-                                marginBottom: 24
-                            }}>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "flex-end",
+                                    gap: 16,
+                                    alignItems: "flex-end",
+                                    marginBottom: 24
+                                }}
+                                className="responsive-totales"
+                            >
                                 <div style={{
                                     display: "flex",
                                     flexDirection: "column",
@@ -484,6 +499,51 @@ const Presupuestos = () => {
                                 </div>
                             </div>
                         </div>
+                        {/* --- ESTILOS RESPONSIVOS --- */}
+                        <style>
+                            {`
+                            @media (max-width: 1024px) {
+                                .responsive-presupuesto-container {
+                                    max-width: 98vw !important;
+                                    padding: 10px !important;
+                            }
+                            .responsive-datos-grid {
+                                grid-template-columns: 1fr !important;
+                                gap: 8px !important;
+                            }
+                            .responsive-totales {
+                                flex-direction: column !important;
+                                align-items: stretch !important;
+                                gap: 8px !important;
+                            }
+                        }
+                        @media (max-width: 700px) {
+                            .responsive-presupuesto-container {
+                                min-width: 0 !important;
+                                max-width: 100vw !important;
+                                padding: 4vw !important;
+                            }
+                            .responsive-datos-cliente {
+                                padding: 8px !important;
+                            }
+                            .responsive-productos-table th,
+                            .responsive-productos-table td {
+                                font-size: 13px !important;
+                                padding: 6px !important;
+                            }
+                        }
+                        @media (max-width: 500px) {
+                            .responsive-presupuesto-container {
+                                padding: 2vw !important;
+                            }
+                            .responsive-productos-table th,
+                            .responsive-productos-table td {
+                                font-size: 11px !important;
+                                padding: 3px !important;
+                            }
+                        }
+                        `}
+                        </style>
                     </Form>
                 )}
             </Formik>

@@ -82,7 +82,7 @@ const Carrito: React.FC<CarritoProps> = (props) => {
     };
 
     const handleDescuentoChange = (productoId: number, value: string) => {
-        const descuento = parseInt(value, 10) || 0;
+        const descuento = parseFloat(value) || 0;
         setDescuentos(prev => ({
             ...prev,
             [productoId]: descuento
@@ -327,7 +327,9 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                                                     </span>
                                                     {descuento > 0 && (
                                                         <span className="ml-2 text-green-400">
-                                                            ${precioConDescuento.toFixed(2)} c/u
+                                                            ${descuento < 1 
+                                                                ? precioConDescuento.toFixed(3) 
+                                                                : precioConDescuento.toFixed(2)} c/u
                                                         </span>
                                                     )}
                                                 </div>

@@ -51,6 +51,14 @@ const ProductoSchema = Yup.object().shape({
             .nullable()
             .min(0, "El descuento no puede ser negativo")
             .max(100, "El descuento no puede ser mayor a 100%")
+            .test(
+                'is-decimal',
+                'El descuento puede tener hasta 2 decimales',
+                (value) => {
+                    if (value === null || value === undefined) return true;
+                    return /^\d+(\.\d{1,2})?$/.test(value.toString());
+                }
+            )
     )
 });
 
@@ -201,6 +209,8 @@ const Productos = () => {
             if (editMode && values.productoId) {
                 await updateProductoById(values.productoId, productData);
             } else {
+                console.log(productData);
+                
                 await createProducto(productData);
             }
             closeModal();
@@ -507,7 +517,7 @@ const Productos = () => {
                                                 value={values.descuentos[index]}
                                                 min="0"
                                                 max="100"
-                                                step="0.1"
+                                                step="0.01"
                                             />
                                             <ErrorMessage
                                                 name={`descuentos[${index}]`}
@@ -539,6 +549,7 @@ const Productos = () => {
                             <th className="h-12 px-4 text-left font-bold">Categoría</th>
                             <th className="h-12 px-4 text-left font-bold">Tipo</th>
                             <th className="h-12 px-4 text-right font-bold">Precio</th>
+                            <th className="h-12 px-4 text-right font-bold">Sucursal</th>
                             <th className="h-12 px-4 text-right font-bold">Stock</th>
                             <th className="h-12 px-4 text-right font-bold">Descuentos</th>
                             <th className="h-12 px-4 text-right font-bold">Acciones</th>
@@ -579,6 +590,9 @@ const Productos = () => {
                                     </td>
                                     <td className="p-4 align-middle text-right font-bold text-gray-800 dark:text-gray-200">
                                         {formatPrice(producto.precio || 0)}
+                                    </td>
+                                    <td className="p-4 align-middle text-right font-bold text-gray-800 dark:text-gray-200">
+                                        {producto.sucursal || "sin sucursal"}
                                     </td>
                                     <td className="p-4 align-middle text-right">
                                         <span className={`${producto.stock <= producto.stockMinimo ? 'text-red-600 font-bold' : 'text-green-700 dark:text-green-300 font-semibold'}`}>

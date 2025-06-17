@@ -30,21 +30,11 @@ const ModalTemplate: React.FC<ModalTemplateProps> = ({
     children,
     title
 }) => {
-    const handleBackdropClick = useCallback(
-        (e: React.MouseEvent<HTMLDivElement>) => {
-            if (e.target === e.currentTarget) {
-                onClose();
-            }
-        },
-        [onClose]
-    );
-
     if (!isOpen) return null;
 
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-blue-900/70 backdrop-blur-sm px-2 py-4"
-            onClick={handleBackdropClick}
         >
             <div
                 className="

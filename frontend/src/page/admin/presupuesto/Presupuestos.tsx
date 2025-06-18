@@ -8,14 +8,6 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import logoMarcaAgua from "../../../assets/logo.png"; // Ajusta la ruta si es necesario
 
-const inputFields = [
-    { name: "nombre", placeholder: "Nombre del cliente" },
-    { name: "telefono", placeholder: "Teléfono" },
-    // Quitamos email y dirección
-    { name: "pie", placeholder: "Pie de página" },
-    { name: "agregarIVA", placeholder: "Agregar IVA", type: "checkbox" },
-];
-
 interface formValues {
     nombre: string;
     telefono: string;

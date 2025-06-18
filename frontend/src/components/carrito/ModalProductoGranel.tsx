@@ -78,8 +78,8 @@ const ModalProductoGranel: React.FC<ModalProductoGranelProps> = ({
             
             if (tipoVenta === 'precio') {
                 // Para venta por precio, pasamos el monto y el sistema calculará internamente
-                cantidadFinal = cantidad/10;
-                console.log(`Confirmando ${cantidadFinal/10} pesos del producto`);
+                cantidadFinal = Number((cantidad/producto.precioVenta).toFixed(3)); // Convertir a litros
+                console.log(`Confirmando ${cantidadFinal*producto.precioVenta} pesos del producto`);
             } else { // volumen
                 cantidadFinal = unidad === 'l' ? cantidad : cantidad/1000;
                 console.log(`Confirmando ${cantidadFinal} litros del producto`);

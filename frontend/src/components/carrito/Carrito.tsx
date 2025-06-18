@@ -65,8 +65,10 @@ const Carrito: React.FC<CarritoProps> = (props) => {
     };
 
     const totalFinal = calcularTotalConDescuentos();
-    const subtotal = totalFinal;
-    const iva = includeIVA ? totalFinal * 0.16 : 0;
+    const subtotal = totalFinal.toFixed(2).endsWith('.99') 
+        ? Math.ceil(totalFinal) 
+        : totalFinal;
+    const iva = includeIVA ? subtotal * 0.16 : 0;
 
     const handleQuantityChange = async (productoId: number, newQuantity: number) => {
         if (newQuantity <= 0) {
@@ -314,7 +316,11 @@ const Carrito: React.FC<CarritoProps> = (props) => {
                             {items.map((item) => {
                                 const descuento = descuentos[item.producto.productoId] || 0;
                                 const precioConDescuento = item.producto.precio * (1 - descuento / 100);
-                                const subtotalItem = precioConDescuento * item.cantidad;
+                                const rawSubtotal = precioConDescuento * item.cantidad;
+                                const subtotalItem = rawSubtotal.toFixed(2).endsWith('.99') 
+                                    ? Math.ceil(rawSubtotal) 
+                                    : rawSubtotal;
+
 
                                 return (
                                     <div key={item.producto.productoId} className="flex flex-col py-3 border-b border-gray-700 last:border-0">

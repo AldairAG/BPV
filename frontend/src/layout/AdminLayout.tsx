@@ -84,7 +84,7 @@ const AdminLayout = () => {
                             textShadow: "2px 2px 8px #0ea5e9, 0 1px 0 #000"
                         }}
                     >
-                        La Burbuja Felíz <span className="font-light text-sky-300" style={{textShadow: "none"}}>Admin</span>
+                        La Burbuja Felíz <span className="font-light text-sky-300" style={{textShadow: "none"}}></span>
                     </span>
                 </div>
                 {/* Menú hamburguesa solo visible en móvil */}

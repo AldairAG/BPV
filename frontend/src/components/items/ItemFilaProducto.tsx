@@ -2,23 +2,20 @@ import React from "react";
 import { X } from "lucide-react";
 import type { ProductoType } from "../../types/ProductoType";
 
-// Estilos base para celdas
+// Estilos base para celdas (más compacto y profesional)
 const cellStyle: React.CSSProperties = {
-  padding: "10px 14px",
+  padding: "5px 8px",
   color: "#1e293b",
-  background: "#fff",
   borderBottom: "1px solid #e5e7eb",
-  fontSize: 16,
+  fontSize: 13,
+  lineHeight: 1.2,
   verticalAlign: "middle",
-  minWidth: 90,
-  maxWidth: 260,
+  minWidth: 70,
+  maxWidth: 220,
   overflow: "visible",
   whiteSpace: "normal",
   wordBreak: "break-word",
-  height: 40,
 };
-
-// Estilos para inputs y selects para que llenen la celda y no se corten
 
 const ItemFilaProducto = ({
   producto,
@@ -27,7 +24,7 @@ const ItemFilaProducto = ({
   handleModificarProducto,
   handleBorrarProducto,
   productoId,
-  modoPDF = false, // <--- NUEVO
+  modoPDF = false,
 }: {
   producto: ProductoType;
   cantidad: number;
@@ -35,11 +32,11 @@ const ItemFilaProducto = ({
   handleModificarProducto: (id: number, value: number, name: string) => void;
   handleBorrarProducto: (id: number) => void;
   productoId: number;
-  modoPDF?: boolean; // <--- NUEVO
+  modoPDF?: boolean;
 }) => (
   <>
     {/* Descripción */}
-    <td style={{ ...cellStyle, minWidth: 160, maxWidth: 300 }}>
+    <td className="compact-td" style={{ ...cellStyle, minWidth: 120, maxWidth: 260 }}>
       {modoPDF ? (
         <span style={{ fontWeight: 500 }}>{producto?.nombre}</span>
       ) : (
@@ -54,9 +51,9 @@ const ItemFilaProducto = ({
             borderBottom: "1px solid #e5e7eb",
             outline: "none",
             width: "100%",
-            height: 32,
-            padding: "4px 8px",
-            fontSize: 16,
+            height: 22,
+            padding: "2px 6px",
+            fontSize: 13,
             fontWeight: 500,
             boxSizing: "border-box",
             display: "block",
@@ -66,7 +63,7 @@ const ItemFilaProducto = ({
       )}
     </td>
     {/* Cantidad */}
-    <td style={{ ...cellStyle, minWidth: 60, maxWidth: 90 }}>
+    <td className="compact-td" style={{ ...cellStyle, minWidth: 45, maxWidth: 70, textAlign: "center" }}>
       {modoPDF ? (
         <span>{cantidad}</span>
       ) : (
@@ -81,11 +78,12 @@ const ItemFilaProducto = ({
             borderBottom: "1px solid #e5e7eb",
             outline: "none",
             width: "100%",
-            height: 32,
-            padding: "4px 8px",
-            fontSize: 16,
+            height: 22,
+            padding: "2px 6px",
+            fontSize: 13,
             boxSizing: "border-box",
             display: "block",
+            textAlign: "center",
           }}
           value={cantidad}
           onChange={e =>
@@ -95,7 +93,7 @@ const ItemFilaProducto = ({
       )}
     </td>
     {/* Precio unitario */}
-    <td style={{ ...cellStyle, minWidth: 80, maxWidth: 110, textAlign: "right" }}>
+    <td className="compact-td" style={{ ...cellStyle, minWidth: 60, maxWidth: 90, textAlign: "right" }}>
       {modoPDF ? (
         <span>{producto?.precio}</span>
       ) : (
@@ -110,9 +108,9 @@ const ItemFilaProducto = ({
             borderBottom: "1px solid #e5e7eb",
             outline: "none",
             width: "100%",
-            height: 32,
-            padding: "4px 8px",
-            fontSize: 16,
+            height: 22,
+            padding: "2px 6px",
+            fontSize: 13,
             boxSizing: "border-box",
             display: "block",
             textAlign: "right",
@@ -123,7 +121,7 @@ const ItemFilaProducto = ({
       )}
     </td>
     {/* Descuento */}
-    <td style={{ ...cellStyle, minWidth: 80, maxWidth: 110 }}>
+    <td className="compact-td" style={{ ...cellStyle, minWidth: 55, maxWidth: 80, textAlign: "center" }}>
       {modoPDF ? (
         <span>{descuento ?? 0}%</span>
       ) : (
@@ -136,13 +134,14 @@ const ItemFilaProducto = ({
             borderBottom: "1px solid #e5e7eb",
             outline: "none",
             width: "100%",
-            height: 32,
-            padding: "4px 8px",
-            fontSize: 16,
+            height: 22,
+            padding: "2px 6px",
+            fontSize: 13,
             boxSizing: "border-box",
-            minWidth: 60,
+            minWidth: 40,
             appearance: "none",
             display: "block",
+            textAlign: "center",
           }}
           value={descuento ?? 0}
           onChange={e =>
@@ -160,14 +159,15 @@ const ItemFilaProducto = ({
     </td>
     {/* Sub Total */}
     <td
+      className="compact-td"
       style={{
         ...cellStyle,
         background: "#f1f5f9",
         textAlign: "right",
         fontFamily: "monospace",
         fontWeight: 500,
-        minWidth: 90,
-        maxWidth: 120,
+        minWidth: 60,
+        maxWidth: 90,
       }}
     >
       {(
@@ -177,11 +177,12 @@ const ItemFilaProducto = ({
     </td>
     {/* Quitar producto */}
     <td
+      className="compact-td"
       style={{
         ...cellStyle,
         textAlign: "center",
-        minWidth: 40,
-        maxWidth: 60,
+        minWidth: 30,
+        maxWidth: 40,
       }}
     >
       {!modoPDF && (
@@ -189,17 +190,17 @@ const ItemFilaProducto = ({
           style={{
             color: "#ef4444",
             fontWeight: 700,
-            padding: "0 8px",
+            padding: "0 4px",
             background: "none",
             border: "none",
             cursor: "pointer",
-            height: 32,
+            height: 22,
           }}
           onClick={() => handleBorrarProducto(productoId)}
           type="button"
           title="Quitar producto"
         >
-          <X style={{ width: 16, height: 16, color: "#dc2626" }} />
+          <X style={{ width: 14, height: 14, color: "#dc2626" }} />
         </button>
       )}
     </td>

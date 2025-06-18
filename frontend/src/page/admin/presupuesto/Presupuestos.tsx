@@ -6,12 +6,12 @@ import * as Yup from "yup";
 import ModalBuscarProducto from "../../../components/modal/ModalBuscarProducto";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import logoMarcaAgua from "../../../assets/logo.png"; // Ajusta la ruta si es necesario
 
 const inputFields = [
     { name: "nombre", placeholder: "Nombre del cliente" },
     { name: "telefono", placeholder: "Teléfono" },
-    { name: "email", placeholder: "E-mail" },
-    { name: "direccion", placeholder: "Dirección" },
+    // Quitamos email y dirección
     { name: "pie", placeholder: "Pie de página" },
     { name: "agregarIVA", placeholder: "Agregar IVA", type: "checkbox" },
 ];
@@ -137,9 +137,10 @@ const Presupuestos = () => {
 
     return (
         <div
+            className="presupuesto-bg"
             style={{
                 minHeight: "100vh",
-                background: "#093283", // gris muy claro, sin degradado
+                background: "#093283",
                 padding: "40px 0",
                 width: "100%",
                 overflow: "hidden",
@@ -208,11 +209,56 @@ const Presupuestos = () => {
                             Guardar PDF
                         </button>
 
+                        {/* Botón Imprimir */}
+                        <button
+                            type="button"
+                            onClick={() => window.print()}
+                            style={{
+                                position: "fixed",
+                                top: "50%",
+                                right: 0,
+                                zIndex: 1000,
+                                background: "#0ea5e9",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "8px 0 0 8px",
+                                padding: "12px 20px",
+                                fontWeight: "bold",
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                                cursor: "pointer",
+                            }}
+                        >
+                            Imprimir
+                        </button>
+
+                        {/* Mensaje solo visible en pantalla */}
+                        <div
+                            style={{
+                                position: "fixed",
+                                top: 16,
+                                left: "50%",
+                                transform: "translateX(-50%)",
+                                background: "#2563eb",
+                                color: "#fff",
+                                padding: "8px 20px",
+                                borderRadius: 8,
+                                zIndex: 99999,
+                                fontWeight: "bold",
+                                fontSize: 16,
+                                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                                display: "block"
+                            }}
+                            className="print:hidden"
+                        >
+                            Para eliminar el margen superior, selecciona <b>Márgenes: Ninguno</b> en la ventana de impresión.
+                        </div>
+
                         {/* Contenedor a exportar */}
                         <div
                             ref={pdfRef}
+                            className="responsive-presupuesto-container"
                             style={{
-                                background: "#f9fafb", // gris casi blanco, menos intenso que blanco puro
+                                background: "#f9fafb",
                                 minHeight: 900,
                                 width: "100%",
                                 maxWidth: 900,
@@ -227,63 +273,92 @@ const Presupuestos = () => {
                                 padding: 24,
                                 position: "relative"
                             }}
-                            className="responsive-presupuesto-container"
                         >
+                            {/* Barra azul decorativa, altura mínima */}
                             <div style={{
                                 width: "100%",
-                                height: 20,
+                                height: 2, // Altura mínima
                                 background: "#2563eb",
                                 borderTopLeftRadius: 12,
                                 borderTopRightRadius: 12,
-                                marginBottom: 16
+                                marginBottom: 2 // Espacio mínimo
                             }} />
-                            {/* Encabezado */}
-                            <div style={{
+
+                            {/* Encabezado, sin padding ni margen superior */}
+                            <div className="encabezado-presupuesto" style={{
                                 display: "flex",
-                                flexDirection: "column",
+                                flexDirection: "row",
                                 alignItems: "center",
                                 borderBottom: "2px solid #93c5fd",
-                                paddingBottom: 8,
-                                marginBottom: 24,
-                                paddingTop: 16,
-                                paddingLeft: 16,
-                                paddingRight: 16
+                                paddingBottom: 4,
+                                marginBottom: 8,
+                                paddingTop: 0,
+                                paddingLeft: 8,
+                                paddingRight: 8,
+                                position: "relative",
+                                gap: 16
                             }}>
-                                <span style={{
-                                    fontSize: 22,
-                                    fontWeight: 700,
-                                    color: "#2563eb",
-                                    letterSpacing: 2,
-                                    textTransform: "uppercase",
-                                    marginBottom: 4
-                                }}>
-                                    Presupuestos
-                                </span>
-                                <span style={{
-                                    fontSize: 18,
-                                    fontWeight: 600,
-                                    color: "#1e40af",
-                                    textAlign: "center"
-                                }}>
-                                    Artículos de limpieza "La Burbuja Feliz"
-                                </span>
-                                <span style={{
-                                    fontSize: 13,
-                                    color: "#334155",
-                                    textAlign: "center",
-                                    fontWeight: 400
-                                }}>
-                                    Tel: 2281278853 &nbsp;|&nbsp; Fabricación, venta y distribución de productos químicos para limpieza a granel, mayoreo y menudeo.
-                                </span>
+                                {/* Logo a la izquierda */}
+                                <img
+                                    src={logoMarcaAgua}
+                                    alt="Logo La Burbuja"
+                                    style={{
+                                        width: 90,
+                                        height: 90,
+                                        objectFit: "contain",
+                                        marginRight: 16,
+                                        borderRadius: 8,
+                                        background: "transparent",
+                                        boxShadow: "0 1px 4px rgba(37,99,235,0.10)"
+                                    }}
+                                />
+                                {/* Títulos y fecha */}
+                                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                    <span style={{
+                                        fontSize: 22,
+                                        fontWeight: 700,
+                                        color: "#2563eb",
+                                        letterSpacing: 2,
+                                        textTransform: "uppercase",
+                                        marginBottom: 2
+                                    }}>
+                                        PRESUPUESTOS
+                                    </span>
+                                    <span style={{
+                                        fontSize: 16,
+                                        fontWeight: 600,
+                                        color: "#1e40af",
+                                        textAlign: "center"
+                                    }}>
+                                        Artículos de limpieza "La Burbuja Feliz"
+                                    </span>
+                                    <span style={{
+                                        fontSize: 12,
+                                        color: "#334155",
+                                        textAlign: "center",
+                                        fontWeight: 400
+                                    }}>
+                                        Tel: 2281278853 &nbsp;|&nbsp; Fabricación, venta y distribución de productos químicos para limpieza a granel, mayoreo y menudeo.
+                                    </span>
+                                    {/* Fecha actual */}
+                                    <span style={{
+                                        fontSize: 12,
+                                        color: "#2563eb",
+                                        marginTop: 2,
+                                        fontWeight: 500
+                                    }}>
+                                        {new Date().toLocaleDateString()}
+                                    </span>
+                                </div>
                             </div>
 
                             {/* Datos del cliente */}
                             <div
                                 style={{
-                                    marginBottom: 24,
+                                    marginBottom: 16, // menos espacio
                                     border: "1px solid #93c5fd",
                                     borderRadius: 10,
-                                    padding: 16,
+                                    padding: 10, // menos padding
                                     background: "#f1f5f9"
                                 }}
                                 className="responsive-datos-cliente"
@@ -291,50 +366,70 @@ const Presupuestos = () => {
                                 <h3 style={{
                                     fontWeight: 700,
                                     color: "#2563eb",
-                                    marginBottom: 8,
+                                    marginBottom: 6,
                                     letterSpacing: 1,
                                     textTransform: "uppercase",
                                     fontSize: 13
                                 }}>Datos del cliente</h3>
                                 <div
+                                    className="responsive-datos-grid"
                                     style={{
                                         display: "grid",
                                         gridTemplateColumns: "1fr 1fr",
-                                        gap: 12,
+                                        gap: 8,
                                         maxWidth: 700
                                     }}
-                                    className="responsive-datos-grid"
                                 >
-                                    {inputFields
-                                        .filter(field => field.name !== "pie" && field.name !== "agregarIVA")
-                                        .map((field, index) => (
-                                            <div key={index} style={{ display: "flex", flexDirection: "column" }}>
-                                                <Field
-                                                    type={field.type || "text"}
-                                                    name={field.name}
-                                                    placeholder={field.placeholder}
-                                                    value={values[field.name]}
-                                                    onChange={handleChange}
-                                                    onBlur={handleBlur}
-                                                    style={{
-                                                        borderBottom: "1px solid #93c5fd",
-                                                        background: "transparent",
-                                                        padding: "6px 8px",
-                                                        fontSize: 15,
-                                                        color: "#222",
-                                                        outline: "none"
-                                                    }}
-                                                />
-                                                <ErrorMessage
-                                                    name={field.name}
-                                                    render={msg => (
-                                                        <div style={{ color: "#ef4444", fontSize: 12, marginTop: 2 }}>
-                                                            {msg}
-                                                        </div>
-                                                    )}
-                                                />
-                                            </div>
-                                        ))}
+                                    <div>
+                                        <Field
+                                            name="nombre"
+                                            placeholder="Nombre del cliente"
+                                            value={values.nombre}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            style={{
+                                                borderBottom: "1px solid #93c5fd",
+                                                background: "transparent",
+                                                padding: "4px 8px",
+                                                fontSize: 15,
+                                                color: "#222",
+                                                outline: "none"
+                                            }}
+                                        />
+                                        <ErrorMessage
+                                            name="nombre"
+                                            render={msg => (
+                                                <div style={{ color: "#ef4444", fontSize: 12, marginTop: 2 }}>
+                                                    {msg}
+                                                </div>
+                                            )}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Field
+                                            name="telefono"
+                                            placeholder="Teléfono"
+                                            value={values.telefono}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            style={{
+                                                borderBottom: "1px solid #93c5fd",
+                                                background: "transparent",
+                                                padding: "4px 8px",
+                                                fontSize: 15,
+                                                color: "#222",
+                                                outline: "none"
+                                            }}
+                                        />
+                                        <ErrorMessage
+                                            name="telefono"
+                                            render={msg => (
+                                                <div style={{ color: "#ef4444", fontSize: 12, marginTop: 2 }}>
+                                                    {msg}
+                                                </div>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
@@ -357,23 +452,59 @@ const Presupuestos = () => {
                                     }}
                                 >
                                     <table
+                                        className="responsive-productos-table"
                                         style={{
                                             width: "100%",
+                                            minWidth: 700,
                                             borderCollapse: "collapse",
                                             background: "#f1f5f9",
                                             fontSize: 15,
                                             borderRadius: 8,
-                                            overflow: "hidden"
+                                            overflow: "visible",
+                                            fontFamily: "inherit"
                                         }}
-                                        className="responsive-productos-table"
                                     >
                                         <thead>
                                             <tr style={{ background: "#2563eb" }}>
-                                                <th style={{ padding: 10, color: "#fff", textAlign: "left", borderTopLeftRadius: 8 }}>Descripción</th>
-                                                <th style={{ padding: 10, color: "#fff", textAlign: "left" }}>Cantidad</th>
-                                                <th style={{ padding: 10, color: "#fff", textAlign: "left" }}>P/U</th>
-                                                <th style={{ padding: 10, color: "#fff", textAlign: "left" }}>Descuentos</th>
-                                                <th style={{ padding: 10, color: "#fff", textAlign: "left", borderTopRightRadius: 8 }}>Sub Total</th>
+                                                <th style={{
+                                                    padding: "8px 8px", // reducido
+                                                    color: "#fff",
+                                                    textAlign: "left",
+                                                    borderTopLeftRadius: 8,
+                                                    whiteSpace: "normal",
+                                                    wordBreak: "break-word",
+                                                    lineHeight: 1.0, // reducido
+                                                    fontFamily: "inherit"
+                                                }}>Descripción</th>
+                                                <th style={{
+                                                    padding: "8px 8px", // reducido
+                                                    color: "#fff",
+                                                    textAlign: "left",
+                                                    lineHeight: 1.0, // reducido
+                                                    fontFamily: "inherit"
+                                                }}>Cantidad</th>
+                                                <th style={{
+                                                    padding: "8px 8px", // reducido
+                                                    color: "#fff",
+                                                    textAlign: "left",
+                                                    lineHeight: 1.0, // reducido
+                                                    fontFamily: "inherit"
+                                                }}>P/U</th>
+                                                <th style={{
+                                                    padding: "8px 8px", // reducido
+                                                    color: "#fff",
+                                                    textAlign: "left",
+                                                    lineHeight: 1.0, // reducido
+                                                    fontFamily: "inherit"
+                                                }}>Descuentos</th>
+                                                <th style={{
+                                                    padding: "8px 8px", // reducido
+                                                    color: "#fff",
+                                                    textAlign: "left",
+                                                    borderTopRightRadius: 8,
+                                                    lineHeight: 1.0, // reducido
+                                                    fontFamily: "inherit"
+                                                }}>Sub Total</th>
                                                 <th style={{ padding: 10 }}></th>
                                             </tr>
                                         </thead>
@@ -382,10 +513,7 @@ const Presupuestos = () => {
                                                 <tr key={i} style={{
                                                     background: "#fff",
                                                     transition: "background 0.2s"
-                                                }}
-                                                    onMouseOver={e => (e.currentTarget.style.background = "#e0e7ff")}
-                                                    onMouseOut={e => (e.currentTarget.style.background = "#fff")}
-                                                >
+                                                }}>
                                                     <ItemFilaProducto
                                                         producto={producto.producto}
                                                         cantidad={producto.cantidad}
@@ -493,6 +621,7 @@ const Presupuestos = () => {
                                         }}
                                         rows={2}
                                         placeholder="Agrega aquí una dirección u observación si es necesario..."
+                                        name="pie"
                                         value={values.pie}
                                         onChange={handleChange}
                                     />
@@ -541,6 +670,102 @@ const Presupuestos = () => {
                                 font-size: 11px !important;
                                 padding: 3px !important;
                             }
+                        }
+                        @media print {
+                          @page {
+                            margin-top: 0cm !important;
+                            margin-bottom: 0cm !important;
+                            margin-left: 1cm !important;
+                            margin-right: 1cm !important;
+                            size: letter portrait;
+                          }
+                          html, body {
+                            margin: 0!important;
+                            padding: 0 !important;
+                            height: 100% !important;
+                            width: 100% !important;
+                            box-sizing: border-box !important;
+                            background: #f9fafb !important;
+                          }
+                          body * {
+                            visibility: hidden !important;
+                          }
+                          .presupuesto-bg {
+                            display: block !important;
+                            align-items: unset !important;
+                            justify-content: unset !important;
+                            padding: 0 !important;
+                            margin: 0 !important;
+                            min-height: 0 !important;
+                            height: auto !important;
+                          }
+                          .barra-azul-decorativa {
+                            height: 0 !important;
+                            margin-bottom: 0 !important;
+                            padding: 0 !important;
+                            border: none !important;
+                          }
+                          .encabezado-presupuesto {
+                            margin-top: 0 !important;
+                            padding-top: 0 !important;
+                          }
+                          .responsive-presupuesto-container, .responsive-presupuesto-container * {
+                            visibility: visible !important;
+                          }
+                          .responsive-presupuesto-container {
+                            margin-top: 0 !important;
+                            padding-top: 0 !important;
+                            margin-bottom: 0 !important;
+                            padding-bottom: 0 !important;
+                            box-shadow: none !important;
+                            border-radius: 0 !important;
+                            border: none !important;
+                            background: #f9fafb !important;
+                            display: block !important;
+                          }
+                          .responsive-datos-grid {
+                            display: grid !important;
+                            grid-template-columns: 1fr 1fr !important;
+                            gap: 8px !important;
+                          }
+                          .responsive-productos-table td,
+                          .responsive-productos-table th,
+                          .responsive-productos-table tr > td,
+                          .responsive-productos-table tr > th,
+                          .compact-td {
+                            padding: 2px 4px !important;
+                            line-height: 1.05 !important;
+                            font-size: 10px !important;
+                            vertical-align: middle !important;
+                            white-space: normal !important;
+                            word-break: break-word !important;
+                          }
+                          button, .print\:hidden {
+                            display: none !important;
+                          }
+                        }
+
+                        .compact-td {
+                          padding: 6px 8px !important;
+                          line-height: 1.1 !important;
+                          font-size: 15px !important;
+                          vertical-align: middle !important;
+                          white-space: normal !important;
+                          word-break: break-word !important;
+                        }
+                        @media print {
+                          .responsive-productos-table td,
+                          .responsive-productos-table th,
+                          .responsive-productos-table tr > td,
+                          .responsive-productos-table tr > th,
+                          .compact-td {
+                            padding: 2px 4px !important;
+                            line-height: 1.05 !important;
+                            font-size: 10px !important;
+                            vertical-align: middle !important;
+                            white-space: normal !important;
+                            word-break: break-word !important;
+                          }
                         }
                         `}
                         </style>

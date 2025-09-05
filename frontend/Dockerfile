@@ -11,7 +11,7 @@ RUN npm run build
 
 # Muestra el contenido del directorio src para depurar
 RUN ls -l src
-RUN ls -l src/constants
+#RUN ls -l src/constants
 RUN npm run build
 
 # Etapa 2: Servir con Nginx

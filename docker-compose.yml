@@ -1,5 +1,5 @@
 services:
-  app_lbf:
+  app_24bet:
     build: 
       context: backend
       dockerfile: Dockerfile
